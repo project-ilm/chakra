@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<!--
+  CHAKRA — Temporal Cycle Observatory · index.html (thin shell).
+  Reads the URL: ?api=... returns JSON (headless); otherwise mounts the UI.
+  All computation lives in the separate library: src/chakra-core.js.
+  Copyright (C) 1993-2026 Abhishek Choudhary. Sole author. SPDX: GPL-3.0-or-later.
+  DISCLAIMER: study/heritage computation only — not for navigation, muhurta-critical, or safety-critical use.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>CHAKRA — Temporal Cycle Observatory</title>
+<style>
+  :root{
+    --bg:#05070e; --bg2:#0a0e1a; --panel:rgba(18,24,40,.72); --panelb:rgba(70,199,214,.16);
+    --ink:#dce6f2; --dim:#7385a0; --faint:#3d4b64;
+    --cy:#46c7d6; --cy2:#5fe3ff; --amber:#e6b450; --grn:#5fe39a; --mag:#d96fb0; --vio:#8b7cf0;
+    --sun:#e6b450;--moon:#cdd6e0;--mercury:#9fb0c0;--venus:#d08a5a;--mars:#e0685a;--jupiter:#d9b24a;--saturn:#8a97b8;--uranus:#46c7d6;--neptune:#6f8be0;--pluto:#9b6fd6;--rahu:#a878d0;--ketu:#6fb0a0;
+    --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.5;-webkit-text-size-adjust:100%}
+  body{min-height:100vh;padding:16px;
+    background:
+      radial-gradient(1000px 600px at 85% -8%, rgba(70,199,214,.10), transparent 55%),
+      radial-gradient(900px 500px at 5% 110%, rgba(139,124,240,.10), transparent 55%),
+      repeating-linear-gradient(0deg, rgba(120,140,180,.025) 0 1px, transparent 1px 42px),
+      repeating-linear-gradient(90deg, rgba(120,140,180,.025) 0 1px, transparent 1px 42px),
+      var(--bg);
+    max-width:1320px;margin:0 auto}
+  h1,h2,h3{font-family:var(--sans);font-weight:600;margin:0}
+  .eyebrow{font-size:10px;letter-spacing:.36em;text-transform:uppercase;color:var(--dim)}
+  a{color:var(--cy)}
+  header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(70,199,214,.18);margin-bottom:14px}
+  .brand{display:flex;align-items:baseline;gap:12px}
+  h1{font-size:23px;letter-spacing:.14em}
+  h1 .dot{color:var(--cy2);text-shadow:0 0 12px var(--cy)}
+  .sub{font-size:11px;color:var(--dim);max-width:52ch}
+  .glyphrow{font-size:17px;letter-spacing:.14em;color:var(--dim)}
+
+  .panel{background:var(--panel);border:1px solid var(--panelb);border-radius:8px;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+  .glow{box-shadow:0 0 0 1px rgba(70,199,214,.05),0 8px 40px rgba(0,0,0,.5),inset 0 0 60px rgba(70,199,214,.02)}
+
+  .controls{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px}
+  @media(max-width:800px){.controls{grid-template-columns:1fr}}
+  .ctlpanel{padding:13px 14px}
+  .ctlpanel h3{font-size:12px;letter-spacing:.04em;margin-bottom:10px;color:var(--ink);display:flex;align-items:center;gap:8px}
+  .ctlpanel h3::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cy);box-shadow:0 0 8px var(--cy)}
+  label.lb{display:block;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0 0 4px}
+  input,select,textarea{width:100%;background:rgba(5,9,18,.7);border:1px solid rgba(90,110,150,.28);color:var(--ink);font-family:var(--mono);font-size:13px;padding:7px 9px;border-radius:5px}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cy);box-shadow:0 0 0 2px rgba(70,199,214,.18)}
+  textarea{resize:vertical;min-height:96px;line-height:1.45}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  .fld{margin-bottom:9px}
+  .evcount{font-size:11px;color:var(--grn);margin-top:5px}
+  .chiprow{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+  .chip{font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid rgba(90,110,150,.3);background:rgba(5,9,18,.5);color:var(--dim);cursor:pointer;user-select:none;transition:.13s;display:flex;align-items:center;gap:5px}
+  .chip .g{font-size:13px}
+  .chip.on{color:var(--bg);font-weight:600}
+  .chip:hover{border-color:var(--cy)}
+
+  .tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;padding:5px;border-radius:10px}
+  .tab{flex:1;min-width:96px;text-align:center;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:9px 8px;border-radius:7px;cursor:pointer;color:var(--dim);border:1px solid transparent;transition:.13s;white-space:nowrap}
+  .tab:hover{color:var(--ink)}
+  .tab.on{color:var(--cy2);border-color:var(--panelb);background:rgba(70,199,214,.08);box-shadow:0 0 18px rgba(70,199,214,.12),inset 0 0 20px rgba(70,199,214,.05)}
+
+  .view{display:none}
+  .view.on{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .vpanel{padding:14px}
+  .vhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
+  .vhead h2{font-size:16px;letter-spacing:.02em}
+  .vhead .h{font-size:11px;color:var(--dim);max-width:60ch}
+
+  svg{display:block;width:100%;height:auto;overflow:visible}
+  .readout{font-size:12px;color:var(--dim);margin-top:10px;border-top:1px dotted rgba(90,110,150,.25);padding-top:9px}
+  .readout b{color:var(--ink)}
+  .miniopts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 4px}
+  .miniopts .seg{display:flex;gap:2px;background:rgba(5,9,18,.6);border:1px solid rgba(90,110,150,.25);border-radius:7px;padding:2px}
+  .miniopts .seg button{font-size:11px;padding:5px 10px;border-radius:5px;border:none;background:transparent;color:var(--dim);cursor:pointer;font-family:var(--mono)}
+  .miniopts .seg button.on{background:rgba(70,199,214,.16);color:var(--cy2)}
+  .miniopts label.lb{margin:0 6px 0 0;display:inline}
+
+  button.act{background:rgba(70,199,214,.08);border:1px solid var(--panelb);color:var(--cy2);font-family:var(--mono);font-size:12px;padding:9px 15px;border-radius:6px;cursor:pointer;transition:.13s;letter-spacing:.04em}
+  button.act:hover{background:rgba(70,199,214,.16);box-shadow:0 0 16px rgba(70,199,214,.2)}
+  button.act.ai{border-color:rgba(139,124,240,.4);color:var(--vio)}
+  button.act.ai:hover{background:rgba(139,124,240,.14);box-shadow:0 0 16px rgba(139,124,240,.22)}
+
+  .reslist{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+  .resrow{display:flex;align-items:baseline;gap:10px;padding:8px 11px;border-radius:6px;background:rgba(5,9,18,.5);border:1px solid rgba(90,110,150,.2);cursor:pointer;font-size:12.5px}
+  .resrow:hover{border-color:var(--cy)}
+  .resrow .g{font-size:15px;width:20px;text-align:center}
+  .resrow .nm{flex:1}
+  .resrow .val{color:var(--grn);font-variant-numeric:tabular-nums}
+  .resrow .p2{color:var(--dim);font-variant-numeric:tabular-nums}
+  .headline{font-size:12.5px;background:rgba(70,199,214,.06);border:1px solid var(--panelb);border-left:3px solid var(--cy);border-radius:6px;padding:10px 12px;margin-bottom:10px}
+  .headline .em{color:var(--cy2)}
+  .empty{font-size:12px;color:var(--dim);border:1px dashed rgba(90,110,150,.3);border-radius:6px;padding:12px;text-align:center}
+  .prompt-box{width:100%;min-height:150px;font-size:11.5px;background:rgba(5,9,18,.75);color:var(--ink);border:1px solid rgba(90,110,150,.3);border-radius:6px;padding:11px;line-height:1.5;white-space:pre-wrap}
+  .aibtns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+  .legend{display:flex;flex-wrap:wrap;gap:6px 15px;font-size:11px;color:var(--dim);margin-top:9px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+  .kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dotted rgba(90,110,150,.22);font-size:12.5px}
+  .kv:last-child{border:0}.kv .k{color:var(--dim)}.kv .v{color:var(--ink);text-align:right}
+  .grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:760px){.grid-2col{grid-template-columns:1fr}}
+  footer{margin-top:18px;padding-top:12px;border-top:1px solid rgba(70,199,214,.14);font-size:10.5px;color:var(--faint);line-height:1.6}
+  .pulse{animation:pulse 2.6s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+  @media(prefers-reduced-motion:reduce){.pulse,.view.on{animation:none}}
+
+@media print{
+  body{background:#fff!important;color:#111!important}
+  header,.controls,.tabs,button,input,select,textarea,.finestrip{display:none!important}
+  .view{display:none!important}
+  #v-almanac{display:block!important}
+  .panel,.vpanel{background:#fff!important;border:1px solid #999!important;box-shadow:none!important;filter:none!important}
+  #v-almanac *{color:#111!important;text-shadow:none!important}
+  #festRead{max-height:none!important;overflow:visible!important}
+}
+</style>
+</head>
+<body>
+<style>
+  .epochbar{display:flex;align-items:center;gap:12px;margin:2px 0 14px;padding:9px 13px;background:rgba(5,9,18,.55);border:1px solid var(--panelb);border-radius:9px}
+  .epochbar .epochval{font-size:16px;color:var(--cy2);min-width:72px;text-align:right;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(70,199,214,.4)}
+  .instr-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:20px;align-items:start}
+  @media(max-width:880px){.instr-grid{grid-template-columns:1fr}}
+  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:rgba(90,110,150,.3);border-radius:3px;outline:none;padding:0}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--cy2);box-shadow:0 0 9px var(--cy);cursor:pointer;border:none}
+  input[type=range]::-moz-range-thumb{width:17px;height:17px;border:none;border-radius:50%;background:var(--cy2);box-shadow:0 0 9px var(--cy);cursor:pointer}
+  .epochbar input[type=range]{flex:1}
+  .finestrip{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px;padding:11px 13px;background:rgba(5,9,18,.42);border:1px solid var(--panelb);border-radius:8px}
+  .finestrip .fc{flex:1;min-width:130px}
+  .finestrip .fc .lb{margin-bottom:5px}
+  .finestrip .fc input[type=range]{width:100%}
+  .finestrip .val{color:var(--cy2)}
+  .momcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
+  .mcard{background:rgba(5,9,18,.55);border:1px solid var(--panelb);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s}
+  .mcard:hover{border-color:var(--cy)}
+  .mcard .mk{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
+  .mcard .mv{font-size:13px;color:var(--ink);line-height:1.45}
+  .mcard .mv b{color:var(--cy2);font-weight:600}
+  .mcard .big{font-size:20px;margin-right:6px;vertical-align:-2px}
+  #liveBtn.on{color:#0a0;border-color:#0a0;text-shadow:0 0 6px rgba(0,255,0,.5)}
+  .skyN{fill:#03060f}.skyA{fill:#071022}.skyU{fill:#0d1830}.skyC{fill:#1a2a4a}.skyD{fill:#2b4a7a}
+</style>
+
+<header>
+  <div class="brand">
+    <div>
+      <div class="eyebrow">Temporal Cycle Observatory</div>
+      <h1>CHAKRA<span class="dot">◉</span></h1>
+    </div>
+    <p class="sub">Fold dated events onto every graha, daśā and planetary cycle at once. Find the frequency, read the sky, hand the result to an AI.</p>
+  </div>
+  <div class="glyphrow pulse">☉ ☾ ☿ ♀ ♂ ♃ ♄ ♅ ♆ ☊ ☋</div>
+</header>
+
+<div class="controls">
+  <div class="ctlpanel panel glow">
+    <h3>Events &amp; signal</h3>
+    <label class="lb">Paste events — CSV / TSV / one per line · <span style="color:var(--faint)">YYYY-MM-DD, label &nbsp;|&nbsp; YYYY, label</span></label>
+    <textarea id="events">1990, first marker
+1993, second marker
+1996, third marker
+2005, fourth marker
+2017, fifth marker
+2026, sixth marker</textarea>
+    <div class="evcount" id="evCount"></div>
+    <div class="grid2" style="margin-top:9px">
+      <div class="fld"><label class="lb">Epoch — drag any dial</label><input id="anchor" value="1990"></div>
+      <div class="fld"><label class="lb">Alignment tol ± yr</label><input id="tol" value="1"></div>
+    </div>
+    <label class="lb" style="margin-top:2px">Active cycles</label>
+    <div class="chiprow" id="cycleChips"></div>
+  </div>
+
+  <div class="ctlpanel panel glow">
+    <h3>Reference moment &amp; place</h3>
+    <div class="grid2">
+      <div class="fld"><label class="lb">Date</label><input type="date" id="refDate" value="2026-07-04"></div>
+      <div class="fld"><label class="lb">Time</label><input type="time" id="refTime" value="12:00"></div>
+    </div>
+    <div class="grid3">
+      <div class="fld"><label class="lb">TZ offset (h)</label><input id="tz" value="5.5"></div>
+      <div class="fld"><label class="lb">Latitude</label><input id="lat" value="28.61"></div>
+      <div class="fld"><label class="lb">Longitude</label><input id="lon" value="77.21"></div>
+    </div>
+    <div class="finestrip">
+      <div class="fc"><label class="lb">Date</label><input type="date" id="fDate"></div>
+      <div class="fc"><label class="lb">Time <span class="val" id="fTimeLbl"></span></label><input type="range" id="fTime" min="0" max="1439" step="1"></div>
+      <div class="fc"><label class="lb">Latitude <span class="val" id="fLatLbl"></span></label><input type="range" id="fLat" min="-66" max="66" step="0.05"></div>
+      <div class="fc"><label class="lb">Longitude <span class="val" id="fLonLbl"></span></label><input type="range" id="fLon" min="-180" max="180" step="0.05"></div>
+      <div style="display:flex;gap:6px;flex:none">
+        <button class="act" id="nowBtn">now ⟳</button>
+        <button class="act" id="liveBtn">● live</button>
+        <button class="act" id="gpsBtn" title="use device location">⌖ GPS</button>
+        <button class="act" id="globeBtn" title="pick on globe">🌍</button>
+      </div>
+    </div>
+    <div id="globeWrap" style="display:none;margin-top:4px">
+      <svg id="globe" viewBox="0 0 300 300" style="width:min(300px,100%);touch-action:none;cursor:grab"></svg>
+      <div class="lb" style="margin-top:4px">drag to spin · tap to set place · <span id="globeRead" style="color:var(--cy2)"></span></div>
+    </div>
+    <label class="lb" style="margin-top:2px">Zodiac</label>
+    <div class="miniopts"><div class="seg" id="zodiacSeg">
+      <button data-z="sidereal" class="on">Sidereal (Lahiri)</button>
+      <button data-z="tropical">Tropical</button>
+    </div></div>
+    <div class="readout" style="margin-top:8px;border:0;padding:0" id="momentRead"></div>
+  </div>
+</div>
+
+<div class="tabs panel">
+  <div class="tab on" data-v="orrery">◉ Observatory</div>
+  <div class="tab" data-v="timeline">Timeline</div>
+  <div class="tab" data-v="wave">Waveforms</div>
+  <div class="tab" data-v="spectrum">Spectrum</div>
+  <div class="tab" data-v="chaos">Dynamics</div>
+  <div class="tab" data-v="lagna">Lagna</div>
+  <div class="tab" data-v="sky">Sky</div>
+  <div class="tab" data-v="almanac">Almanac</div>
+  <div class="tab" data-v="optimize">Optimise + AI</div>
+</div>
+
+<div class="view on" id="v-orrery">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>The mechanism</h2><span class="h">Drag <em>any</em> ring to turn the whole geared orrery — every dial rotates in proportion to its period and the epoch scrubs beneath your events. The waveforms alongside shift with it; slide until the peaks sit on the event marks.</span></div>
+    <div class="epochbar">
+      <span class="eyebrow">Epoch</span>
+      <input type="range" id="epochSlider" min="1900" max="2040" step="0.1" value="1990">
+      <span class="epochval" id="epochVal">1990.0</span>
+    </div>
+    <div class="instr-grid">
+      <div>
+        <svg id="orrery" viewBox="0 0 640 640" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
+        <div class="legend">
+          <span><i style="background:var(--amber)"></i>event</span>
+          <span><i style="background:var(--cy2)"></i>now-hand</span>
+          <span><i style="background:var(--grn)"></i>coherent ring</span>
+          <span style="color:var(--cy2)">◈ drag a ring to crank the epoch</span>
+        </div>
+      </div>
+      <div>
+        <div class="miniopts"><label class="lb">Waveform · <span style="color:var(--faint)">drag the graph ⇄ to scrub the epoch</span></label>
+          <div class="seg wavesel">
+            <button data-w="sine" class="on">Sine</button><button data-w="rectified">Rectified</button><button data-w="square">Square</button><button data-w="triangle">Triangle</button><button data-w="saw">Saw</button>
+          </div>
+        </div>
+        <svg id="orreryWave" viewBox="0 0 620 600" preserveAspectRatio="xMidYMid meet" style="touch-action:pan-y;cursor:grab"></svg>
+      </div>
+    </div>
+    <div class="momcards" id="momCards"></div>
+  </div>
+</div>
+
+<div class="view" id="v-timeline">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Timeline stave</h2><span class="h">Linear view: events as gold standards, each active cycle as a return comb, green bands where two or more cycles align.</span></div>
+    <svg id="stave" viewBox="0 0 1160 300" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="legend">
+      <span><i style="background:var(--amber)"></i>event</span>
+      <span><i style="background:var(--grn)"></i>return on an event / conjunction</span>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="v-wave">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Waveform superposition</h2><span class="h">Render each cycle as a waveform and stack them. Rectified doubles the beat — hard aspects fire at conjunction <em>and</em> opposition.</span></div>
+    <div class="miniopts">
+      <label class="lb">Waveform</label>
+      <div class="seg wavesel" id="waveSeg">
+        <button data-w="sine" class="on">Sine</button>
+        <button data-w="rectified">Rectified</button>
+        <button data-w="square">Square</button>
+        <button data-w="triangle">Triangle</button>
+        <button data-w="saw">Saw</button>
+      </div>
+      <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--dim);cursor:pointer"><input type="checkbox" id="showSum" checked style="width:auto"> show superposition</label>
+    </div>
+    <svg id="wave" viewBox="0 0 1160 380" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+</div>
+
+<div class="view" id="v-spectrum">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Phase-coherence spectrum</h2><span class="h">Rayleigh power vs trial period over your irregular event times. Peaks are candidate cycles; dashed guides mark the named grahas and daśās.</span></div>
+    <svg id="spectrum" viewBox="0 0 1160 400" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="readout" id="spectrumRead"></div>
+  </div>
+</div>
+
+<div class="view" id="v-chaos">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Dynamics &amp; chaos</h2><span class="h">The event intervals as a dynamical system, and what commensurability tells us about long-run predictability.</span></div>
+    <div class="grid-2col">
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">Poincaré return map — Δₙ vs Δₙ₊₁</div>
+        <svg id="returnmap" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="readout" id="chaosRead1"></div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">Commensurability of active cycles</div>
+        <div id="chaosRead2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="v-lagna">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Lagna &amp; graha positions</h2><span class="h">Rāśi chart and sky-dial. Retrograde ℞, below-horizon dimmed, above-horizon arc shaded. <b>Drag the Asc hand</b> — the observatory solves for the nearest time with that ascendant.</span></div>
+    <div class="grid-2col">
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">South-Indian rāśi chart</div>
+        <svg id="rasi" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">Sky dial — drag Asc to time-travel</div>
+        <svg id="skydial" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
+        <div id="lagnaRead" style="margin-top:8px"></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px">
+      <div><div class="eyebrow" style="margin-bottom:6px">Yogas at this moment · janma-kuṇḍalī reading</div><div id="yogaRead"></div></div>
+      <div><div class="eyebrow" style="margin-bottom:6px">Vimśottarī daśā · from this Moon</div><div id="dashaRead"></div></div>
+      <div><div class="eyebrow" style="margin-bottom:6px">Telescope · RA/Dec · Alt/Az</div><div id="telescopeRead"></div></div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="v-sky">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Night sky</h2><span class="h">The same ephemeris, pointed at the actual sky: planets, Moon with phase, ☊☋ nodes on the ecliptic, and 45 stars including every nakṣatra yogatārā. Drag to look around. On a phone, enable sensors and hold the screen to the sky.</span></div>
+    <div class="finestrip" style="margin-bottom:10px">
+      <div class="fc" style="flex:none;min-width:auto"><div class="seg" id="skyModeSeg"><button data-m="dome" class="on">Dome</button><button data-m="ar">Point (AR)</button></div></div>
+      <div class="fc"><label class="lb">FOV <span class="val" id="fovLbl">70°</span></label><input type="range" id="fovSlider" min="25" max="110" step="1" value="70"></div>
+      <div style="display:flex;gap:6px;flex:none">
+        <button class="act" id="sensorBtn">enable sensors</button>
+        <label class="lb" style="display:flex;align-items:center;gap:5px;margin:0"><input type="checkbox" id="yogChk" checked> yogatārā names</label>
+      </div>
+      <span class="lb" id="sensorStat" style="flex:1;min-width:120px"></span>
+    </div>
+    <svg id="skyview" viewBox="0 0 700 700" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab;border-radius:12px"></svg>
+    <div class="lb" style="margin-top:6px">Dome: zenith at centre, horizon at rim, N top / E left (as seen looking up). AR: drag ⇄ to calibrate azimuth against a known object. Star positions J2000 + precession; yogatārā = traditional junction star (its longitude need not fall inside the equal-division nakṣatra span).</div>
+  </div>
+</div>
+
+<div class="view" id="v-almanac">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Sky almanac &amp; world calendars</h2><span class="h">The reference moment read across traditions — moon phase, pañchāṅga, eclipses within ±18 months, and eight calendar systems.</span></div>
+    <div class="grid-2col">
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">Moon</div>
+        <div style="display:flex;gap:16px;align-items:center"><svg id="moonSvg" viewBox="0 0 140 140" style="width:130px;flex:none"></svg><div style="flex:1" id="moonRead"></div></div>
+        <div class="eyebrow" style="margin:16px 0 6px">Pañchāṅga &amp; lunar mansions</div>
+        <div id="panchangaRead"></div>
+        <div class="eyebrow" style="margin:16px 0 6px">Eclipses · ±18 months <span style="color:var(--faint)">· click a row to jump</span></div>
+        <div id="eclipseRead"></div>
+        <div class="eyebrow" style="margin:16px 0 6px">Sun–Earth–Moon geometry <span style="color:var(--faint)">· drag the Moon — time follows</span></div>
+        <svg id="eclGeo" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
+        <div style="display:flex;gap:8px;margin-top:6px">
+          <button class="act" id="prevEcl">◀ prev eclipse</button>
+          <button class="act" id="nextEcl">next eclipse ▶</button>
+          <span class="lb" id="eclGeoRead" style="flex:1"></span>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow" style="margin-bottom:6px">World calendars — same instant</div>
+        <div id="calRead"></div>
+        <div class="eyebrow" style="margin:14px 0 6px">Festivals &amp; observances — <span id="festYear"></span> <button class="act" onclick="window.print()" style="float:right">🖨 print almanac</button></div>
+        <div id="festRead" style="max-height:340px;overflow:auto"></div>
+        <p style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.65">Traditions spanned: <b>Indic</b> (grahas, daśās, Jaimini, pañchāṅga, Kali / Samvatsara) · <b>Islamic</b> (Hijrī, tabular) · <b>Sufi</b> (28 manāzil al-qamar) · <b>Buddhist</b> (Tibetan Rabjung / Kālachakra 60-yr) · <b>Chinese</b> (sexagenary stem–branch) · <b>Western</b> (tropical planets, precessional age) · <b>Mayan</b> (Long Count, Tzolk'in, Haab') · plus eclipse / lunisolar cycles (Saros, Metonic). Hijrī and Samvatsara are arithmetic and can differ ±1 day / shift at Chaitra; eclipse flags use the Sun–node distance and don't resolve annular vs total.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="view" id="v-optimize">
+  <div class="vpanel panel glow">
+    <div class="vhead"><h2>Optimiser &amp; AI hand-off</h2><span class="h">Search all periods for the best fit to your events under the chosen waveform, then open the finding in an AI with web search.</span></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
+      <button class="act" id="runOpt">▶ Optimise fit</button>
+      <button class="act" id="runTile">Exact interval tilings</button>
+    </div>
+    <div class="headline" id="optHead">Run the optimiser to rank every period by how tightly your events lock onto it.</div>
+    <div id="optResults" class="reslist"></div>
+    <div style="margin-top:16px" class="eyebrow">AI analysis hand-off</div>
+    <p style="font-size:11.5px;color:var(--dim);margin:6px 0">Prompt is built from your events, the best-fit periods, spectral peaks and — if computed — the lagna. Opens a new chat with web search.</p>
+    <textarea class="prompt-box" id="aiPrompt" readonly></textarea>
+    <div class="aibtns">
+      <button class="act ai" id="openClaude">◈ Open in Claude</button>
+      <button class="act ai" id="openGPT">Open in ChatGPT</button>
+      <button class="act ai" id="openPplx">Open in Perplexity</button>
+      <button class="act" id="copyPrompt">⧉ Copy prompt</button>
+    </div>
+  </div>
+</div>
+
+<footer id="foot"></footer>
+
+<script src="src/chakra-core.js"></script>
+<script src="src/chakra-kernel.js"></script>
+<script src="src/chakra-api.js"></script>
+<script src="src/chakra-ui.js"></script>
+<script>
+/* Dispatcher: URL API mode vs interactive UI. Copyright (C) 1993-2026 Abhishek Choudhary. GPL-3.0-or-later. */
+(function(){
+  var params=new URLSearchParams(location.search);
+  if(params.get("api")){
+    var res=ChakraAPI.handle(params);
+    var ep=String(res.endpoint||"").replace(/[^a-z0-9]/g,"");   /* belt-and-braces: never interpolate raw input */
+    document.open();
+    document.write('<!doctype html><meta charset="utf-8"><title>CHAKRA API · '+ep+'</title>'+
+      '<style>body{margin:0;background:#0b1020;color:#cfe;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace}'+
+      'pre{padding:20px;white-space:pre-wrap;word-break:break-word}a{color:#8fd}h1{font:600 14px system-ui;padding:14px 20px;margin:0;border-bottom:1px solid #23304d;color:#9fb}</style>'+
+      '<h1>CHAKRA · /api/'+ep+' · application/json</h1><pre>'+
+      res.body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</pre>');
+    document.close();
+  } else {
+    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",ChakraUI.mount);
+    else ChakraUI.mount();
+  }
+})();
+</script>
+</body>
+</html>
