@@ -1,0 +1,274 @@
+<!doctype html>
+<!--
+  CHAKRA — Interstellar Tour Planner.
+  Real stars, real relativity, zero engineering: pick a destination and a
+  fraction of light-speed; watch Earth-years and ship-years disagree; read
+  your arrival date in ten calendars, computed by the same core as the
+  observatory. No fuel was harmed — kinematics only.
+
+  Copyright (C) 1993-2026 Abhishek Choudhary. Sole author.
+  SPDX-License-Identifier: GPL-3.0-or-later · text CC BY-SA 4.0
+  Distributed WITHOUT ANY WARRANTY. For play and study; see DISCLAIMER.md.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interstellar Tour — CHAKRA</title>
+<meta name="description" content="Plan a voyage to a real nearby star at a fraction of light-speed. Lorentz time dilation done honestly: Earth-frame vs ship time, and your arrival date in ten calendars.">
+<style>
+  :root{
+    --bg:#05070e; --bg2:#0a0e1a; --panel:rgba(18,24,40,.72); --panelb:rgba(70,199,214,.16);
+    --ink:#dce6f2; --dim:#7385a0; --faint:#3d4b64;
+    --cy:#46c7d6; --cy2:#5fe3ff; --amber:#e6b450; --grn:#5fe39a; --mag:#d96fb0; --vio:#8b7cf0;
+    --gold:#d8a94e; --paper:#e8ecf7;
+    --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --serif:Georgia,"Times New Roman",Cambria,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.6}
+  a{color:var(--cy)}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  header.top{padding:26px 0 8px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4.6vw,44px);letter-spacing:.05em;color:var(--paper);margin:4px 0 6px}
+  .sub{color:var(--dim);max-width:72ch}
+  nav.crumbs{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11.5px;margin-top:12px}
+  nav.crumbs a{color:var(--dim);text-decoration:none}
+  nav.crumbs a:hover{color:var(--cy2)}
+  .console{background:var(--panel);border:1px solid var(--panelb);border-radius:14px;padding:20px 22px;margin-top:20px;backdrop-filter:blur(9px)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:760px){.grid{grid-template-columns:1fr}}
+  label.f{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin:12px 0 5px}
+  select,input[type=number]{width:100%;background:var(--bg2);color:var(--ink);border:1px solid var(--panelb);border-radius:8px;padding:8px 10px;font:inherit;font-size:13px}
+  input[type=range]{width:100%;accent-color:var(--cy)}
+  .drives{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .drives button{font-family:var(--mono);font-size:10px;color:var(--dim);background:none;border:1px solid var(--panelb);border-radius:999px;padding:3px 9px;cursor:pointer}
+  .drives button:hover{color:var(--cy2)}
+  .betaRead{font-family:var(--mono);font-size:12.5px;color:var(--paper);margin-top:6px}
+  .betaRead b{color:var(--cy2)}
+  .starnote{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:6px;min-height:2.6em}
+  .chk{display:flex;gap:8px;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:12px}
+  .board{margin-top:18px;border-top:1px dashed var(--panelb);padding-top:16px}
+  .bigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+  .big{background:var(--bg2);border:1px solid var(--panelb);border-radius:10px;padding:12px 14px}
+  .big .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+  .big .v{font-family:var(--mono);font-size:clamp(17px,2.6vw,22px);color:var(--paper);margin-top:4px}
+  .big .v.g{color:var(--gold)} .big .v.c{color:var(--cy2)} .big .v.gr{color:var(--grn)}
+  .big .s{font-family:var(--mono);font-size:10.5px;color:var(--dim);margin-top:3px}
+  .twin{font-family:var(--serif);font-style:italic;color:var(--dim);margin:16px 2px 4px;font-size:15px}
+  .calhead{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin:18px 0 8px}
+  .cals{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:8px}
+  .cal{background:var(--bg2);border:1px solid var(--panelb);border-radius:8px;padding:9px 11px}
+  .cal .t{font-family:var(--mono);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--faint)}
+  .cal .v{font-size:13px;color:var(--paper);margin-top:3px;font-family:var(--mono)}
+  .honest{margin-top:18px;border:1px dashed var(--panelb);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--dim)}
+  .honest b{color:var(--paper)}
+  .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .links a,.links button{font-family:var(--mono);font-size:10.5px;color:var(--dim);border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;text-decoration:none;background:none;cursor:pointer}
+  .links a:hover,.links button:hover{color:var(--cy2)}
+  footer{border-top:1px solid var(--panelb);margin-top:34px;padding:22px 0 40px;font-size:11.5px;color:var(--dim)}
+  .frow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .frow a{color:var(--dim);text-decoration:none;border:1px solid var(--panelb);border-radius:999px;padding:3px 10px}
+</style>
+</head>
+<body data-page="tour">
+<header class="top wrap">
+  <div class="eyebrow">CHAKRA · departures board</div>
+  <h1>Interstellar tour planner</h1>
+  <p class="sub">Pick a real star and a fraction of light-speed. Special relativity does the rest: the clock on Earth and the clock on your ship will not agree — and your arrival date deserves to be written in more than one calendar.</p>
+  <nav class="crumbs">
+    <a data-keep-theme href="index.html">◂ CHAKRA home</a>
+    <a data-keep-theme href="pro.html">Observatory Pro</a>
+    <a data-keep-theme href="learn.html">Learn</a>
+    <a data-keep-theme href="tests.html">Test console</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="console">
+    <div class="grid">
+      <div>
+        <label class="f" for="star">destination</label>
+        <select id="star"></select>
+        <div class="starnote" id="starnote"></div>
+        <label class="f" for="custom">…or anywhere in the universe (custom light-years)</label>
+        <input type="number" id="custom" min="0.001" step="any" placeholder="e.g. 1000000 — overrides the star above when set">
+      </div>
+      <div>
+        <label class="f" for="beta">cruise speed · β = v/c</label>
+        <input type="range" id="beta" min="1" max="9999" value="2000">
+        <div class="betaRead" id="betaRead"></div>
+        <div class="drives" id="drives"></div>
+        <label class="f" for="depart">departure year (CE)</label>
+        <input type="number" id="depart" step="1">
+        <div class="chk"><input type="checkbox" id="rt"><label for="rt">round trip — come home and compare clocks</label></div>
+      </div>
+    </div>
+
+    <div class="board">
+      <div class="bigrow">
+        <div class="big"><div class="k">distance</div><div class="v" id="oDist">—</div><div class="s" id="oDistS"></div></div>
+        <div class="big"><div class="k">Earth-frame duration</div><div class="v g" id="oEarth">—</div><div class="s">what mission control waits</div></div>
+        <div class="big"><div class="k">ship proper time</div><div class="v c" id="oShip">—</div><div class="s">what your calendar shows</div></div>
+        <div class="big"><div class="k">Lorentz γ</div><div class="v gr" id="oGamma">—</div><div class="s">1 ship-year = γ Earth-years</div></div>
+      </div>
+      <p class="twin" id="twin"></p>
+      <div class="calhead" id="calhead">arrival, written ten ways</div>
+      <div class="cals" id="cals"></div>
+    </div>
+
+    <div class="honest">
+      <b>Honesty panel.</b> Pure kinematics: instant acceleration, no fuel, no shielding, no slowing down at the far end unless you tick round-trip (which simply doubles both clocks). Real starships must accelerate — a comfortable 1&nbsp;g brachistochrone changes these numbers (pleasantly, for the crew). β = 1 is not on the slider because it is not in the universe. Distances are published estimates; the mathematics is exact:
+      <span style="font-family:var(--mono);color:var(--cy2)">γ = 1/√(1−β²) · t_earth = D/β · t_ship = t_earth/γ</span>
+    </div>
+    <div class="links">
+      <a href="https://en.wikipedia.org/wiki/Time_dilation" target="_blank" rel="noopener">Wikipedia · time dilation</a>
+      <a href="https://en.wikipedia.org/wiki/Lorentz_factor" target="_blank" rel="noopener">Wikipedia · Lorentz factor</a>
+      <a href="https://en.wikipedia.org/wiki/List_of_nearest_stars" target="_blank" rel="noopener">Wikipedia · nearest stars</a>
+      <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-voyage.js" target="_blank" rel="noopener">view the code · chakra-voyage.js</a>
+      <button id="aiPrompt">copy AI prompt</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div data-sharebar></div>
+    <div class="frow">
+      <span data-claude-badge></span>
+      <a href="https://github.com/project-ilm/chakra" target="_blank" rel="noopener">Source · GitHub</a>
+      <a data-keep-theme href="index.html">CHAKRA home</a>
+      <span style="flex:1"></span>
+      <span data-themesel></span>
+    </div>
+    <div style="margin-top:12px">© 1993–2026 Abhishek Choudhary · GPL-3.0-or-later · a toy with true equations — not a flight plan.</div>
+  </div>
+</footer>
+
+<script src="src/chakra-core.js"></script>
+<script src="src/chakra-voyage.js"></script>
+<script src="src/chakra-site.js"></script>
+<script>
+(function(){
+"use strict";
+var C=window.Chakra,V=window.ChakraVoyage;
+function el(id){return document.getElementById(id);}
+function fmtY(y){
+  if(y<1e-3)return (y*365.25*24).toFixed(1)+" hours";
+  if(y<0.5)return (y*365.25).toFixed(1)+" days";
+  if(y<1e4)return y.toFixed(y<100?2:0)+" years";
+  if(y<1e6)return (y/1e3).toFixed(1)+" thousand years";
+  if(y<1e9)return (y/1e6).toFixed(2)+" million years";
+  return (y/1e9).toFixed(2)+" billion years";
+}
+function fmtLy(l){
+  if(l<1e3)return l+" ly";
+  if(l<1e6)return (l/1e3).toFixed(1)+" kly";
+  return (l/1e6).toFixed(3)+" Mly";
+}
+/* β slider: value 1..9999 → β in (0.0001 .. 0.9999) with useful resolution at both ends */
+function sliderToBeta(v){ return v/10000; }
+function betaToSlider(b){ return Math.round(b*10000); }
+
+/* populate stars + drives */
+var starSel=el("star");
+V.STARS.forEach(function(s,i){
+  var o=document.createElement("option");
+  o.value=i;o.textContent=s.nm+" — "+fmtLy(s.ly)+" · "+s.sp;
+  starSel.appendChild(o);
+});
+starSel.value=1; /* α Cen */
+var dr=el("drives");
+V.DRIVES.forEach(function(d0){
+  var b=document.createElement("button");
+  b.textContent=d0.nm.split(" (")[0];
+  b.title=d0.note+" · β="+d0.beta;
+  b.onclick=function(){el("beta").value=betaToSlider(Math.max(0.0001,d0.beta));update();};
+  dr.appendChild(b);
+});
+el("depart").value=new Date().getFullYear();
+
+function arrivalCalendars(decYear){
+  var Y=Math.floor(decYear);
+  var frac=decYear-Y;
+  var doy=1+Math.floor(frac*365.2425); if(doy>365)doy=365;
+  var jdn=C.greg2jdn(Y,1,1)+doy-1;
+  var g=C.jdn2greg(jdn);
+  var d=C.dayNo(g.Y,g.M,g.D,12);
+  var out=[];
+  function add(t,v){out.push([t,v]);}
+  var MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  add("Gregorian · civil",g.D+" "+MON[g.M-1]+" "+g.Y.toLocaleString("en"));
+  try{var sv=C.samvInfo(d,g.Y);
+    add("Śaka era",sv.saka.toLocaleString("en"));
+    add("Vikrama saṁvat",sv.vikrama.toLocaleString("en"));
+    add("Kali yuga",(sv.saka+3179).toLocaleString("en"));
+  }catch(e){}
+  try{var hs=C.hijriSunni(jdn);add("Hijrī (Sunni tabular)",hs.d+" "+C.HIJRI_M[hs.m-1]+" "+hs.y.toLocaleString("en")+" AH");}catch(e){}
+  try{var hb=C.hebrew(jdn);add("Hebrew",hb.d+" "+hb.month+" "+hb.y.toLocaleString("en")+" AM");}catch(e){}
+  try{var nk=C.nanakshahi(jdn);add("Nanakshahi",nk.d+" "+nk.month+" "+nk.y.toLocaleString("en")+" NS");}catch(e){}
+  try{add("Chinese sexagenary",C.chineseYear(g.Y));}catch(e){}
+  try{var my=C.mayan(jdn);add("Maya Long Count",my.lc);}catch(e){}
+  try{var ph=C.phaseInfo(d);add("Moon that day",ph.name+" · "+(ph.illum*100).toFixed(0)+"% lit");}catch(e){}
+  return out;
+}
+
+function update(){
+  var custom=parseFloat(el("custom").value);
+  var star=V.STARS[+starSel.value];
+  var ly=(custom>0)?custom:star.ly;
+  var name=(custom>0)?"custom destination":star.nm;
+  el("starnote").textContent=(custom>0)?"free-range mode: "+fmtLy(ly)+" of vacuum, your responsibility":star.note;
+  var beta=sliderToBeta(+el("beta").value);
+  if(beta<=0)beta=0.0001;
+  var rt=el("rt").checked?2:1;
+  var depart=parseInt(el("depart").value)||new Date().getFullYear();
+  var g=V.gamma(beta);
+  var tE=V.earthYears(ly,beta)*rt;
+  var tS=V.shipYears(ly,beta)*rt;
+  el("betaRead").innerHTML="β = <b>"+beta.toFixed(4)+"</b> c · "+(beta*299792.458).toFixed(0)+" km/s"+
+    (beta>=0.995?" · <span style='color:var(--gold)'>the universe fast-forwards</span>":"");
+  el("oDist").textContent=fmtLy(ly)+(rt===2?" ×2":"");
+  el("oDistS").textContent=name;
+  el("oEarth").textContent=fmtY(tE);
+  el("oShip").textContent=fmtY(tS);
+  el("oGamma").textContent=g.toFixed(g<10?4:1);
+  var arrive=depart+tE;
+  el("calhead").textContent=(rt===2?"homecoming":"arrival")+", written ten ways — Earth frame";
+  var cbox=el("cals");cbox.innerHTML="";
+  if(arrive<3e8){ /* keep the arithmetic honest; beyond this the Gregorian rules are satire anyway */
+    arrivalCalendars(arrive).forEach(function(cv){
+      var d0=document.createElement("div");d0.className="cal";
+      d0.innerHTML='<div class="t">'+cv[0]+'</div><div class="v">'+cv[1]+'</div>';
+      cbox.appendChild(d0);
+    });
+  }else{
+    var d0=document.createElement("div");d0.className="cal";
+    d0.innerHTML='<div class="t">arrival</div><div class="v">'+fmtY(arrive)+' CE — past the Sun\u2019s red-giant phase; calendars decline further comment</div>';
+    cbox.appendChild(d0);
+  }
+  var saved=tE-tS;
+  el("twin").textContent=rt===2
+    ? "You step off having aged "+fmtY(tS)+". Your twin — if the family line held — has been gone "+fmtY(tE)+". You are now "+fmtY(saved)+" younger than your own birthday arithmetic."
+    : "While you live "+fmtY(tS)+" aboard, Earth runs through "+fmtY(tE)+". You bank "+fmtY(saved)+" against the calendar — relativity's honest discount.";
+}
+["change","input"].forEach(function(evt){
+  el("star").addEventListener(evt,update);
+  el("custom").addEventListener(evt,update);
+  el("beta").addEventListener(evt,update);
+  el("depart").addEventListener(evt,update);
+  el("rt").addEventListener(evt,update);
+});
+el("aiPrompt").onclick=function(){
+  var t="Explain special-relativistic interstellar travel kinematics: the Lorentz factor γ=1/√(1−β²), why Earth-frame time is distance/speed while ship proper time is that divided by γ, the twin 'paradox' and its resolution, and compute a worked example: 4.367 light-years to α Centauri at β=0.5 (Earth time, ship time, aging difference). Then explain how a constant 1 g acceleration profile would change the numbers.";
+  var b=this,o=b.textContent;
+  (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent="Copied ✓";setTimeout(function(){b.textContent=o;},1300);},function(){
+    var ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");b.textContent="Copied ✓";setTimeout(function(){b.textContent=o;},1300);}catch(e){}document.body.removeChild(ta);});
+};
+update();
+})();
+</script>
+</body>
+</html>

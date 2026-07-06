@@ -1,0 +1,12 @@
+# CHAKRA — keep the repo shippable
+node_modules/
+*.zip
+*.tar.gz
+*.log
+.DS_Store
+*~
+# C build outputs (sources + vectors.h ARE committed; binaries are not)
+lib/*.o
+lib/libchakra.a
+lib/chakra
+lib/test_chakra

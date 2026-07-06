@@ -17,6 +17,8 @@ Each item below is filed as a GitHub issue by `seed-chakra.sh`. Numbers are stab
 13. **Print layouts per tradition** — dedicated one-page Hindu / Muslim / Jewish / Sikh annual sheets from `annualEvents()`.
 14. **Accessibility pass** — keyboard drag alternatives for every inverse solver; ARIA on readouts; prefers-reduced-motion.
 15. **Publish `chakra-core` to npm** — the library is already UMD + tested; add package.json and CI.
+> **Field note (v1.2.0, 2026-07-05):** the 2026 run flags *two* adhika pūrṇimās — 31 May (correct: Adhika Jyaiṣṭha) and 29 Jun (spurious). The lunation-edge saṅkrānti test needs the refined rule this item describes; until then, treat a second consecutive adhika row as suspect.
+
 
 
 ---

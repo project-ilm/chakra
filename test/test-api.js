@@ -23,4 +23,7 @@ const p=JSON.parse(alm.body);ok("API almanac has disclaimer",/heritage/.test(p.d
 const tel=API.handle(new URLSearchParams("api=telescope&date=2026-07-04&time=18:00&lat=28.61&lon=77.21&tz=5.5"));
 const td=JSON.parse(tel.body);ok("API telescope bodies present",!!td.bodies.Jupiter && typeof td.bodies.Jupiter.dec==="number");
 const yg=API.handle(new URLSearchParams("api=yogas&date=2026-07-04"));ok("API yogas endpoint",Array.isArray(JSON.parse(yg.body).yogas));
+const evr=API.handle(new URLSearchParams("api=events&year=2026"));
+ok("events endpoint: 4 eclipses in 2026",evr.data.events.filter(e=>e.tradition==="Astronomical").length===4);
+ok("events endpoint: Dīpāvalī present",evr.data.events.some(e=>e.name.indexOf("Dīpāvalī")>=0));
 done("test-api");

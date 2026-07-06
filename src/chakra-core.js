@@ -413,7 +413,7 @@ function parseEvents(text){
 
   /* ============================ PUBLIC API ============================ */
   return {
-    version: "1.1.0",
+    version: "1.2.0",
     D2R:D2R, R2D:R2D, TAU:TAU, rev:rev, S:S, C:C, Tn:Tn, atan2d:atan2d,
     RASHI:RASHI, NAK:NAK, VARA:VARA, TITHI:TITHI, YOGA:YOGA, MANAZIL:MANAZIL,
     SAMV:SAMV, HIJRI_M:HIJRI_M, SIGN_CELL:SIGN_CELL, GRAHA_GLYPH:GRAHA_GLYPH, GRAHA_COL:GRAHA_COL,

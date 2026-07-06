@@ -19,7 +19,7 @@
   function handle(params) {
     var get = params && params.get ? function (k) { return params.get(k); } : function (k) { return params[k]; };
     var ep = (get("api") || "moment").toLowerCase();
-    var VALID = ["moment","almanac","panchang","panchanga","chart","yogas","yoga","dasha","telescope","calendars","eclipses"];
+    var VALID = ["moment","almanac","panchang","panchanga","chart","yogas","yoga","dasha","telescope","calendars","eclipses","events"];
     if (VALID.indexOf(ep) < 0) ep = "moment";   /* unknown endpoints fall back — raw input is never echoed */
     var init = {};
     if (get("date")) init.refDate = get("date");
@@ -40,6 +40,7 @@
       case "telescope": body = { input: M.input, lst: null, bodies: M.telescope, note: "raH/dec for equatorial GoTo; alt/az for alt-az mounts; haH = hour angle (hours)." }; break;
       case "calendars": body = { input: M.input, calendars: M.calendars }; break;
       case "eclipses":  body = { input: M.input, eclipses: M.eclipses }; break;
+      case "events":  { var yy=parseInt(get("year"))||parseInt(M.input.refDate)||2026; body={ year: yy, events: C.annualEvents(yy) }; } break;
       case "almanac":   body = M; break;
       case "moment": default: body = M; break;
     }
@@ -48,5 +49,5 @@
     return { contentType: "application/json", body: JSON.stringify(body, null, 2), endpoint: ep, data: body };
   }
 
-  return { handle: handle, endpoints: ["moment","almanac","panchang","chart","yogas","dasha","telescope","calendars","eclipses"] };
+  return { handle: handle, endpoints: ["moment","almanac","panchang","chart","yogas","dasha","telescope","calendars","eclipses","events"] };
 });

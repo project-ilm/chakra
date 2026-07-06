@@ -28,6 +28,9 @@ Lahiri (Citrā-pakṣa) via polynomial fit. Divergence from the official Rashtri
 - **Houses**: whole-sign from the sidereal ascendant. **Kālasarpa**: strict definition — all seven grahas on one side of the Rāhu–Ketu axis (schools differ; some exclude the Moon or accept partial). **Maṅgala Doṣa**: houses {1,2,4,7,8,12} checked from Lagna, Moon *and* Venus — many traditions use subsets and cancellation rules CHAKRA does not apply. **Vimśottarī**: mahādaśā sequence only (no antardaśā yet), computed from the Moon's sidereal longitude; the app deliberately frames any chart as "this moment read as janma-kuṇḍalī".
 - All astrological output is **cultural/heritage computation, not prediction or advice**.
 
+## Festival-date convention
+Lunisolar festival rows carry the civil date of the **tithi instant** (UT-noon anchored), not the sunrise-prevailing (udaya-vyāpinī) day. Usually identical; when the instant falls near midnight they differ by one day — e.g. **Dīpāvalī 2026: engine 9 Nov (amāvāsyā instant), common civil practice 8 Nov**. The udaya rule is tracked as FW-2.
+
 ## Telescope numbers
 RA/Dec are **of-date** (ecliptic→equatorial via mean obliquity), Alt/Az geometric — **no refraction**, no parallax. Fine for finding a planet in a finder scope; do not drive unattended GoTo slews near the horizon from these numbers.
 

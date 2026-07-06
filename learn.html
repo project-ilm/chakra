@@ -1,0 +1,797 @@
+<!doctype html>
+<!--
+  CHAKRA — Learn: the mathematics, the schools, the history, the spacecraft.
+  Every formula on this page is the formula the engine actually runs;
+  every "view the code" link lands on the function that runs it.
+
+  Copyright (C) 1993-2026 Abhishek Choudhary. Sole author.
+  SPDX-License-Identifier: GPL-3.0-or-later · text CC BY-SA 4.0
+  Distributed WITHOUT ANY WARRANTY. Study & heritage computation only — see DISCLAIMER.md.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Learn — CHAKRA Temporal Cycle Observatory</title>
+<meta name="description" content="From Kepler's equation to the ayanāṁśa: interactive derivations of the mathematics inside CHAKRA, the calendar schools and their differences, a history of positional astronomy, and how the same equations launch spacecraft.">
+<style>
+  :root{
+    --bg:#05070e; --bg2:#0a0e1a; --panel:rgba(18,24,40,.72); --panelb:rgba(70,199,214,.16);
+    --ink:#dce6f2; --dim:#7385a0; --faint:#3d4b64;
+    --cy:#46c7d6; --cy2:#5fe3ff; --amber:#e6b450; --grn:#5fe39a; --mag:#d96fb0; --vio:#8b7cf0;
+    --gold:#d8a94e; --paper:#e8ecf7;
+    --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --serif:Georgia,"Times New Roman",Cambria,serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.62;-webkit-text-size-adjust:100%}
+  a{color:var(--cy)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+  header.top{padding:26px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(30px,4.6vw,44px);letter-spacing:.06em;color:var(--paper);margin:4px 0 6px}
+  .sub{color:var(--dim);max-width:70ch;margin:0}
+  nav.crumbs{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11.5px;margin-top:14px}
+  nav.crumbs a{color:var(--dim);text-decoration:none}
+  nav.crumbs a:hover{color:var(--cy2)}
+
+  .layout{display:grid;grid-template-columns:216px 1fr;gap:26px;margin-top:22px}
+  @media(max-width:860px){.layout{grid-template-columns:1fr}}
+  .rail{position:sticky;top:14px;align-self:start;display:flex;flex-direction:column;gap:4px}
+  @media(max-width:860px){.rail{position:static;flex-direction:row;overflow-x:auto;padding-bottom:6px}}
+  .rail button{font-family:var(--mono);font-size:12px;text-align:left;color:var(--dim);background:none;border:1px solid transparent;border-radius:8px;padding:8px 12px;cursor:pointer;white-space:nowrap}
+  .rail button.on{color:var(--cy2);border-color:var(--panelb);background:var(--panel)}
+  .rail .cnt{color:var(--faint);font-size:10px;margin-left:6px}
+
+  .tabpane{display:none}
+  .tabpane.on{display:block}
+  section.blk{background:var(--panel);border:1px solid var(--panelb);border-radius:12px;padding:20px 22px;margin-bottom:16px;backdrop-filter:blur(8px)}
+  section.blk h3{font-family:var(--serif);font-weight:400;font-size:21px;color:var(--paper);margin:0 0 8px;letter-spacing:.03em}
+  section.blk p{color:var(--ink);margin:.5em 0}
+  section.blk p.mut{color:var(--dim);font-size:13px}
+  .formula{font-family:var(--mono);font-size:13px;color:var(--cy2);background:var(--bg2);border:1px solid var(--panelb);border-radius:8px;padding:10px 14px;margin:10px 0;overflow-x:auto;white-space:pre}
+  .links{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .links a,.links button{font-family:var(--mono);font-size:10.5px;color:var(--dim);border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;text-decoration:none;background:none;cursor:pointer}
+  .links a:hover,.links button:hover{color:var(--cy2)}
+  .sim{border:1px dashed var(--panelb);border-radius:10px;padding:14px;margin-top:12px;background:rgba(6,10,20,.5)}
+  .sim .simhead{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+  .sim .ctl{display:flex;flex-wrap:wrap;gap:14px;align-items:center;font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-bottom:10px}
+  .sim input[type=range]{accent-color:var(--cy)}
+  .sim select,.sim button{background:var(--bg2);color:var(--ink);border:1px solid var(--panelb);border-radius:6px;padding:3px 8px;font:inherit;font-size:11.5px;cursor:pointer}
+  .sim .read{font-family:var(--mono);font-size:12px;color:var(--paper)}
+  .sim .read b{color:var(--cy2)}
+  .sim svg,.sim canvas{display:block;max-width:100%;height:auto;margin-top:6px}
+  table.tbl{width:100%;border-collapse:collapse;font-size:13px;margin:10px 0}
+  table.tbl th{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);text-align:left;padding:6px 8px;border-bottom:1px solid var(--panelb)}
+  table.tbl td{padding:7px 8px;border-bottom:1px solid rgba(70,199,214,.07);vertical-align:top;color:var(--ink)}
+  table.tbl td.m{font-family:var(--mono);color:var(--cy2);white-space:nowrap}
+  .tl{list-style:none;margin:0;padding:0;border-left:1px solid var(--panelb)}
+  .tl li{position:relative;padding:0 0 18px 22px}
+  .tl li::before{content:"";position:absolute;left:-5px;top:6px;width:9px;height:9px;border-radius:50%;background:var(--bg);border:2px solid var(--gold)}
+  .tl .when{font-family:var(--mono);font-size:11px;color:var(--gold);letter-spacing:.08em}
+  .tl .what{color:var(--paper);font-family:var(--serif);font-size:16px}
+  .tl .how{color:var(--dim);font-size:13px;margin-top:2px}
+  .tl .code{font-family:var(--mono);font-size:10.5px;color:var(--cy)}
+  .promptcard{border:1px solid var(--panelb);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+  .promptcard b{display:block;font-size:13px;color:var(--cy2);margin-bottom:5px}
+  .promptcard pre{white-space:pre-wrap;font-family:var(--mono);font-size:11.5px;color:var(--dim);margin:0 0 8px;line-height:1.5}
+  footer{border-top:1px solid var(--panelb);margin-top:34px;padding:22px 0 40px;font-size:11.5px;color:var(--dim)}
+  .frow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .frow a{color:var(--dim);text-decoration:none;border:1px solid var(--panelb);border-radius:999px;padding:3px 10px}
+</style>
+</head>
+<body data-page="learn">
+<header class="top wrap">
+  <div class="eyebrow">CHAKRA · study room</div>
+  <h1>The mathematics of many calendars</h1>
+  <p class="sub">Everything the observatory computes, explained and made playable. The formulas below are not illustrations of the code — they <em>are</em> the code, and each section links to the exact function on GitHub.</p>
+  <nav class="crumbs">
+    <a data-keep-theme href="index.html">◂ CHAKRA home</a>
+    <a data-keep-theme href="pro.html">Observatory Pro</a>
+    <a data-keep-theme href="tour.html">Interstellar tour</a>
+    <a data-keep-theme href="tests.html">Test console</a>
+  </nav>
+</header>
+
+<div class="wrap layout">
+  <div class="rail" id="rail">
+    <button data-t="math" class="on">Mathematics<span class="cnt">7 sections · 6 sims</span></button>
+    <button data-t="schools">Schools &amp; traditions</button>
+    <button data-t="history">History</button>
+    <button data-t="space">Spacecraft</button>
+    <button data-t="refs">References &amp; code map</button>
+    <button data-t="ai">AI study prompts</button>
+  </div>
+
+  <div>
+  <!-- ══════════════════ MATHEMATICS ══════════════════ -->
+  <div class="tabpane on" id="t-math">
+
+    <section class="blk">
+      <h3>1 · Kepler's ellipse and the equal-area clock</h3>
+      <p>A planet does not circle the Sun; it sweeps an ellipse with the Sun at one focus. Two numbers fix the shape: the semi-major axis <em>a</em> (size) and the eccentricity <em>e</em> (squash). The orbit's radius at true anomaly ν is:</p>
+      <div class="formula">r(ν) = a·(1 − e²) / (1 + e·cos ν)        perihelion r = a(1−e) · aphelion r = a(1+e)</div>
+      <p>Kepler's second law is the part that makes it a <em>clock</em>: the line from Sun to planet sweeps equal areas in equal times — so a planet races through perihelion and lingers at aphelion. Drag the eccentricity and watch the swept wedge keep its area while its shape changes.</p>
+      <div class="sim" id="sim-kepler">
+        <div class="simhead">sim 1 · equal areas in equal times</div>
+        <div class="ctl">e <input type="range" id="k1e" min="0" max="0.85" step="0.01" value="0.5"> <span class="read" id="k1r"></span></div>
+        <svg id="k1svg" viewBox="0 0 560 300" width="560"></svg>
+      </div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Kepler%27s_laws_of_planetary_motion" target="_blank" rel="noopener">Wikipedia · Kepler's laws</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · helio()</a>
+        <button data-copy="Explain Kepler's three laws of planetary motion, then derive the orbit equation r = a(1−e²)/(1+e·cosν) from the geometry of an ellipse with the Sun at a focus. Assume I know high-school trigonometry and take it slowly.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>2 · Kepler's equation — where the clock gets hard</h3>
+      <p>Position on the ellipse is easy if you know the true anomaly ν; but time gives you the <em>mean</em> anomaly M, which grows uniformly. The bridge is the eccentric anomaly E, tied to M by a transcendental equation that has no closed-form solution — you must iterate:</p>
+      <div class="formula">M = E − e·sin E            (Kepler, 1609 — in degrees: M = E − (180/π)·e·sin E)
+
+Newton's step:   E ← E − (E − (180/π)·e·sin E − M) / (1 − e·cos E)</div>
+      <p>Six iterations reach machine precision for planetary eccentricities. This exact loop runs inside every position the observatory shows you.</p>
+      <div class="sim" id="sim-newton">
+        <div class="simhead">sim 2 · watch Newton converge</div>
+        <div class="ctl">M° <input type="range" id="k2m" min="0" max="359" step="1" value="137">
+             e <input type="range" id="k2e" min="0" max="0.9" step="0.01" value="0.6">
+             <span class="read" id="k2r"></span></div>
+        <svg id="k2svg" viewBox="0 0 560 240" width="560"></svg>
+      </div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Kepler%27s_equation" target="_blank" rel="noopener">Wikipedia · Kepler's equation</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · kepler()</a>
+        <button data-copy="Explain Kepler's equation M = E − e·sinE: what mean anomaly, eccentric anomaly and true anomaly each measure, why the equation cannot be solved in closed form, and how Newton–Raphson iteration solves it numerically. Show three iterations by hand for M=137°, e=0.6.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>3 · From the Sun's frame to your sky</h3>
+      <p>The engine computes each planet <em>heliocentrically</em>, then shifts to Earth's point of view by adding the Sun's geocentric vector — a one-line change of origin. Ecliptic coordinates become the sky you see through two rotations:</p>
+      <div class="formula">geocentric  = heliocentric_planet + geocentric_Sun          (vector add)
+ecliptic λ,β → equatorial α,δ :  rotate by the obliquity ε ≈ 23.44°
+equatorial → horizon alt,az   :  rotate by hour angle H = LST − α and latitude φ
+
+sin(alt) = sinφ·sinδ + cosφ·cosδ·cosH</div>
+      <p class="mut">Local sidereal time is Greenwich sidereal time plus your east longitude — which is why the observatory insists on knowing where you stand. Every telescope in the world points with these same three lines.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Celestial_coordinate_system" target="_blank" rel="noopener">Wikipedia · celestial coordinates</a>
+        <a href="https://en.wikipedia.org/wiki/Sidereal_time" target="_blank" rel="noopener">Wikipedia · sidereal time</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · planetLon(), altAz(), telescope()</a>
+        <button data-copy="Walk me through converting an ecliptic longitude and latitude into altitude and azimuth for an observer: ecliptic→equatorial using the obliquity, computing local sidereal time from GMST and longitude, forming the hour angle, then the alt/az formulas. Include one fully worked numeric example.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>4 · Precession and the ayanāṁśa</h3>
+      <p>Earth's axis wobbles like a slowing top, once around in ~25,772 years, so the equinox point drifts backward along the zodiac ~50.3″ every year. Western <em>tropical</em> astrology stays anchored to the moving equinox; Indian <em>sidereal</em> astronomy stays anchored to the stars. The gap between the two zero-points is the <strong>ayanāṁśa</strong> — this engine uses the official Lahiri (Citrāpakṣa) value, defined so that the star Spica (Citrā) sits at exactly 180° sidereal.</p>
+      <div class="formula">sidereal longitude = tropical longitude − ayanāṁśa(t)
+Lahiri here:  ayan(y) = 23.853° + 0.0139552°·(y − 2000)      ← linear fit, ±0.01° 1900–2100</div>
+      <div class="sim" id="sim-ayan">
+        <div class="simhead">sim 3 · two zodiacs drifting apart</div>
+        <div class="ctl">year <input type="range" id="k3y" min="500" max="3500" step="1" value="2026"> <span class="read" id="k3r"></span></div>
+        <svg id="k3svg" viewBox="0 0 560 210" width="560"></svg>
+        <p class="mut" style="margin-top:8px">Outer ring: tropical (0° Aries = equinox, fixed on screen). Inner ring: sidereal, sliding as the centuries pass. The gold marker is Spica, pinned at sidereal 180°. Around 285 CE the rings agree — that is the epoch both systems implicitly share.</p>
+      </div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Axial_precession" target="_blank" rel="noopener">Wikipedia · axial precession</a>
+        <a href="https://en.wikipedia.org/wiki/Ayanamsa" target="_blank" rel="noopener">Wikipedia · ayanāṁśa</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · ayan(), siderealAdj()</a>
+        <button data-copy="Explain axial precession of the Earth: its physical cause (torques on the equatorial bulge), the 25,772-year period, and how it creates the difference between the tropical and sidereal zodiacs. Then explain what an ayanāṁśa is and how the Lahiri/Citrāpakṣa value is defined using the star Spica at 180°.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>5 · The tithi — a clock made of two hands</h3>
+      <p>The pañcāṅga's day-unit is not the Sun's alone: a <strong>tithi</strong> is the time for the Moon to gain 12° of ecliptic longitude on the Sun. Thirty tithis make one lunation; the first fifteen (śukla pakṣa) brighten toward full, the next fifteen (kṛṣṇa pakṣa) darken toward new. Every festival row in the almanac is ultimately this subtraction:</p>
+      <div class="formula">elongation e = λ☾ − λ☉  (mod 360°)      tithi index = ⌊e / 12°⌋      karaṇa = ⌊e / 6°⌋</div>
+      <div class="sim" id="sim-tithi">
+        <div class="simhead">sim 4 · drag the sun and moon hands</div>
+        <svg id="k4svg" viewBox="0 0 560 250" width="560" style="touch-action:none;cursor:grab"></svg>
+        <div class="read" id="k4r" style="margin-top:6px"></div>
+      </div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Tithi" target="_blank" rel="noopener">Wikipedia · tithi</a>
+        <a href="https://en.wikipedia.org/wiki/Hindu_calendar" target="_blank" rel="noopener">Wikipedia · Hindu calendar</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · panchanga(), solveElong()</a>
+        <button data-copy="Explain the tithi system of the Hindu lunisolar calendar: why a tithi is defined as 12° of Sun–Moon elongation rather than a fixed number of hours, why tithis vary in duration (roughly 19 to 26 hours), what śukla and kṛṣṇa pakṣa are, and how karaṇas relate to half-tithis.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>6 · Synodic beats — why conjunctions keep time</h3>
+      <p>Two planets on different periods lap each other on a rhythm of their own — the <em>synodic period</em>. It is exactly the beat frequency of two waves, and it is why great conjunctions, launch windows and several festival cycles all tick:</p>
+      <div class="formula">1/S = 1/P₁ − 1/P₂        Jupiter (11.862 y) &amp; Saturn (29.457 y)  →  S ≈ 19.86 y</div>
+      <div class="sim" id="sim-beats">
+        <div class="simhead">sim 5 · two periods, one beat</div>
+        <div class="ctl">P₁ <input type="range" id="k5a" min="1" max="40" step="0.1" value="11.9">
+             P₂ <input type="range" id="k5b" min="1" max="40" step="0.1" value="29.5">
+             <button id="k5js">Jupiter–Saturn</button>
+             <span class="read" id="k5r"></span></div>
+        <canvas id="k5cv" width="1040" height="240" style="width:100%"></canvas>
+      </div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Orbital_period#Synodic_period" target="_blank" rel="noopener">Wikipedia · synodic period</a>
+        <a href="https://en.wikipedia.org/wiki/Great_conjunction" target="_blank" rel="noopener">Wikipedia · great conjunction</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · CYCLES table</a>
+        <button data-copy="Derive the synodic period formula 1/S = 1/P1 − 1/P2 for two co-orbiting bodies, explain its identity with the beat frequency of two sinusoids, and compute it for Jupiter (11.862 y) and Saturn (29.457 y). Then explain why interplanetary launch windows repeat on the Earth–target synodic period.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>7 · Eclipse geometry — the node windows</h3>
+      <p>The Moon's orbit is tilted 5.1° to the ecliptic, so most new moons miss the Sun and most full moons miss Earth's shadow. Eclipses happen only when syzygy occurs <em>near a node</em> — the crossing points of the two planes. The engine scans every new and full moon and measures the Sun's angular distance from the nearest node:</p>
+      <div class="formula">solar eclipse possible : |λ☉ − node| &lt; 18.4°     central if &lt; 11.8°
+lunar eclipse possible : |λ☉ − node| &lt; 12.2°     total-ish if &lt; 9.5°
+nodes regress a full circle in 18.61 years → eclipse seasons ~173 days apart
+Saros: 223 synodic ≈ 242 draconic ≈ 239 anomalistic months ≈ 18 y 11 d</div>
+      <p class="mut">Those four windows are how this site found all four eclipses of 2026 with no tables — the dates in the almanac are outputs of this inequality, and the test suite pins them.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Eclipse_season" target="_blank" rel="noopener">Wikipedia · eclipse season</a>
+        <a href="https://en.wikipedia.org/wiki/Saros_(astronomy)" target="_blank" rel="noopener">Wikipedia · Saros</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · eclipses(), checkEcl()</a>
+        <button data-copy="Explain why eclipses only occur near the lunar nodes: the 5.1° inclination of the Moon's orbit, ecliptic limits for solar and lunar eclipses, the 173-day eclipse season, the 18.61-year regression of the nodes, and why the Saros cycle (223 synodic months) predicts eclipse repeats so well.">copy AI prompt</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════ SCHOOLS ══════════════════ -->
+  <div class="tabpane" id="t-schools">
+    <section class="blk">
+      <h3>Ayanāṁśa systems — one sky, several zero-points</h3>
+      <p>Sidereal traditions agree on the method and differ on the anchor. The differences are fractions of a degree — enough to move a lagna across a sign boundary, which is why the choice is named on every serious chart.</p>
+      <table class="tbl"><thead><tr><th>system</th><th>anchor / definition</th><th id="ayY">value</th><th>used by</th></tr></thead>
+      <tbody id="ayanTable"></tbody></table>
+      <p class="mut">Values other than Lahiri are shown as their conventional offsets from Lahiri and are approximate to ~1′; consult each school's ephemeris for chart-grade values. CHAKRA computes with Lahiri throughout — the ayanāṁśa India's Calendar Reform Committee (1955) adopted for the national pañcāṅga, defined by Spica at sidereal 180°.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Ayanamsa" target="_blank" rel="noopener">Wikipedia · ayanāṁśa</a>
+        <button data-copy="Compare the major ayanāṁśa systems used in sidereal astrology and astronomy — Lahiri/Citrāpakṣa, B.V. Raman, Krishnamurti (KP), and Fagan–Bradley — explaining how each fixes its zero point, roughly how far apart they are, and why the Indian Calendar Reform Committee (1955) standardised on Lahiri.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>Dṛk vs vākya — computed sky vs memorised sky</h3>
+      <p><strong>Dṛk-gaṇita</strong> ("observation-computation") derives positions from current astronomical theory — what this engine does. <strong>Vākya-gaṇita</strong> encodes pre-computed motions in memorised Sanskrit/Tamil mnemonic sentences (<em>vākyas</em>), a brilliant compression technology from the era before cheap paper: a panchāṅgam-maker could reconstruct the Moon's position from verses alone. Vākya almanacs (still printed in Tamil Nadu and Kerala) drift slowly from the true sky; dṛk almanacs track it. Where a festival date differs between two printed pañcāṅgas, this is very often the reason.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Vakya" target="_blank" rel="noopener">Wikipedia · vākya</a>
+        <button data-copy="Explain the difference between dṛk-gaṇita and vākya-gaṇita in Indian calendrical astronomy: how vākya mnemonic verse systems encoded lunar and planetary motion, why they drift from the observed sky over centuries, and why modern computed (dṛk) pañcāṅgas sometimes give different festival dates from traditional vākya almanacs.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>Sūrya Siddhānta — the classical engine</h3>
+      <p>The <em>Sūrya Siddhānta</em> (compiled by ~500 CE, revised for a millennium after) is the great classical treatise of Indian mathematical astronomy: mean motions over vast cycles, epicyclic corrections (<em>manda</em> and <em>śīghra</em>), eclipse computation, and trigonometry built on the sine (<em>jyā</em>) — a function India gave the world. Its planetary mean motions are startlingly accurate; its epicycle geometry plays the role Kepler's ellipse plays here. Traditional schools that still compute by its methods form the "Saura" tradition. This engine is its philosophical descendant with modern elements: same questions, newer coefficients.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Surya_Siddhanta" target="_blank" rel="noopener">Wikipedia · Sūrya Siddhānta</a>
+        <button data-copy="Describe the Sūrya Siddhānta: its structure, its system of mean motions and manda/śīghra epicyclic corrections, its trigonometric methods based on jyā (sine), how accurate its planetary periods are against modern values, and its historical role in Indian and world astronomy.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>Jaimini — a different question, not a different sky</h3>
+      <p>Honesty requires a distinction: <strong>Jaimini</strong> names a school of <em>predictive interpretation</em> (chara daśā, kārakas, argalā — from the <em>Jaimini Sūtras</em>), not a different ephemeris. Jaimini and Parāśari astrologers read the same computed sky; they disagree about what it means, not where the planets are. CHAKRA computes positions and the classical yoga/daśā structures; interpretation — Jaimini, Parāśari or otherwise — is a cultural layer this instrument deliberately leaves to humans.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Jaimini_astrology" target="_blank" rel="noopener">Wikipedia · Jaimini</a>
+        <button data-copy="Explain what distinguishes the Jaimini school of Hindu astrology (chara daśā, chara kārakas, argalā, rāśi-based aspects) from the mainstream Parāśari school, and clarify why this is a difference of interpretive system rather than of astronomical computation.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>Amānta vs pūrṇimānta — the same month, two labels</h3>
+      <p>South and West India end the lunar month at new moon (<strong>amānta</strong>); the North ends it at full moon (<strong>pūrṇimānta</strong>). The dark fortnight between them belongs to different month-names in the two conventions — so Janmāṣṭamī falls in <em>Śrāvaṇa kṛṣṇa</em> by amānta but <em>Bhādrapada kṛṣṇa</em> by pūrṇimānta, <strong>on the very same civil day</strong>. CHAKRA's festival engine computes amānta and says so on each row; when a printed calendar seems to disagree with it by "a month", check the convention before suspecting the mathematics.</p>
+      <div class="formula">amānta month  = new moon → new moon, named for the saṅkrānti inside it
+no saṅkrānti inside → adhika māsa (intercalary; carries no festivals)</div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Hindu_calendar#Am%C4%81nta_and_P%C5%ABr%E1%B9%87im%C4%81nta_systems" target="_blank" rel="noopener">Wikipedia · amānta/pūrṇimānta</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · annualEvents()</a>
+        <button data-copy="Explain the amānta and pūrṇimānta month conventions of the Hindu lunisolar calendar, why the kṛṣṇa pakṣa carries different month names under each, how adhika (intercalary) months arise from the saṅkrānti rule, and give the Janmāṣṭamī example where both systems name the same civil day differently.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>Hijrī reckonings — why two devout neighbours differ by a day</h3>
+      <p>The Islamic year is purely lunar. Three legitimate ways to run it coexist: <strong>sighting</strong> (month begins with the seen crescent — regional by nature), <strong>Umm al-Qura</strong> (Saudi astronomical criterion), and <strong>tabular</strong> (arithmetic 30-year cycle of 19 common + 11 leap years). Within tabular practice, Sunni and Shia (Ithnā-ʿAsharī) conventions choose <em>different leap-year sets</em> in the 30-year cycle — so the two arithmetic calendars, both internally exact, drift a day apart and rejoin. CHAKRA computes both and shows the divergence live:</p>
+      <div class="formula">leap years / 30 · Sunni (Kuwaiti):  2 5 7 10 13 16 18 21 24 26 29
+leap years / 30 · Shia (Ithnā-ʿAsharī): 2 5 8 10 13 16 19 21 24 27 29</div>
+      <p class="read" id="hijriDemo" style="font-family:var(--mono)"></p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Tabular_Islamic_calendar" target="_blank" rel="noopener">Wikipedia · tabular Islamic calendar</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · hijriTabular()</a>
+        <button data-copy="Explain the tabular Islamic calendar's 30-year intercalation cycle, list the Sunni (Kuwaiti) and Shia (Ithnā-ʿAsharī) leap-year sets, show why the two arithmetic calendars can differ by one day on the same Gregorian date, and contrast both with sighting-based and Umm al-Qura practice.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>The Hebrew calendar — Hillel II's fixed arithmetic</h3>
+      <p>Once observational, the Hebrew calendar was fixed in arithmetic form (tradition credits Hillel II, ~358 CE): a 19-year Metonic cycle of 12 leap months, the <em>molad</em> mean-conjunction clock ticking in 1/25920-day parts (<em>ḥalakim</em>), and four postponement rules (<em>deḥiyyot</em>) that nudge Rosh Hashana to keep festivals off forbidden weekdays. Because it is arithmetic, it can be computed exactly forever — this engine does, calibrated to published civil dates, and the C port reproduces it byte-for-byte.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Hebrew_calendar" target="_blank" rel="noopener">Wikipedia · Hebrew calendar</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · hebrew()</a>
+        <button data-copy="Explain the fixed arithmetic Hebrew calendar attributed to Hillel II: the 19-year cycle of leap months, the molad reckoned in ḥalakim (1/25920 day), the four deḥiyyot postponement rules and why they exist, and how year lengths of 353/354/355 and 383/384/385 days arise.">copy AI prompt</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════ HISTORY ══════════════════ -->
+  <div class="tabpane" id="t-history">
+    <section class="blk">
+      <h3>How this science was built — a 3,000-year relay</h3>
+      <p class="mut">Dates below mark the runner, not the starting line; every entry leans on centuries before it. The last column notes what of each survives, literally, in this repository's code.</p>
+      <ul class="tl">
+        <li><span class="when">~1400–1000 BCE</span><div class="what">Vedāṅga Jyotiṣa</div><div class="how">India's first calendrical treatise: 5-year yuga, 27 nakṣatras, tithi arithmetic for fixing ritual time.</div><div class="code">→ the nakṣatra ring and tithi definition in panchanga()</div></li>
+        <li><span class="when">~700–300 BCE</span><div class="what">Babylonian arithmetic astronomy</div><div class="how">Zig-zag functions, the Saros eclipse cycle, the zodiac's 12×30° grid — positional astronomy's first great data pipeline.</div><div class="code">→ the 360° longitude grid everywhere; Saros in the CYCLES table</div></li>
+        <li><span class="when">~150 BCE</span><div class="what">Hipparchus measures precession</div><div class="how">Comparing his star catalogue with older ones, he finds the equinox itself moves — the discovery that later splits tropical from sidereal.</div><div class="code">→ ayan() exists because of this</div></li>
+        <li><span class="when">499 CE</span><div class="what">Āryabhaṭa's Āryabhaṭīya</div><div class="how">Sine tables, Earth's rotation proposed, eclipse theory without demons — computation as explanation.</div><div class="code">→ the jyā/sine lineage under every S() and C() call</div></li>
+        <li><span class="when">~500–1000 CE</span><div class="what">Sūrya Siddhānta matures</div><div class="how">Mean motions plus manda/śīghra epicycles; the canonical engine of the pañcāṅga tradition.</div><div class="code">→ same job as ELEM + kepler(), older coefficients</div></li>
+        <li><span class="when">628 CE</span><div class="what">Brahmagupta's Brāhmasphuṭasiddhānta</div><div class="how">Rules for zero and negatives inside an astronomy book — the arithmetic this code runs on was published as astronomy.</div><div class="code">→ every signed longitude difference</div></li>
+        <li><span class="when">~820–1030 CE</span><div class="what">The zīj era — al-Khwārizmī to al-Bīrūnī</div><div class="how">Islamic astronomers industrialise tables (zījes), refine trigonometry, and al-Bīrūnī writes the first great <em>comparative</em> study of the world's calendars.</div><div class="code">→ this repo's multi-calendar ambition is al-Bīrūnī's project, executable</div></li>
+        <li><span class="when">1150 CE</span><div class="what">Bhāskara II's Siddhānta-Śiromaṇi</div><div class="how">Peak medieval synthesis: instantaneous motion (proto-calculus), refined eclipse limits, planetary theory.</div><div class="code">→ eclipse windows in checkEcl() descend from these limit analyses</div></li>
+        <li><span class="when">~1380–1500 CE</span><div class="what">Kerala school — Mādhava's series</div><div class="how">Infinite series for sine, cosine and π, two centuries before Europe; born of the demand for ever-better pañcāṅga accuracy.</div><div class="code">→ Math.sin() is the industrial descendant</div></li>
+        <li><span class="when">1543 · 1609 · 1619</span><div class="what">Copernicus → Kepler</div><div class="how">Heliocentrism, then the death of the epicycle: ellipses, equal areas, and P² ∝ a³.</div><div class="code">→ helio(), kepler(), and the true-orbit orrery mode</div></li>
+        <li><span class="when">1687</span><div class="what">Newton's Principia</div><div class="how">One inverse-square law explains Kepler, the tides, precession, and — eventually — how to leave.</div><div class="code">→ the physics licence behind everything above</div></li>
+        <li><span class="when">1752 · 1582</span><div class="what">Gregorian reform reaches the world</div><div class="how">Ten-then-eleven dropped days, a better leap rule; civil time becomes arithmetic.</div><div class="code">→ greg2jdn()/jdn2greg() implement exactly this</div></li>
+        <li><span class="when">1955</span><div class="what">India's Calendar Reform Committee</div><div class="how">Under Meghnad Saha: one national pañcāṅga standard, the Lahiri ayanāṁśa, dṛk computation over vākya tables.</div><div class="code">→ ayan() is this committee's number</div></li>
+        <li><span class="when">1957 →</span><div class="what">The spacecraft era</div><div class="how">The same two-body mathematics, run forward instead of backward: launch windows from synodic periods, transfers from Kepler.</div><div class="code">→ see the Spacecraft tab; the equations do not change</div></li>
+      </ul>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Indian_astronomy" target="_blank" rel="noopener">Wikipedia · Indian astronomy</a>
+        <a href="https://en.wikipedia.org/wiki/History_of_astronomy" target="_blank" rel="noopener">Wikipedia · history of astronomy</a>
+        <button data-copy="Give me a connected history of positional astronomy as a relay across cultures: Vedāṅga Jyotiṣa, Babylonian arithmetic methods and the Saros, Hipparchus and precession, Āryabhaṭa, the Sūrya Siddhānta, Brahmagupta, the Islamic zīj tradition and al-Bīrūnī's comparative calendrics, Bhāskara II, the Kerala school's series, then Copernicus, Kepler and Newton — emphasising what each layer contributed that survives in modern ephemeris code.">copy AI prompt</button>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════════════ SPACECRAFT ══════════════════ -->
+  <div class="tabpane" id="t-space">
+    <section class="blk">
+      <h3>Launch windows are synodic periods</h3>
+      <p>You cannot leave for Mars whenever you like: Earth and Mars must be in the right <em>relative</em> geometry, and that geometry repeats on their synodic period — about 780 days. This is the same beat arithmetic as the great conjunction (Mathematics · §6), pointed at engineering instead of omens. Miss a window, wait 26 months: every Mars mission in history has obeyed this line of the CYCLES table.</p>
+      <div class="formula">1/S = 1/P_Earth − 1/P_target        Earth–Mars: S ≈ 2.135 y ≈ 780 d
+Earth–Venus: S ≈ 584 d · Earth–Jupiter: S ≈ 399 d</div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Launch_window" target="_blank" rel="noopener">Wikipedia · launch window</a>
+        <button data-copy="Explain why interplanetary launch windows exist and why they repeat on the Earth–target synodic period. Compute the synodic period for Earth–Mars from their orbital periods and connect it to the ~26-month cadence of real Mars missions.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>The Hohmann transfer — Kepler, weaponised gently</h3>
+      <p>The cheapest path between two circular orbits is half of an ellipse that kisses both: perihelion at the inner orbit, aphelion at the outer. Its size is fixed by the two radii, its flight time by Kepler's third law, and the required <em>phase angle</em> — how far ahead the target must be at launch — falls straight out of the arithmetic. Choose a target; everything below is computed from the same orbital elements the orrery uses.</p>
+      <div class="formula">a_t = (r₁ + r₂)/2        t_flight = ½ · a_t^{3/2}  years   (r in AU, Kepler III with GM☉=4π²)
+phase angle φ = 180° − 360° · ( t_flight / P_target )</div>
+      <div class="sim" id="sim-hoh">
+        <div class="simhead">sim 6 · plan a transfer from Earth</div>
+        <div class="ctl">target <select id="k6t"><option>Venus</option><option selected>Mars</option><option>Mercury</option><option>Jupiter</option><option>Saturn</option></select>
+             <span class="read" id="k6r"></span></div>
+        <svg id="k6svg" viewBox="0 0 560 300" width="560"></svg>
+        <p class="mut" style="margin-top:8px">Dashed: the transfer half-ellipse. The gold arc is the phase angle φ — where the target must be when you light the engine. Radial scale ∝ √AU so Mercury and Saturn can share a screen.</p>
+      </div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Hohmann_transfer_orbit" target="_blank" rel="noopener">Wikipedia · Hohmann transfer</a>
+        <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · ELEM, kepler()</a>
+        <button data-copy="Derive the Hohmann transfer between two circular coplanar orbits: the transfer ellipse's semi-major axis, the flight time from Kepler's third law, the two Δv burns using the vis-viva equation, and the launch phase angle. Work the Earth→Mars case numerically (r1=1 AU, r2=1.524 AU).">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>How India actually flies it</h3>
+      <p>Chandrayaan and Mangalyaan could not afford a giant single burn, so they used Kepler as a ratchet: repeated perigee burns raised the apogee orbit by orbit until the ellipse reached the Moon — or escaped to the Mars transfer. Each burn happens at perigee because that is where a unit of Δv buys the most energy (the Oberth effect: kinetic energy grows with the square of speed). Gravity assists are the same idea borrowed from a moving planet. Nothing in this paragraph needs mathematics beyond this page — the ellipse equation, vis-viva, and patience.</p>
+      <div class="formula">vis-viva:  v² = GM·(2/r − 1/a)      raise a by burning where v is already greatest (perigee)</div>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Mars_Orbiter_Mission" target="_blank" rel="noopener">Wikipedia · Mangalyaan</a>
+        <a href="https://en.wikipedia.org/wiki/Chandrayaan-3" target="_blank" rel="noopener">Wikipedia · Chandrayaan-3</a>
+        <a href="https://en.wikipedia.org/wiki/Oberth_effect" target="_blank" rel="noopener">Wikipedia · Oberth effect</a>
+        <button data-copy="Explain how ISRO's Chandrayaan and Mangalyaan missions used successive perigee burns to raise their apogee before trans-lunar/trans-Mars injection, why burning at perigee is most efficient (Oberth effect, via the vis-viva equation), and how this strategy trades time for propellant compared with a single large injection burn.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>The same code, both directions</h3>
+      <p class="mut">Calendar-making runs the two-body problem backward (when was the sky like this?); mission design runs it forward (when will it be?). One table of correspondences:</p>
+      <table class="tbl"><thead><tr><th>mission question</th><th>calendrical twin</th><th>function here</th></tr></thead><tbody>
+        <tr><td>When does the window open?</td><td>When is the next conjunction?</td><td class="m">CYCLES · synodic entries</td></tr>
+        <tr><td>Where is the target at arrival?</td><td>Where is the graha at the muhūrta?</td><td class="m">grahas(), kepler()</td></tr>
+        <tr><td>Flight time on the transfer ellipse</td><td>Time between tithis on the lunar ellipse</td><td class="m">helio(), solveElong()</td></tr>
+        <tr><td>Arrival epoch in mission elapsed time</td><td>Arrival date in ten calendars</td><td class="m">tour.html → calendars()</td></tr>
+      </tbody></table>
+    </section>
+  </div>
+
+  <!-- ══════════════════ REFERENCES ══════════════════ -->
+  <div class="tabpane" id="t-refs">
+    <section class="blk">
+      <h3>Books that built this page</h3>
+      <table class="tbl"><thead><tr><th>work</th><th>why it matters here</th></tr></thead><tbody>
+        <tr><td><b>Paul Schlyter</b>, <i>Computing Planetary Positions</i> (online tutorial)</td><td><b>The direct source of this engine's orbital elements and perturbation series.</b> If you read one thing to audit chakra-core.js, read this.</td></tr>
+        <tr><td><b>Jean Meeus</b>, <i>Astronomical Algorithms</i> (2nd ed., 1998)</td><td>The standard reference for higher-precision methods; our Julian-day and calendar conversions follow its conventions.</td></tr>
+        <tr><td><b>E. Burgess</b> (tr.), <i>Sūrya Siddhānta</i> (1860)</td><td>The classical Indian engine in English — mean motions, epicycles, eclipse limits.</td></tr>
+        <tr><td><b>Āryabhaṭa</b>, <i>Āryabhaṭīya</i> (499 CE; Shukla &amp; Sarma tr.)</td><td>Sine tables, rotation of the Earth, rational eclipse theory.</td></tr>
+        <tr><td><b>Bhāskara II</b>, <i>Siddhānta-Śiromaṇi</i> (1150)</td><td>Medieval synthesis; instantaneous motion anticipating calculus.</td></tr>
+        <tr><td><b>al-Bīrūnī</b>, <i>The Chronology of Ancient Nations</i> (1000 CE; Sachau tr.)</td><td>The founding text of comparative calendrics — this site's multi-tradition ribbon is its executable homage.</td></tr>
+        <tr><td><b>Dershowitz &amp; Reingold</b>, <i>Calendrical Calculations</i> (4th ed., 2018)</td><td>The definitive algorithmic treatment of world calendars; our Hebrew and tabular-Hijrī arithmetic is cross-checkable against it.</td></tr>
+        <tr><td><b>Calendar Reform Committee</b> (M.N. Saha, chair), <i>Report</i> (Govt. of India, 1955)</td><td>Where the Lahiri ayanāṁśa and the national pañcāṅga standard come from.</td></tr>
+        <tr><td><b>N.C. Lahiri</b>, <i>Indian Ephemeris</i> / <i>Advance Ephemeris</i></td><td>The working tables of the dṛk tradition this engine emulates.</td></tr>
+        <tr><td><b>Sewell &amp; Dikshit</b>, <i>The Indian Calendar</i> (1896)</td><td>Classic conversion tables and the clearest statement of amānta/pūrṇimānta mechanics.</td></tr>
+        <tr><td><b>B.V. Raman</b>; <b>K.S. Krishnamurti</b></td><td>Primary sources for the Raman and KP ayanāṁśa schools quoted in the comparison table.</td></tr>
+      </tbody></table>
+    </section>
+
+    <section class="blk">
+      <h3>Code map — every claim, one click from its proof</h3>
+      <table class="tbl"><thead><tr><th>function</th><th>computes</th><th></th></tr></thead><tbody id="codemap"></tbody></table>
+      <p class="mut">All in <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">src/chakra-core.js</a> · exercised by the <a data-keep-theme href="tests.html">live test console</a> and the 98-assertion node suite · ported byte-compatibly to C in <a href="https://github.com/project-ilm/chakra/tree/main/lib" target="_blank" rel="noopener">lib/</a>.</p>
+    </section>
+  </div>
+
+  <!-- ══════════════════ AI PROMPTS ══════════════════ -->
+  <div class="tabpane" id="t-ai">
+    <section class="blk">
+      <h3>Seed a conversation with any AI</h3>
+      <p class="mut">Self-contained prompts, tuned to get a good explanation on the first try. Copy one into your assistant of choice; add numbers from the observatory for a concrete session. The same prompts appear contextually inside <a data-keep-theme href="pro.html">Observatory Pro</a> via the ✦ button.</p>
+      <div id="promptList"></div>
+    </section>
+  </div>
+  </div><!-- /content -->
+</div><!-- /layout -->
+
+<footer>
+  <div class="wrap">
+    <div data-sharebar></div>
+    <div class="frow">
+      <span data-claude-badge></span>
+      <a href="https://github.com/project-ilm/chakra" target="_blank" rel="noopener">Source · GitHub</a>
+      <a data-keep-theme href="index.html">CHAKRA home</a>
+      <a href="DISCLAIMER.md" target="_blank">Disclaimer</a>
+      <span style="flex:1"></span>
+      <span data-themesel></span>
+    </div>
+    <div style="margin-top:12px">© 1993–2026 Abhishek Choudhary · GPL-3.0-or-later, text CC BY-SA 4.0 · study &amp; heritage computation — not for navigation or muhūrta-critical use.</div>
+  </div>
+</footer>
+
+<script src="src/chakra-core.js"></script>
+<script src="src/chakra-site.js"></script>
+<script>
+(function(){
+"use strict";
+var C=window.Chakra, NS="http://www.w3.org/2000/svg";
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function E(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function el(id){return document.getElementById(id);}
+function copyText(txt,btn){function done(){var o=btn.textContent;btn.textContent="Copied ✓";setTimeout(function(){btn.textContent=o;},1300);}
+  if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done,leg);else leg();
+  function leg(){var ta=document.createElement("textarea");ta.value=txt;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}document.body.removeChild(ta);} }
+document.querySelectorAll("button[data-copy]").forEach(function(b){b.onclick=function(){copyText(b.getAttribute("data-copy"),b);};});
+
+/* tabs */
+var rail=el("rail");
+rail.querySelectorAll("button").forEach(function(b){
+  b.onclick=function(){
+    rail.querySelectorAll("button").forEach(function(x){x.classList.toggle("on",x===b);});
+    document.querySelectorAll(".tabpane").forEach(function(p){p.classList.remove("on");});
+    el("t-"+b.dataset.t).classList.add("on");
+    try{history.replaceState(null,"",location.pathname+location.search+"#"+b.dataset.t);}catch(e){}
+  };
+});
+if(location.hash){var want=location.hash.slice(1);var btn=rail.querySelector('button[data-t="'+want+'"]');if(btn)btn.onclick();}
+
+/* now */
+var now=new Date();
+var dNow=C.dayNo(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),now.getUTCHours()+now.getUTCMinutes()/60);
+var yNow=C.decYear(now);
+
+/* ── SIM 1 · Kepler equal areas ─────────────────────────────────────── */
+(function(){
+  var svg=el("k1svg"),slider=el("k1e"),read=el("k1r");
+  var A=150,cx0=250,cy=150,M=0,trail=[];
+  function kepE(M,e){var R2D=180/Math.PI,S=function(x){return Math.sin(x*Math.PI/180);},Cc=function(x){return Math.cos(x*Math.PI/180);};
+    var Ev=M+e*R2D*S(M)*(1+e*Cc(M));for(var i=0;i<7;i++)Ev=Ev-(Ev-e*R2D*S(Ev)-M)/(1-e*Cc(Ev));return Ev;}
+  function frame(){
+    var e=+slider.value,B=A*Math.sqrt(1-e*e),fx=cx0+A*e;
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    svg.appendChild(E("ellipse",{cx:cx0,cy:cy,rx:A,ry:B,fill:"none",stroke:"rgba(120,140,190,.4)"}));
+    svg.appendChild(E("circle",{cx:fx,cy:cy,r:7,fill:"var(--sun)",style:"filter:drop-shadow(0 0 8px var(--sun))"}));
+    var per=[cx0+A,cy],ap=[cx0-A,cy];
+    svg.appendChild(E("circle",{cx:per[0],cy:per[1],r:2.5,fill:"var(--cy2)"}));
+    svg.appendChild(E("circle",{cx:ap[0],cy:ap[1],r:2.5,fill:"none",stroke:"var(--cy2)"}));
+    var tp=E("text",{x:per[0]+6,y:per[1]-6,fill:"var(--dim)","font-size":"10","font-family":"var(--mono)"});tp.textContent="perihelion a(1−e)";svg.appendChild(tp);
+    var ta=E("text",{x:ap[0]+6,y:ap[1]-6,fill:"var(--dim)","font-size":"10","font-family":"var(--mono)"});ta.textContent="aphelion a(1+e)";svg.appendChild(ta);
+    M=(M+0.9)%360;
+    var Ev=kepE(M,e);
+    var xv=A*(Math.cos(Ev*Math.PI/180)-e), yv=A*Math.sqrt(1-e*e)*Math.sin(Ev*Math.PI/180);
+    var px=fx+xv-A*e+A*e, py=cy-yv; px=cx0+A*Math.cos(Ev*Math.PI/180)*1; px=cx0+xv+A*e; /* focus-origin */
+    px=fx+ (xv); py=cy - yv;
+    trail.push([px,py]); if(trail.length>26)trail.shift();
+    if(trail.length>3){
+      var dstr="M "+fx+" "+cy;
+      trail.forEach(function(p){dstr+=" L "+p[0].toFixed(1)+" "+p[1].toFixed(1);});
+      dstr+=" Z";
+      svg.appendChild(E("path",{d:dstr,fill:"rgba(216,169,78,.20)",stroke:"rgba(216,169,78,.45)","stroke-width":.6}));
+      var area=0;
+      for(var i=1;i<trail.length;i++){var a1=trail[i-1],a2=trail[i];
+        area+=Math.abs((a1[0]-fx)*(a2[1]-cy)-(a2[0]-fx)*(a1[1]-cy))/2;}
+      read.textContent="e="+e.toFixed(2)+" · swept area per fixed Δt ≈ "+area.toFixed(0)+" px² (constant — law II)";
+    }
+    svg.appendChild(E("circle",{cx:px,cy:py,r:5,fill:"var(--cy2)",style:"filter:drop-shadow(0 0 6px var(--cy))"}));
+    if(!reduce)requestAnimationFrame(frame);
+  }
+  slider.oninput=function(){trail=[];};
+  if(reduce){M=40;frame();M=200;frame();}else requestAnimationFrame(frame);
+})();
+
+/* ── SIM 2 · Newton on Kepler's equation ────────────────────────────── */
+(function(){
+  var svg=el("k2svg"),ms=el("k2m"),es=el("k2e"),read=el("k2r");
+  function draw(){
+    var M=+ms.value,e=+es.value,R2D=180/Math.PI;
+    var S=function(x){return Math.sin(x*Math.PI/180);},Cc=function(x){return Math.cos(x*Math.PI/180);};
+    var f=function(Ev){return Ev-e*R2D*S(Ev)-M;};
+    var iters=[],Ev=M+e*R2D*S(M)*(1+e*Cc(M));iters.push(Ev);
+    for(var i=0;i<6;i++){Ev=Ev-f(Ev)/(1-e*Cc(Ev));iters.push(Ev);}
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var X=function(Edeg){return 40+(Edeg/360)*490;},mx=0;
+    for(var Ed=0;Ed<=360;Ed+=4)mx=Math.max(mx,Math.abs(f(Ed)));
+    var Yf=function(v){return 120-(v/mx)*95;};
+    svg.appendChild(E("line",{x1:40,y1:120,x2:530,y2:120,stroke:"var(--faint)"}));
+    var p="";for(var Ed=0;Ed<=360;Ed+=4)p+=(Ed?"L":"M")+X(Ed).toFixed(1)+" "+Yf(f(Ed)).toFixed(1)+" ";
+    svg.appendChild(E("path",{d:p,fill:"none",stroke:"var(--cy)","stroke-width":1.4}));
+    [0,90,180,270,360].forEach(function(g){svg.appendChild(E("line",{x1:X(g),y1:118,x2:X(g),y2:124,stroke:"var(--faint)"}));
+      var t=E("text",{x:X(g),y:136,fill:"var(--dim)","font-size":"9","text-anchor":"middle","font-family":"var(--mono)"});t.textContent=g+"°";svg.appendChild(t);});
+    var lbl=E("text",{x:40,y:20,fill:"var(--dim)","font-size":"10","font-family":"var(--mono)"});
+    lbl.textContent="f(E) = E − (180/π)·e·sinE − M   ·   dots = Newton iterations";svg.appendChild(lbl);
+    iters.forEach(function(Ei,i){
+      svg.appendChild(E("circle",{cx:X(((Ei%360)+360)%360),cy:Yf(f(Ei)),r:i===iters.length-1?4.5:3,
+        fill:i===iters.length-1?"var(--grn)":"var(--amber)","fill-opacity":i===iters.length-1?1:.75}));
+      var t=E("text",{x:X(((Ei%360)+360)%360),y:Yf(f(Ei))-8,fill:"var(--dim)","font-size":"8.5","text-anchor":"middle","font-family":"var(--mono)"});
+      t.textContent="E"+i;svg.appendChild(t);
+    });
+    var last=iters[iters.length-1];
+    read.textContent="E★ = "+last.toFixed(9)+"° · residual "+f(last).toExponential(2)+" after "+(iters.length-1)+" Newton steps";
+    var rows=E("text",{x:40,y:170,fill:"var(--dim)","font-size":"10","font-family":"var(--mono)"});
+    var s="";iters.forEach(function(Ei,i){if(i<5)s+="E"+i+"="+Ei.toFixed(5)+"°   ";});
+    rows.textContent=s;svg.appendChild(rows);
+    var rows2=E("text",{x:40,y:188,fill:"var(--faint)","font-size":"10","font-family":"var(--mono)"});
+    var s2="";iters.forEach(function(Ei,i){if(i<5)s2+="f="+f(Ei).toExponential(1)+"      ";});
+    rows2.textContent=s2;svg.appendChild(rows2);
+  }
+  ms.oninput=es.oninput=draw;draw();
+})();
+
+/* ── SIM 3 · ayanāṁśa rings ─────────────────────────────────────────── */
+(function(){
+  var svg=el("k3svg"),ys=el("k3y"),read=el("k3r");
+  var GL=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+  function draw(){
+    var yv=+ys.value,ay=C.ayan(yv);
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var cx=280,cy=105,R1=92,R2=64;
+    [ [R1,0,"tropical (equinox-fixed)","rgba(95,227,255,.75)"],
+      [R2,ay,"sidereal (star-fixed)","rgba(216,169,78,.85)"] ].forEach(function(ring){
+      var R=ring[0],off=ring[1];
+      svg.appendChild(E("circle",{cx:cx,cy:cy,r:R,fill:"none",stroke:"rgba(120,140,190,.35)"}));
+      for(var s=0;s<12;s++){
+        var lam=s*30+off, a=(-lam)*Math.PI/180; /* 0° at right, CCW */
+        svg.appendChild(E("line",{x1:cx+(R-6)*Math.cos(a),y1:cy+(R-6)*Math.sin(a),x2:cx+R*Math.cos(a),y2:cy+R*Math.sin(a),stroke:"rgba(120,140,190,.4)"}));
+        var ga=(-(s*30+15+off))*Math.PI/180;
+        var t=E("text",{x:cx+(R-16)*Math.cos(ga),y:cy+(R-16)*Math.sin(ga)+4,fill:ring[3],"font-size":R===R1?"11":"9","text-anchor":"middle","font-family":"var(--mono)"});
+        t.textContent=GL[s];svg.appendChild(t);
+      }
+    });
+    /* vernal point marker + Spica */
+    svg.appendChild(E("line",{x1:cx,y1:cy,x2:cx+R1+14,y2:cy,stroke:"var(--cy2)","stroke-width":1.2}));
+    var vt=E("text",{x:cx+R1+18,y:cy+4,fill:"var(--cy2)","font-size":"10","font-family":"var(--mono)"});vt.textContent="♈0° tropical (equinox)";svg.appendChild(vt);
+    var sp=(-(180+ay))*Math.PI/180;
+    svg.appendChild(E("circle",{cx:cx+R2*Math.cos(sp),cy:cy+R2*Math.sin(sp),r:4,fill:"var(--gold)",style:"filter:drop-shadow(0 0 6px var(--gold))"}));
+    var st=E("text",{x:cx+(R2+14)*Math.cos(sp),y:cy+(R2+14)*Math.sin(sp)+4,fill:"var(--gold)","font-size":"9.5","text-anchor":"middle","font-family":"var(--mono)"});
+    st.textContent="Spica · sid 180°";svg.appendChild(st);
+    var idx=Math.floor((((-ay)%360)+360)%360/30);
+    read.textContent=yv+" CE · ayanāṁśa = "+ay.toFixed(3)+"° · vernal equinox sits in sidereal "+C.RASHI[idx];
+  }
+  ys.oninput=draw;draw();
+})();
+
+/* ── SIM 4 · tithi dial ─────────────────────────────────────────────── */
+(function(){
+  var svg=el("k4svg"),read=el("k4r");
+  var g0=C.grahas(dNow);
+  var sun=g0.Sun,moon=g0.Moon,drag=null;
+  var KAR_MOV=["Bava","Bālava","Kaulava","Taitila","Garaja","Vaṇija","Viṣṭi"];
+  var KAR_FIX=["Kiṃstughna","Śakuni","Chatuṣpāda","Nāga"];
+  var PH8=["New Moon","Waxing Crescent","First Quarter","Waxing Gibbous","Full Moon","Waning Gibbous","Last Quarter","Waning Crescent"];
+  var cx=140,cy=125,R=96;
+  function karName(kn){return kn===0?KAR_FIX[0]:kn>=57?KAR_FIX[kn-56]:KAR_MOV[(kn-1)%7];}
+  function draw(){
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    svg.appendChild(E("circle",{cx:cx,cy:cy,r:R,fill:"rgba(6,10,20,.6)",stroke:"rgba(120,140,190,.4)"}));
+    for(var a=0;a<360;a+=30){
+      var r1=R-7,x1=cx+r1*Math.cos(-a*Math.PI/180),y1=cy+r1*Math.sin(-a*Math.PI/180);
+      svg.appendChild(E("line",{x1:x1,y1:y1,x2:cx+R*Math.cos(-a*Math.PI/180),y2:cy+R*Math.sin(-a*Math.PI/180),stroke:"rgba(120,140,190,.35)"}));
+    }
+    function hand(lam,col,r,glyph){
+      var a=-lam*Math.PI/180,hx=cx+r*Math.cos(a),hy=cy+r*Math.sin(a);
+      svg.appendChild(E("line",{x1:cx,y1:cy,x2:hx,y2:hy,stroke:col,"stroke-width":2}));
+      svg.appendChild(E("circle",{cx:hx,cy:hy,r:8,fill:col,style:"filter:drop-shadow(0 0 7px "+col+")"}));
+      var t=E("text",{x:hx,y:hy+4,fill:"#04121a","font-size":"10","text-anchor":"middle","font-family":"var(--mono)"});
+      t.textContent=glyph;svg.appendChild(t);
+      return [hx,hy];
+    }
+    hand(sun,"#e6b450",R-26,"☉");
+    hand(moon,"#cdd6e0",R-4,"☾");
+    var e=((moon-sun)%360+360)%360, ti=Math.floor(e/12), kn=Math.floor(e/6);
+    var illum=(1-Math.cos(e*Math.PI/180))/2;
+    var pi2=0;var lims=[11.25,78.75,101.25,168.75,191.25,258.75,281.25,348.75];
+    for(var k2=0;k2<8;k2++){if(e<lims[k2]){pi2=k2;break;}}
+    var TIT=C.TITHI[ti%15];
+    read.innerHTML="elongation <b>"+e.toFixed(1)+"°</b> → tithi "+(ti+1)+" · <b>"+TIT+"</b> ("+(ti<15?"śukla":"kṛṣṇa")+" pakṣa) · karaṇa <b>"+karName(kn)+"</b> · "+PH8[pi2]+" · "+(illum*100).toFixed(0)+"% lit";
+    var hint=E("text",{x:290,y:40,fill:"var(--dim)","font-size":"11","font-family":"var(--mono)"});
+    hint.textContent="drag either hand — ☾ gains 12° per tithi";svg.appendChild(hint);
+    var f=E("text",{x:290,y:64,fill:"var(--faint)","font-size":"10","font-family":"var(--mono)"});
+    f.textContent="initialised to the real sky right now";svg.appendChild(f);
+  }
+  function lamFromEvent(ev){
+    var r=svg.getBoundingClientRect();
+    var x=(ev.clientX-r.left)*560/r.width-cx, y=(ev.clientY-r.top)*250/r.height-cy;
+    return ((Math.atan2(-y,x)*180/Math.PI)%360+360)%360;
+  }
+  svg.addEventListener("pointerdown",function(ev){
+    var lam=lamFromEvent(ev);
+    var ds=Math.abs(((lam-sun+540)%360)-180),dm=Math.abs(((lam-moon+540)%360)-180);
+    drag=dm<=ds?"m":"s";try{svg.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();
+  });
+  svg.addEventListener("pointermove",function(ev){
+    if(!drag)return;var lam=lamFromEvent(ev);
+    if(drag==="m")moon=lam;else sun=lam;draw();ev.preventDefault();
+  });
+  svg.addEventListener("pointerup",function(){drag=null;});
+  draw();
+})();
+
+/* ── SIM 5 · synodic beats ──────────────────────────────────────────── */
+(function(){
+  var cv=el("k5cv"),ctx=cv.getContext("2d"),a=el("k5a"),b=el("k5b"),read=el("k5r");
+  el("k5js").onclick=function(){a.value=11.862;b.value=29.457;draw();};
+  function draw(){
+    var P1=+a.value,P2=+b.value,W=cv.width,H=cv.height;
+    ctx.clearRect(0,0,W,H);
+    var T=120,X=function(t){return t/T*W;},mid=H/2,amp=H*0.30;
+    ctx.strokeStyle="rgba(70,199,214,.35)";ctx.beginPath();
+    for(var t=0;t<=T;t+=0.1){var yv=mid-amp*Math.sin(2*Math.PI*t/P1);t?ctx.lineTo(X(t),yv):ctx.moveTo(X(t),yv);}ctx.stroke();
+    ctx.strokeStyle="rgba(217,111,176,.35)";ctx.beginPath();
+    for(t=0;t<=T;t+=0.1){yv=mid-amp*Math.sin(2*Math.PI*t/P2);t?ctx.lineTo(X(t),yv):ctx.moveTo(X(t),yv);}ctx.stroke();
+    ctx.strokeStyle="#e8ecf7";ctx.lineWidth=1.6;ctx.beginPath();
+    for(t=0;t<=T;t+=0.1){yv=mid-amp*0.5*(Math.sin(2*Math.PI*t/P1)+Math.sin(2*Math.PI*t/P2));t?ctx.lineTo(X(t),yv):ctx.moveTo(X(t),yv);}ctx.stroke();
+    ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.strokeStyle="rgba(216,169,78,.8)";
+    [1,-1].forEach(function(sg){ctx.beginPath();
+      for(t=0;t<=T;t+=0.2){var env=Math.abs(Math.cos(Math.PI*t*(1/P1-1/P2)));yv=mid-sg*amp*env;t?ctx.lineTo(X(t),yv):ctx.moveTo(X(t),yv);}ctx.stroke();});
+    ctx.setLineDash([]);
+    ctx.fillStyle="rgba(115,133,160,.9)";ctx.font="11px monospace";
+    for(t=0;t<=T;t+=20){ctx.fillText(t+"y",X(t)+3,H-6);}
+    var S=Math.abs(1/(1/P1-1/P2));
+    read.textContent=(P1===P2)?"identical periods — no beat":"P₁="+(+P1).toFixed(2)+"y · P₂="+(+P2).toFixed(2)+"y → synodic S="+(S>1e4?"∞":S.toFixed(2)+"y");
+  }
+  a.oninput=b.oninput=draw;draw();
+})();
+
+/* ── SIM 6 · Hohmann planner ────────────────────────────────────────── */
+(function(){
+  var svg=el("k6svg"),sel=el("k6t"),read=el("k6r");
+  function draw(){
+    var nm=sel.value,a2=C.ELEM[nm](dNow).a,r1=1;
+    var inner=Math.min(r1,a2),outer=Math.max(r1,a2);
+    var at=(r1+a2)/2, tY=0.5*Math.pow(at,1.5), tD=tY*365.25;
+    var P2=Math.pow(a2,1.5), phi=180-360*(tY/P2);
+    var Ssyn=Math.abs(1/(1/1-1/P2));
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var cx=175,cy=150,Rmax=125,sc=function(r){return Rmax*Math.sqrt(r/Math.max(outer,1.6));};
+    svg.appendChild(E("circle",{cx:cx,cy:cy,r:5,fill:"var(--sun)",style:"filter:drop-shadow(0 0 8px var(--sun))"}));
+    svg.appendChild(E("circle",{cx:cx,cy:cy,r:sc(r1),fill:"none",stroke:"rgba(95,227,255,.5)"}));
+    svg.appendChild(E("circle",{cx:cx,cy:cy,r:sc(a2),fill:"none",stroke:"rgba(217,111,176,.5)"}));
+    /* transfer half ellipse from departure (angle 0, at r_inner side) to arrival (180) — draw in true space then map radially */
+    var et=(outer-inner)/(outer+inner);
+    var p="";
+    for(var v=0;v<=180;v+=3){
+      var rr=at*(1-et*et)/(1+et*Math.cos(v*Math.PI/180));
+      var ang=(a2>r1? v : 180+v)*Math.PI/180; /* outward: start at inner */
+      var R=sc(rr),x=cx+R*Math.cos(-ang),y=cy+R*Math.sin(-ang);
+      p+=(v?"L":"M")+x.toFixed(1)+" "+y.toFixed(1)+" ";
+    }
+    svg.appendChild(E("path",{d:p,fill:"none",stroke:"var(--amber)","stroke-width":1.6,"stroke-dasharray":"5 4"}));
+    /* Earth at departure */
+    var Re=sc(r1),xE=cx+Re,yE=cy;
+    svg.appendChild(E("circle",{cx:xE,cy:yE,r:4,fill:"var(--cy2)"}));
+    var tE=E("text",{x:xE+7,y:yE+4,fill:"var(--cy2)","font-size":"10","font-family":"var(--mono)"});tE.textContent="Earth · depart";svg.appendChild(tE);
+    /* target at arrival (angle 180 from departure point of transfer) and at launch (phase angle ahead) */
+    var Rt=sc(a2);
+    var xa=cx+Rt*Math.cos(Math.PI),ya=cy-Rt*Math.sin(Math.PI);
+    svg.appendChild(E("circle",{cx:xa,cy:ya,r:4,fill:"var(--mag)"}));
+    var tA=E("text",{x:xa-8,y:ya-8,fill:"var(--mag)","font-size":"10","text-anchor":"end","font-family":"var(--mono)"});tA.textContent=nm+" · arrive";svg.appendChild(tA);
+    var la=(a2>r1?phi:180-phi)*Math.PI/180;
+    var xl=cx+Rt*Math.cos(-la),yl=cy+Rt*Math.sin(-la);
+    svg.appendChild(E("circle",{cx:xl,cy:yl,r:4,fill:"none",stroke:"var(--mag)"}));
+    var tL=E("text",{x:xl+7,y:yl+4,fill:"var(--mag)","font-size":"10","font-family":"var(--mono)"});tL.textContent=nm+" · at launch";svg.appendChild(tL);
+    /* phase angle arc */
+    var arc="M "+(cx+Rt*0.42)+" "+cy+" ";
+    for(var q=0;q<=Math.abs(phi);q+=3){var qa=(phi>0?q:-q)*Math.PI/180;
+      arc+="L "+(cx+Rt*0.42*Math.cos(-qa)).toFixed(1)+" "+(cy+Rt*0.42*Math.sin(-qa)).toFixed(1)+" ";}
+    svg.appendChild(E("path",{d:arc,fill:"none",stroke:"var(--gold)","stroke-width":1.4}));
+    var tf=E("text",{x:cx+8,y:cy-Rt*0.42-6,fill:"var(--gold)","font-size":"10","font-family":"var(--mono)"});
+    tf.textContent="φ = "+phi.toFixed(1)+"°";svg.appendChild(tf);
+    read.textContent="a_t="+at.toFixed(3)+" AU · flight "+tD.toFixed(0)+" days ("+tY.toFixed(2)+" y) · window repeats every "+ (Ssyn*365.25).toFixed(0)+" d";
+    var note=E("text",{x:355,y:40,fill:"var(--dim)","font-size":"10.5","font-family":"var(--mono)"});
+    note.textContent="Earth→"+nm;svg.appendChild(note);
+  }
+  sel.onchange=draw;draw();
+})();
+
+/* ── schools: live ayanāṁśa table + hijrī divergence line ───────────── */
+(function(){
+  var ay=C.ayan(yNow);
+  el("ayY").textContent="value at "+now.getFullYear();
+  function dms(x){var d0=Math.floor(x),m=Math.round((x-d0)*60);if(m===60){d0++;m=0;}return d0+"° "+String(m).padStart(2,"0")+"′";}
+  var rows=[
+    ["Lahiri / Citrāpakṣa","Spica (Citrā) fixed at sidereal 180° — Calendar Reform Committee, 1955",ay,"Indian national pañcāṅga · this engine","live"],
+    ["Krishnamurti (KP)","Lahiri family, slightly earlier zero; ≈ 6′ behind",ay-0.100,"KP stellar astrology","≈"],
+    ["B.V. Raman","Revised Sūrya-Siddhāntic zero; ≈ 1°29′ behind Lahiri",ay-1.483,"Raman school","≈"],
+    ["Fagan–Bradley","Western sidereal; Spica at 29° Virgo; ≈ 53′ ahead",ay+0.883,"Western siderealists","≈"],
+    ["True Citrā","Spica held at 180° with proper motion, instant-exact",ay,"research pañcāṅgas","≈ Lahiri ±1′"]
+  ];
+  var tb=el("ayanTable");
+  rows.forEach(function(r){
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td><b>"+r[0]+"</b></td><td>"+r[1]+"</td><td class='m'>"+dms(r[2])+" <span style='color:var(--faint)'>"+r[4]+"</span></td><td>"+r[3]+"</td>";
+    tb.appendChild(tr);
+  });
+  var j=C.greg2jdn(2026,6,16),su=C.hijriSunni(j),sh=C.hijriShia(j);
+  el("hijriDemo").textContent="computed now → 16 Jun 2026 = "+su.d+" "+C.HIJRI_M[su.m-1]+" "+su.y+" AH (Sunni) but "+sh.d+" "+C.HIJRI_M[sh.m-1]+" "+sh.y+" AH (Shia) — one sky, two arithmetics, one day apart.";
+})();
+
+/* ── code map ───────────────────────────────────────────────────────── */
+(function(){
+  var GH="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js";
+  var rows=[
+    ["ELEM · kepler() · helio()","orbital elements → position on the ellipse (Schlyter)"],
+    ["sunLon() · moonLon() · planetLon()","geocentric ecliptic longitudes with lunar perturbations"],
+    ["ayan() · panchanga()","Lahiri ayanāṁśa; tithi, nakṣatra, yoga, karaṇa, vāra"],
+    ["solveElong() · eclipses()","new/full-moon solver; node-window eclipse scan"],
+    ["hijriTabular() · hebrew() · nanakshahi() · mayan()","the calendar arithmetic family"],
+    ["annualEvents()","the amānta festival engine — every almanac row"],
+    ["ascendant() · telescope() · altAz()","lagna and where to point a telescope"],
+    ["buildChart() · computeYogas() · vimshottari()","jyotiṣa structures (cultural computation)"]
+  ];
+  var tb=el("codemap");
+  rows.forEach(function(r){
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td class='m'>"+r[0]+"</td><td>"+r[1]+"</td><td><a href='"+GH+"' target='_blank' rel='noopener'>open ↗</a></td>";
+    tb.appendChild(tr);
+  });
+})();
+
+/* ── AI prompts tab (shared registry + learn extras) ────────────────── */
+(function(){
+  var box=el("promptList");
+  var extra=[["The whole engine in one sitting","I'm reading a small astronomical engine (Schlyter low-precision ephemeris) that computes: planetary positions via Keplerian elements, the Moon with 12 longitude perturbation terms, Lahiri ayanāṁśa as 23.853°+0.0139552°(y−2000), a pañcāṅga from Sun–Moon elongation, tabular Hijrī / fixed Hebrew / Nanakshahi / Mayan calendars, and an amānta festival engine. Walk me through how these parts must fit together, in dependency order, and quiz me at each step."],
+    ["Audit my eclipse windows","An engine flags a possible solar eclipse when the Sun is within 18.4° of a lunar node at new moon (central under 11.8°), and a lunar eclipse within 12.2° at full moon (near-total under 9.5°). Assess those thresholds against standard ecliptic limits, explain where they come from geometrically, and describe edge cases where a simple node-distance test misclassifies."],
+    ["Calendars as algorithms","Teach me the tabular Islamic, fixed Hebrew, and Mayan Long Count calendars purely as algorithms: epochs, cycle structures, leap rules, and conversion to/from Julian Day Numbers, with one worked example each."]];
+  function card(title,text){
+    var d=document.createElement("div");d.className="promptcard";
+    var b=document.createElement("b");b.textContent=title;d.appendChild(b);
+    var pre=document.createElement("pre");pre.textContent=text;d.appendChild(pre);
+    var btn=document.createElement("button");btn.textContent="Copy prompt";
+    btn.style.cssText="font-family:var(--mono);font-size:10.5px;color:var(--cy2);background:none;border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;cursor:pointer";
+    btn.onclick=function(){copyText(text,btn);};d.appendChild(btn);
+    box.appendChild(d);
+  }
+  extra.forEach(function(p){card(p[0],p[1]);});
+  if(window.ChakraSite&&window.ChakraSite.PROMPTS){
+    var P=window.ChakraSite.PROMPTS;
+    Object.keys(P).forEach(function(view){
+      P[view].forEach(function(p){card(view+" · "+p[0],p[1]);});
+    });
+  }
+})();
+})();
+</script>
+</body>
+</html>

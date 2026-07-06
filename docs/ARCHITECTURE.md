@@ -52,3 +52,32 @@ The app must open from `file://` fully offline. Browsers block module imports fr
 ---
 © 1993–2026 Abhishek Choudhary. This document is licensed under [CC BY-SA 4.0](../LICENSE-docs).
 CHAKRA is study/heritage software — see [DISCLAIMER](../DISCLAIMER.md).
+
+---
+## v1.2.0 additions
+
+### Page tier
+```
+index.html   landing — hero instrument (moon-in-astrolabe) + ten-calendar ribbon + API dispatcher shell
+pro.html     the full observatory UI (chakra-ui.js) + per-view AI prompt popups
+learn.html   six self-contained sims + schools/history/spacecraft/references
+tour.html    interstellar planner (chakra-voyage.js + core calendars for arrival dates)
+tests.html   fetches test-plan.json, executes it via ChakraAPI.handle in-browser
+```
+All pages load `src/chakra-site.js`: theme sets applied to `:root` custom properties and carried by `?theme=`; share bar; "Built with Claude" badge; prompt popups gated on `body[data-page="pro"]`.
+
+### New modules
+- `src/chakra-voyage.js` — pure relativistic tour arithmetic (`STARS`, `DRIVES`, `gamma`, `plan`, `tour`); no DOM; covered by `test/test-voyage.js`.
+- `src/chakra-site.js` — page chrome only; no computation.
+
+### `lib/` — the C99 twin
+```
+gen_vectors.js ──(node, reads ../src/chakra-core.js)──▶ vectors.h
+chakra.h / chakra.c ──▶ libchakra.a ── chakra_cli.c ──▶ ./chakra (JSON CLI)
+test_chakra.c + vectors.h ──▶ ./test_chakra   (6,590 parity checks; byte-exact annualEvents 2026–27)
+```
+`make vectors.h && make && make test`. The vector file is committed so C users can verify without node; regenerating it re-derives truth from the JS reference.
+
+### Browser test plan
+`test-plan.json` (26 cases) is produced by a generator that executes every check against the live engine before writing — a red case aborts generation. `tests.html` embeds a byte-identical fallback for `file://` use.
+

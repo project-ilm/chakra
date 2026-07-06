@@ -1,0 +1,581 @@
+<!doctype html>
+<!--
+  CHAKRA — public test console. Fetches test-plan.json from this very site
+  and executes every case in your browser against the same engine that
+  renders every page. Don't trust — verify.
+
+  Copyright (C) 1993-2026 Abhishek Choudhary. Sole author.
+  SPDX-License-Identifier: GPL-3.0-or-later - text CC BY-SA 4.0
+  Distributed WITHOUT ANY WARRANTY. See DISCLAIMER.md.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test console — CHAKRA</title>
+<meta name="description" content="Run CHAKRA's public test plan live in your browser: eclipse dates, festival calculus, calendar cross-checks and API hardening, executed against the same engine that renders the site.">
+<style>
+  :root{
+    --bg:#05070e; --bg2:#0a0e1a; --panel:rgba(18,24,40,.72); --panelb:rgba(70,199,214,.16);
+    --ink:#dce6f2; --dim:#7385a0; --faint:#3d4b64;
+    --cy:#46c7d6; --cy2:#5fe3ff; --amber:#e6b450; --grn:#5fe39a; --mag:#d96fb0;
+    --gold:#d8a94e; --paper:#e8ecf7;
+    --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --serif:Georgia,"Times New Roman",Cambria,serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.55}
+  a{color:var(--cy)}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+  header.top{padding:26px 0 8px}
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--dim)}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(28px,4.4vw,42px);color:var(--paper);margin:4px 0 6px;letter-spacing:.05em}
+  .sub{color:var(--dim);max-width:74ch}
+  nav.crumbs{display:flex;flex-wrap:wrap;gap:14px;font-family:var(--mono);font-size:11.5px;margin-top:12px}
+  nav.crumbs a{color:var(--dim);text-decoration:none}
+  nav.crumbs a:hover{color:var(--cy2)}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0 12px}
+  .chip{font-family:var(--mono);font-size:11px;border:1px solid var(--panelb);border-radius:999px;padding:4px 12px;color:var(--dim)}
+  .chip b{color:var(--paper)}
+  .chip.pass b{color:var(--grn)} .chip.fail b{color:var(--mag)}
+  button.run{font-family:var(--mono);font-size:12px;color:#04121a;background:linear-gradient(135deg,var(--cy),var(--cy2));border:0;border-radius:999px;padding:8px 18px;cursor:pointer}
+  table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--panelb);border-radius:12px;overflow:hidden;font-size:12.5px}
+  th{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);text-align:left;padding:9px 12px;border-bottom:1px solid var(--panelb)}
+  td{padding:8px 12px;border-bottom:1px solid rgba(70,199,214,.07);vertical-align:top}
+  td.m{font-family:var(--mono);font-size:11px}
+  td.m a{color:var(--cy);text-decoration:none}
+  .b{font-family:var(--mono);font-size:10px;border-radius:999px;padding:2px 9px;letter-spacing:.08em}
+  .b.p{color:#04140b;background:var(--grn)} .b.f{color:#1c040f;background:var(--mag)}
+  details{font-family:var(--mono);font-size:10.5px;color:var(--dim)}
+  details pre{white-space:pre-wrap;max-height:260px;overflow:auto;background:var(--bg2);border:1px solid var(--panelb);border-radius:8px;padding:8px;margin:6px 0 0}
+  .failwhy{color:var(--mag);font-family:var(--mono);font-size:10.5px;margin-top:4px}
+  footer{border-top:1px solid var(--panelb);margin-top:34px;padding:22px 0 40px;font-size:11.5px;color:var(--dim)}
+  .frow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .frow a{color:var(--dim);text-decoration:none;border:1px solid var(--panelb);border-radius:999px;padding:3px 10px}
+</style>
+</head>
+<body data-page="tests">
+<header class="top wrap">
+  <div class="eyebrow">CHAKRA - verification deck</div>
+  <h1>Run the tests yourself</h1>
+  <p class="sub">This page fetches <a href="test-plan.json" target="_blank">test-plan.json</a> from the site and executes every case in <em>your</em> browser, against the very engine rendering these pages. Eclipse dates found by geometry, festivals found by the amānta rule, calendars cross-checked on published civil dates, and the API's manners under abuse. Green means the mathematics held on your machine, just now.</p>
+  <nav class="crumbs">
+    <a data-keep-theme href="index.html">&#9666; CHAKRA home</a>
+    <a data-keep-theme href="pro.html">Observatory Pro</a>
+    <a data-keep-theme href="learn.html">Learn</a>
+    <a data-keep-theme href="tour.html">Interstellar tour</a>
+  </nav>
+</header>
+
+<div class="wrap">
+  <div class="bar">
+    <button class="run" id="rerun">Run again</button>
+    <span class="chip" id="cSrc">plan: loading…</span>
+    <span class="chip pass" id="cPass"><b>0</b> pass</span>
+    <span class="chip fail" id="cFail"><b>0</b> fail</span>
+    <span class="chip" id="cTime"><b>—</b></span>
+  </div>
+  <table id="tbl">
+    <thead><tr><th style="width:44%">case</th><th>request</th><th style="width:70px">result</th><th style="width:120px">envelope</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div data-sharebar></div>
+    <div class="frow">
+      <span data-claude-badge></span>
+      <a href="https://github.com/project-ilm/chakra" target="_blank" rel="noopener">Source - GitHub</a>
+      <a data-keep-theme href="index.html">CHAKRA home</a>
+      <span style="flex:1"></span>
+      <span data-themesel></span>
+    </div>
+    <div style="margin-top:12px">&copy; 1993-2026 Abhishek Choudhary - GPL-3.0-or-later - the node suite (98 assertions) and the C parity harness live in the repo; this console is the public, in-browser slice.</div>
+  </div>
+</footer>
+
+<script type="application/json" id="fallbackPlan">{
+ "name": "CHAKRA public test plan",
+ "version": "1.2.0",
+ "note": "Executed live in your browser by tests.html against the same engine that renders the site. Anchors are externally verifiable civil dates.",
+ "cases": [
+  {
+   "name": "moment · full envelope present",
+   "params": "api=moment",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "jd"
+    },
+    {
+     "op": "exists",
+     "path": "calendars.hijriSunni"
+    },
+    {
+     "op": "exists",
+     "path": "panchanga.tithi"
+    }
+   ]
+  },
+  {
+   "name": "moment · echoes the requested date",
+   "params": "api=moment&date=2026-08-12",
+   "checks": [
+    {
+     "op": "eq",
+     "path": "input.refDate",
+     "value": "2026-08-12"
+    }
+   ]
+  },
+  {
+   "name": "pañcāṅga · Delhi, 12 Aug 2026 06:30 is Budhavāra",
+   "params": "api=panchang&date=2026-08-12&time=06:30&lat=28.61&lon=77.21&tz=5.5",
+   "checks": [
+    {
+     "op": "eq",
+     "path": "panchanga.vara",
+     "value": "Budhavāra"
+    },
+    {
+     "op": "exists",
+     "path": "panchanga.nakshatra"
+    }
+   ]
+  },
+  {
+   "name": "Hijrī divergence · Sunni still in 1447",
+   "params": "api=calendars&date=2026-06-16",
+   "checks": [
+    {
+     "op": "contains",
+     "path": "calendars.hijriSunni",
+     "value": "Dhū al-Ḥijjah 1447"
+    }
+   ]
+  },
+  {
+   "name": "Hijrī divergence · Shia already 1448",
+   "params": "api=calendars&date=2026-06-16",
+   "checks": [
+    {
+     "op": "contains",
+     "path": "calendars.hijriShia",
+     "value": "Muḥarram 1448"
+    }
+   ]
+  },
+  {
+   "name": "Hebrew · Rosh Hashana 5786 lands 23 Sep 2025",
+   "params": "api=calendars&date=2025-09-23",
+   "checks": [
+    {
+     "op": "contains",
+     "path": "calendars.hebrew",
+     "value": "Tishri 5786"
+    }
+   ]
+  },
+  {
+   "name": "festivals · Dīpāvalī 2026 = 9 Nov (instant-of-amāvāsyā convention; udaya rule is FW-2)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Dīpāvalī"
+      },
+      "date": {
+       "eq": "2026-11-09"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "festivals · Holikā/Holi pūrṇimā = 3 Mar 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Holikā"
+      },
+      "date": {
+       "eq": "2026-03-03"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "festivals · Mahāśivarātri = 15 Feb 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Mahāśivarātri"
+      },
+      "date": {
+       "eq": "2026-02-15"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · solar, 17 Feb 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Solar eclipse"
+      },
+      "date": {
+       "eq": "2026-02-17"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · lunar, 3 Mar 2026 (Holi eclipse)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Lunar eclipse"
+      },
+      "date": {
+       "eq": "2026-03-03"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · solar, 12 Aug 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Solar eclipse"
+      },
+      "date": {
+       "eq": "2026-08-12"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · lunar, 28 Aug 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Lunar eclipse"
+      },
+      "date": {
+       "eq": "2026-08-28"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "adhika māsa 2026 · intercalary pūrṇimā flagged 31 May",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Adhika"
+      },
+      "date": {
+       "eq": "2026-05-31"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Eid al-Fiṭr (Sunni tabular) = 20 Mar 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "eq": "Eid al-Fiṭr"
+      },
+      "note": {
+       "eq": "Sunni tabular"
+      },
+      "date": {
+       "eq": "2026-03-20"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Vaisakhi fixed · 14 Apr",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Vaisakhi"
+      },
+      "date": {
+       "eq": "2026-04-14"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Makara Saṅkrānti 2026 · 14 Jan (Lahiri)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Makara"
+      },
+      "date": {
+       "eq": "2026-01-14"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Pesach 5786 begins 2 Apr 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "eq": "Pesach begins"
+      },
+      "date": {
+       "eq": "2026-04-02"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "events · 2026 list is rich (≥48 rows)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "events",
+     "value": 48
+    }
+   ]
+  },
+  {
+   "name": "events · 2027 works across the year boundary",
+   "params": "api=events&year=2027",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "events",
+     "value": 44
+    }
+   ]
+  },
+  {
+   "name": "telescope · Jupiter has alt/az/RA at Hyderabad",
+   "params": "api=telescope&date=2026-07-04&time=21:30",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "bodies.Jupiter.alt"
+    },
+    {
+     "op": "exists",
+     "path": "bodies.Saturn.raH"
+    }
+   ]
+  },
+  {
+   "name": "daśā · nine mahādaśās, always",
+   "params": "api=dasha&date=1990-05-15&time=06:30",
+   "checks": [
+    {
+     "op": "len",
+     "path": "dasha.seq",
+     "value": 9
+    }
+   ]
+  },
+  {
+   "name": "yogas endpoint · returns an array",
+   "params": "api=yogas&date=2026-07-04",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "yogas",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "eclipses endpoint · finds events near 2026",
+   "params": "api=eclipses&date=2026-06-01",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "eclipses",
+     "value": 2
+    }
+   ]
+  },
+  {
+   "name": "hardening · __proto__ endpoint degrades safely to moment",
+   "params": "api=__proto__",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "panchanga.tithi"
+    },
+    {
+     "op": "exists",
+     "path": "calendars.hijriShia"
+    }
+   ]
+  },
+  {
+   "name": "hardening · junk endpoint degrades safely to moment",
+   "params": "api=doom",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "panchanga.tithi"
+    }
+   ]
+  }
+ ]
+}
+</script>
+<script src="src/chakra-core.js"></script>
+<script src="src/chakra-kernel.js"></script>
+<script src="src/chakra-api.js"></script>
+<script src="src/chakra-site.js"></script>
+<script>
+(function(){
+"use strict";
+var API=window.ChakraAPI;
+function el(id){return document.getElementById(id);}
+function resolve(root,path){
+  return path.split(".").reduce(function(o,k){
+    if(o==null)return undefined;
+    var m=k.match(/^(\w+)\[(\d+)\]$/);
+    if(m)return (o[m[1]]||[])[+m[2]];
+    return o[k];
+  },root);
+}
+function check(env,c){
+  var v=c.path?resolve(env,c.path):undefined;
+  switch(c.op){
+    case "eq": return JSON.stringify(v)===JSON.stringify(c.value);
+    case "near": return typeof v==="number"&&Math.abs(v-c.value)<=c.tol;
+    case "gte": return typeof v==="number"&&v>=c.value;
+    case "contains": return String(v).indexOf(c.value)>=0;
+    case "exists": return v!==undefined&&v!==null;
+    case "len": return Array.isArray(v)&&v.length===c.value;
+    case "lenGte": return Array.isArray(v)&&v.length>=c.value;
+    case "some":
+      if(!Array.isArray(v))return false;
+      return v.some(function(it){return Object.keys(c.where).every(function(f){
+        var w=c.where[f];
+        if(w.eq!==undefined)return it[f]===w.eq;
+        if(w.contains!==undefined)return String(it[f]).indexOf(w.contains)>=0;
+        return false;});});
+  }
+  return false;
+}
+function describe(c){
+  var s=c.op+" "+(c.path||"");
+  if(c.value!==undefined)s+=" "+JSON.stringify(c.value);
+  if(c.where)s+=" where "+JSON.stringify(c.where);
+  return s;
+}
+function loadPlan(){
+  return fetch("test-plan.json",{cache:"no-store"}).then(function(r){
+    if(!r.ok)throw 0;return r.json();
+  }).then(function(p){el("cSrc").innerHTML="plan: <b>fetched from site</b> - "+p.cases.length+" cases";return p;})
+  .catch(function(){
+    var p=JSON.parse(el("fallbackPlan").textContent);
+    el("cSrc").innerHTML="plan: <b>embedded snapshot</b> (offline/file mode) - "+p.cases.length+" cases";
+    return p;
+  });
+}
+function run(plan){
+  var rows=el("rows");rows.innerHTML="";
+  var pass=0,fail=0,t0=performance.now();
+  plan.cases.forEach(function(c){
+    var env,err=null,raw="";
+    try{
+      var res=API.handle(new URLSearchParams(c.params));
+      raw=res.body;env=JSON.parse(res.body);
+    }catch(e){err="engine threw: "+e.message;}
+    var bad=[];
+    if(!err)c.checks.forEach(function(ch){if(!check(env,ch))bad.push(describe(ch));});
+    var okAll=!err&&bad.length===0;
+    if(okAll)pass++;else fail++;
+    var tr=document.createElement("tr");
+    var link="pro.html?"+c.params;
+    tr.innerHTML="<td>"+c.name+(okAll?"":('<div class="failwhy">'+(err||("failed: "+bad.join(" ; ")))+"</div>"))+"</td>"+
+      '<td class="m"><a data-keep-theme href="'+link+'" title="open in the observatory">?'+c.params+"</a></td>"+
+      '<td><span class="b '+(okAll?"p\">PASS":"f\">FAIL")+"</span></td>"+
+      "<td><details><summary>raw</summary><pre></pre></details></td>";
+    tr.querySelector("pre").textContent=raw?JSON.stringify(JSON.parse(raw),null,1).slice(0,4000):String(err);
+    rows.appendChild(tr);
+  });
+  el("cPass").innerHTML="<b>"+pass+"</b> pass";
+  el("cFail").innerHTML="<b>"+fail+"</b> fail";
+  el("cTime").innerHTML="<b>"+(performance.now()-t0).toFixed(0)+" ms</b> - "+new Date().toLocaleTimeString();
+}
+var PLAN=null;
+loadPlan().then(function(p){PLAN=p;run(p);});
+el("rerun").onclick=function(){if(PLAN)run(PLAN);};
+})();
+</script>
+</body>
+</html>

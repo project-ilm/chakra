@@ -1,0 +1,396 @@
+{
+ "name": "CHAKRA public test plan",
+ "version": "1.2.0",
+ "note": "Executed live in your browser by tests.html against the same engine that renders the site. Anchors are externally verifiable civil dates.",
+ "cases": [
+  {
+   "name": "moment · full envelope present",
+   "params": "api=moment",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "jd"
+    },
+    {
+     "op": "exists",
+     "path": "calendars.hijriSunni"
+    },
+    {
+     "op": "exists",
+     "path": "panchanga.tithi"
+    }
+   ]
+  },
+  {
+   "name": "moment · echoes the requested date",
+   "params": "api=moment&date=2026-08-12",
+   "checks": [
+    {
+     "op": "eq",
+     "path": "input.refDate",
+     "value": "2026-08-12"
+    }
+   ]
+  },
+  {
+   "name": "pañcāṅga · Delhi, 12 Aug 2026 06:30 is Budhavāra",
+   "params": "api=panchang&date=2026-08-12&time=06:30&lat=28.61&lon=77.21&tz=5.5",
+   "checks": [
+    {
+     "op": "eq",
+     "path": "panchanga.vara",
+     "value": "Budhavāra"
+    },
+    {
+     "op": "exists",
+     "path": "panchanga.nakshatra"
+    }
+   ]
+  },
+  {
+   "name": "Hijrī divergence · Sunni still in 1447",
+   "params": "api=calendars&date=2026-06-16",
+   "checks": [
+    {
+     "op": "contains",
+     "path": "calendars.hijriSunni",
+     "value": "Dhū al-Ḥijjah 1447"
+    }
+   ]
+  },
+  {
+   "name": "Hijrī divergence · Shia already 1448",
+   "params": "api=calendars&date=2026-06-16",
+   "checks": [
+    {
+     "op": "contains",
+     "path": "calendars.hijriShia",
+     "value": "Muḥarram 1448"
+    }
+   ]
+  },
+  {
+   "name": "Hebrew · Rosh Hashana 5786 lands 23 Sep 2025",
+   "params": "api=calendars&date=2025-09-23",
+   "checks": [
+    {
+     "op": "contains",
+     "path": "calendars.hebrew",
+     "value": "Tishri 5786"
+    }
+   ]
+  },
+  {
+   "name": "festivals · Dīpāvalī 2026 = 9 Nov (instant-of-amāvāsyā convention; udaya rule is FW-2)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Dīpāvalī"
+      },
+      "date": {
+       "eq": "2026-11-09"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "festivals · Holikā/Holi pūrṇimā = 3 Mar 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Holikā"
+      },
+      "date": {
+       "eq": "2026-03-03"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "festivals · Mahāśivarātri = 15 Feb 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Mahāśivarātri"
+      },
+      "date": {
+       "eq": "2026-02-15"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · solar, 17 Feb 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Solar eclipse"
+      },
+      "date": {
+       "eq": "2026-02-17"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · lunar, 3 Mar 2026 (Holi eclipse)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Lunar eclipse"
+      },
+      "date": {
+       "eq": "2026-03-03"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · solar, 12 Aug 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Solar eclipse"
+      },
+      "date": {
+       "eq": "2026-08-12"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "eclipse · lunar, 28 Aug 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Lunar eclipse"
+      },
+      "date": {
+       "eq": "2026-08-28"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "adhika māsa 2026 · intercalary pūrṇimā flagged 31 May",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Adhika"
+      },
+      "date": {
+       "eq": "2026-05-31"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Eid al-Fiṭr (Sunni tabular) = 20 Mar 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "eq": "Eid al-Fiṭr"
+      },
+      "note": {
+       "eq": "Sunni tabular"
+      },
+      "date": {
+       "eq": "2026-03-20"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Vaisakhi fixed · 14 Apr",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Vaisakhi"
+      },
+      "date": {
+       "eq": "2026-04-14"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Makara Saṅkrānti 2026 · 14 Jan (Lahiri)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "contains": "Makara"
+      },
+      "date": {
+       "eq": "2026-01-14"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "Pesach 5786 begins 2 Apr 2026",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "some",
+     "path": "events",
+     "where": {
+      "name": {
+       "eq": "Pesach begins"
+      },
+      "date": {
+       "eq": "2026-04-02"
+      }
+     }
+    }
+   ]
+  },
+  {
+   "name": "events · 2026 list is rich (≥48 rows)",
+   "params": "api=events&year=2026",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "events",
+     "value": 48
+    }
+   ]
+  },
+  {
+   "name": "events · 2027 works across the year boundary",
+   "params": "api=events&year=2027",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "events",
+     "value": 44
+    }
+   ]
+  },
+  {
+   "name": "telescope · Jupiter has alt/az/RA at Hyderabad",
+   "params": "api=telescope&date=2026-07-04&time=21:30",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "bodies.Jupiter.alt"
+    },
+    {
+     "op": "exists",
+     "path": "bodies.Saturn.raH"
+    }
+   ]
+  },
+  {
+   "name": "daśā · nine mahādaśās, always",
+   "params": "api=dasha&date=1990-05-15&time=06:30",
+   "checks": [
+    {
+     "op": "len",
+     "path": "dasha.seq",
+     "value": 9
+    }
+   ]
+  },
+  {
+   "name": "yogas endpoint · returns an array",
+   "params": "api=yogas&date=2026-07-04",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "yogas",
+     "value": 0
+    }
+   ]
+  },
+  {
+   "name": "eclipses endpoint · finds events near 2026",
+   "params": "api=eclipses&date=2026-06-01",
+   "checks": [
+    {
+     "op": "lenGte",
+     "path": "eclipses",
+     "value": 2
+    }
+   ]
+  },
+  {
+   "name": "hardening · __proto__ endpoint degrades safely to moment",
+   "params": "api=__proto__",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "panchanga.tithi"
+    },
+    {
+     "op": "exists",
+     "path": "calendars.hijriShia"
+    }
+   ]
+  },
+  {
+   "name": "hardening · junk endpoint degrades safely to moment",
+   "params": "api=doom",
+   "checks": [
+    {
+     "op": "exists",
+     "path": "panchanga.tithi"
+    }
+   ]
+  }
+ ]
+}

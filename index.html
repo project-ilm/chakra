@@ -1,431 +1,379 @@
-<!DOCTYPE html>
+<!doctype html>
 <!--
-  CHAKRA — Temporal Cycle Observatory · index.html (thin shell).
-  Reads the URL: ?api=... returns JSON (headless); otherwise mounts the UI.
-  All computation lives in the separate library: src/chakra-core.js.
-  Copyright (C) 1993-2026 Abhishek Choudhary. Sole author. SPDX: GPL-3.0-or-later.
-  DISCLAIMER: study/heritage computation only — not for navigation, muhurta-critical, or safety-critical use.
+  CHAKRA — Temporal Cycle Observatory · landing
+  The hero is the instrument: the Moon as it is right now, inside an astrolabe
+  ring carrying the Sun and planets at their true ecliptic longitudes.
+  Everything on this page is computed live by src/chakra-core.js — offline,
+  no trackers, no dependencies.
+
+  Copyright (C) 1993-2026 Abhishek Choudhary. Sole author.
+  SPDX-License-Identifier: GPL-3.0-or-later
+  Site text: CC BY-SA 4.0. Distributed WITHOUT ANY WARRANTY.
+  Study & heritage computation only — see DISCLAIMER.md.
 -->
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CHAKRA — Temporal Cycle Observatory</title>
+<meta name="description" content="One sky, many calendars. A self-contained observatory: today across ten calendar traditions, the moon as it is right now, coming festivals and eclipses — all computed, never looked up.">
 <style>
   :root{
     --bg:#05070e; --bg2:#0a0e1a; --panel:rgba(18,24,40,.72); --panelb:rgba(70,199,214,.16);
     --ink:#dce6f2; --dim:#7385a0; --faint:#3d4b64;
     --cy:#46c7d6; --cy2:#5fe3ff; --amber:#e6b450; --grn:#5fe39a; --mag:#d96fb0; --vio:#8b7cf0;
-    --sun:#e6b450;--moon:#cdd6e0;--mercury:#9fb0c0;--venus:#d08a5a;--mars:#e0685a;--jupiter:#d9b24a;--saturn:#8a97b8;--uranus:#46c7d6;--neptune:#6f8be0;--pluto:#9b6fd6;--rahu:#a878d0;--ketu:#6fb0a0;
+    --gold:#d8a94e; --paper:#e8ecf7;
+    --sun:#e6b450;--moon:#cdd6e0;
     --mono:"IBM Plex Mono","JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
     --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    --serif:Georgia,"Times New Roman",Cambria,serif;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--mono);font-size:13.5px;line-height:1.5;-webkit-text-size-adjust:100%}
-  body{min-height:100vh;padding:16px;
-    background:
-      radial-gradient(1000px 600px at 85% -8%, rgba(70,199,214,.10), transparent 55%),
-      radial-gradient(900px 500px at 5% 110%, rgba(139,124,240,.10), transparent 55%),
-      repeating-linear-gradient(0deg, rgba(120,140,180,.025) 0 1px, transparent 1px 42px),
-      repeating-linear-gradient(90deg, rgba(120,140,180,.025) 0 1px, transparent 1px 42px),
-      var(--bg);
-    max-width:1320px;margin:0 auto}
-  h1,h2,h3{font-family:var(--sans);font-weight:600;margin:0}
-  .eyebrow{font-size:10px;letter-spacing:.36em;text-transform:uppercase;color:var(--dim)}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14.5px;line-height:1.55;-webkit-text-size-adjust:100%}
   a{color:var(--cy)}
-  header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-bottom:14px;border-bottom:1px solid rgba(70,199,214,.18);margin-bottom:14px}
-  .brand{display:flex;align-items:baseline;gap:12px}
-  h1{font-size:23px;letter-spacing:.14em}
-  h1 .dot{color:var(--cy2);text-shadow:0 0 12px var(--cy)}
-  .sub{font-size:11px;color:var(--dim);max-width:52ch}
-  .glyphrow{font-size:17px;letter-spacing:.14em;color:var(--dim)}
+  #stars{position:fixed;inset:0;z-index:-1}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 
-  .panel{background:var(--panel);border:1px solid var(--panelb);border-radius:8px;backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
-  .glow{box-shadow:0 0 0 1px rgba(70,199,214,.05),0 8px 40px rgba(0,0,0,.5),inset 0 0 60px rgba(70,199,214,.02)}
+  /* hero */
+  .hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 0 30px}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--dim)}
+  h1.title{font-family:var(--serif);font-weight:400;font-size:clamp(44px,7.5vw,84px);letter-spacing:.14em;margin:6px 0 2px;color:var(--paper)}
+  h1.title .dot{color:var(--cy2);text-shadow:0 0 18px var(--cy)}
+  .tag{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2.2vw,19px);color:var(--dim);margin:0 0 26px}
+  .instr{width:min(72vw,460px);margin:4px auto 10px;position:relative}
+  .instr svg{width:100%;height:auto;display:block;overflow:visible}
+  @keyframes settle{from{transform:rotate(-16deg)}to{transform:rotate(0deg)}}
+  .ring-anim{transform-origin:230px 230px;animation:settle 1.3s cubic-bezier(.2,.7,.2,1) both}
+  @media (prefers-reduced-motion:reduce){.ring-anim{animation:none}}
+  .nowline{font-family:var(--mono);font-size:clamp(12px,1.7vw,14px);color:var(--paper);margin-top:14px}
+  .nowline .g{color:var(--gold)}
+  .nowsub{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:4px}
+  .ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:26px}
+  .cta{font-family:var(--mono);font-size:13px;text-decoration:none;border-radius:999px;padding:11px 22px;border:1px solid var(--panelb)}
+  .cta.primary{color:#04121a;background:linear-gradient(135deg,var(--cy),var(--cy2));box-shadow:0 0 26px rgba(70,199,214,.28)}
+  .cta.ghost{color:var(--ink)}
+  .cta.ghost:hover{border-color:var(--cy)}
 
-  .controls{display:grid;grid-template-columns:1.4fr 1fr;gap:14px;margin-bottom:14px}
-  @media(max-width:800px){.controls{grid-template-columns:1fr}}
-  .ctlpanel{padding:13px 14px}
-  .ctlpanel h3{font-size:12px;letter-spacing:.04em;margin-bottom:10px;color:var(--ink);display:flex;align-items:center;gap:8px}
-  .ctlpanel h3::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--cy);box-shadow:0 0 8px var(--cy)}
-  label.lb{display:block;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin:0 0 4px}
-  input,select,textarea{width:100%;background:rgba(5,9,18,.7);border:1px solid rgba(90,110,150,.28);color:var(--ink);font-family:var(--mono);font-size:13px;padding:7px 9px;border-radius:5px}
-  input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cy);box-shadow:0 0 0 2px rgba(70,199,214,.18)}
-  textarea{resize:vertical;min-height:96px;line-height:1.45}
-  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  .fld{margin-bottom:9px}
-  .evcount{font-size:11px;color:var(--grn);margin-top:5px}
-  .chiprow{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
-  .chip{font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid rgba(90,110,150,.3);background:rgba(5,9,18,.5);color:var(--dim);cursor:pointer;user-select:none;transition:.13s;display:flex;align-items:center;gap:5px}
-  .chip .g{font-size:13px}
-  .chip.on{color:var(--bg);font-weight:600}
-  .chip:hover{border-color:var(--cy)}
+  /* sections */
+  section{padding:56px 0}
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  .shead h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3.4vw,30px);letter-spacing:.04em;color:var(--paper);margin:0}
+  .shead .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--panelb),transparent)}
+  .shead .k{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.2em;text-transform:uppercase}
 
-  .tabs{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:12px;padding:5px;border-radius:10px}
-  .tab{flex:1;min-width:96px;text-align:center;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;padding:9px 8px;border-radius:7px;cursor:pointer;color:var(--dim);border:1px solid transparent;transition:.13s;white-space:nowrap}
-  .tab:hover{color:var(--ink)}
-  .tab.on{color:var(--cy2);border-color:var(--panelb);background:rgba(70,199,214,.08);box-shadow:0 0 18px rgba(70,199,214,.12),inset 0 0 20px rgba(70,199,214,.05)}
+  .ribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
+  .cal{background:var(--panel);border:1px solid var(--panelb);border-radius:10px;padding:12px 14px;backdrop-filter:blur(8px)}
+  .cal .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
+  .cal .v{font-size:14.5px;color:var(--paper);line-height:1.4}
+  .cal .s{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:3px}
 
-  .view{display:none}
-  .view.on{display:block;animation:fade .25s ease}
-  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-  .vpanel{padding:14px}
-  .vhead{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px}
-  .vhead h2{font-size:16px;letter-spacing:.02em}
-  .vhead .h{font-size:11px;color:var(--dim);max-width:60ch}
+  .events{display:flex;flex-direction:column;gap:8px}
+  .ev{display:flex;gap:14px;align-items:baseline;background:var(--panel);border:1px solid var(--panelb);border-radius:10px;padding:11px 14px;text-decoration:none;color:inherit}
+  .ev:hover{border-color:var(--cy)}
+  .ev .d{font-family:var(--mono);color:var(--gold);font-size:13px;white-space:nowrap}
+  .ev .n{flex:1;color:var(--paper)}
+  .ev .tr{font-family:var(--mono);font-size:10px;color:var(--dim);border:1px solid var(--panelb);border-radius:999px;padding:2px 8px;white-space:nowrap}
+  .ev .in{font-family:var(--mono);font-size:11px;color:var(--cy2);white-space:nowrap}
 
-  svg{display:block;width:100%;height:auto;overflow:visible}
-  .readout{font-size:12px;color:var(--dim);margin-top:10px;border-top:1px dotted rgba(90,110,150,.25);padding-top:9px}
-  .readout b{color:var(--ink)}
-  .miniopts{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:6px 0 4px}
-  .miniopts .seg{display:flex;gap:2px;background:rgba(5,9,18,.6);border:1px solid rgba(90,110,150,.25);border-radius:7px;padding:2px}
-  .miniopts .seg button{font-size:11px;padding:5px 10px;border-radius:5px;border:none;background:transparent;color:var(--dim);cursor:pointer;font-family:var(--mono)}
-  .miniopts .seg button.on{background:rgba(70,199,214,.16);color:var(--cy2)}
-  .miniopts label.lb{margin:0 6px 0 0;display:inline}
+  .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .door{background:var(--panel);border:1px solid var(--panelb);border-radius:12px;padding:18px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px}
+  .door:hover{border-color:var(--cy);transform:translateY(-2px)}
+  .door{transition:transform .18s ease,border-color .18s ease}
+  @media (prefers-reduced-motion:reduce){.door{transition:none}.door:hover{transform:none}}
+  .door .ic{font-size:22px}
+  .door .h{font-family:var(--serif);font-size:19px;color:var(--paper);letter-spacing:.03em}
+  .door .p{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .door .go{font-family:var(--mono);font-size:11px;color:var(--cy2);margin-top:auto}
 
-  button.act{background:rgba(70,199,214,.08);border:1px solid var(--panelb);color:var(--cy2);font-family:var(--mono);font-size:12px;padding:9px 15px;border-radius:6px;cursor:pointer;transition:.13s;letter-spacing:.04em}
-  button.act:hover{background:rgba(70,199,214,.16);box-shadow:0 0 16px rgba(70,199,214,.2)}
-  button.act.ai{border-color:rgba(139,124,240,.4);color:var(--vio)}
-  button.act.ai:hover{background:rgba(139,124,240,.14);box-shadow:0 0 16px rgba(139,124,240,.22)}
-
-  .reslist{display:flex;flex-direction:column;gap:5px;margin-top:8px}
-  .resrow{display:flex;align-items:baseline;gap:10px;padding:8px 11px;border-radius:6px;background:rgba(5,9,18,.5);border:1px solid rgba(90,110,150,.2);cursor:pointer;font-size:12.5px}
-  .resrow:hover{border-color:var(--cy)}
-  .resrow .g{font-size:15px;width:20px;text-align:center}
-  .resrow .nm{flex:1}
-  .resrow .val{color:var(--grn);font-variant-numeric:tabular-nums}
-  .resrow .p2{color:var(--dim);font-variant-numeric:tabular-nums}
-  .headline{font-size:12.5px;background:rgba(70,199,214,.06);border:1px solid var(--panelb);border-left:3px solid var(--cy);border-radius:6px;padding:10px 12px;margin-bottom:10px}
-  .headline .em{color:var(--cy2)}
-  .empty{font-size:12px;color:var(--dim);border:1px dashed rgba(90,110,150,.3);border-radius:6px;padding:12px;text-align:center}
-  .prompt-box{width:100%;min-height:150px;font-size:11.5px;background:rgba(5,9,18,.75);color:var(--ink);border:1px solid rgba(90,110,150,.3);border-radius:6px;padding:11px;line-height:1.5;white-space:pre-wrap}
-  .aibtns{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
-  .legend{display:flex;flex-wrap:wrap;gap:6px 15px;font-size:11px;color:var(--dim);margin-top:9px}
-  .legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
-  .kv{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dotted rgba(90,110,150,.22);font-size:12.5px}
-  .kv:last-child{border:0}.kv .k{color:var(--dim)}.kv .v{color:var(--ink);text-align:right}
-  .grid-2col{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-  @media(max-width:760px){.grid-2col{grid-template-columns:1fr}}
-  footer{margin-top:18px;padding-top:12px;border-top:1px solid rgba(70,199,214,.14);font-size:10.5px;color:var(--faint);line-height:1.6}
-  .pulse{animation:pulse 2.6s ease-in-out infinite}
-  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
-  @media(prefers-reduced-motion:reduce){.pulse,.view.on{animation:none}}
-
-@media print{
-  body{background:#fff!important;color:#111!important}
-  header,.controls,.tabs,button,input,select,textarea,.finestrip{display:none!important}
-  .view{display:none!important}
-  #v-almanac{display:block!important}
-  .panel,.vpanel{background:#fff!important;border:1px solid #999!important;box-shadow:none!important;filter:none!important}
-  #v-almanac *{color:#111!important;text-shadow:none!important}
-  #festRead{max-height:none!important;overflow:visible!important}
-}
+  footer{border-top:1px solid var(--panelb);margin-top:30px;padding:26px 0 42px;font-size:11.5px;color:var(--dim)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .chip{font-family:var(--mono);font-size:10.5px;border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;color:var(--dim)}
+  .chip b{color:var(--grn);font-weight:600}
+  .frow{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}
+  .frow a{color:var(--dim);text-decoration:none;border:1px solid var(--panelb);border-radius:999px;padding:3px 10px}
+  .frow a:hover{color:var(--cy2)}
+  .reveal{opacity:0;transform:translateY(12px);transition:opacity .6s ease,transform .6s ease}
+  .reveal.on{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none;transition:none}}
 </style>
 </head>
-<body>
-<style>
-  .epochbar{display:flex;align-items:center;gap:12px;margin:2px 0 14px;padding:9px 13px;background:rgba(5,9,18,.55);border:1px solid var(--panelb);border-radius:9px}
-  .epochbar .epochval{font-size:16px;color:var(--cy2);min-width:72px;text-align:right;font-variant-numeric:tabular-nums;text-shadow:0 0 8px rgba(70,199,214,.4)}
-  .instr-grid{display:grid;grid-template-columns:1.02fr .98fr;gap:20px;align-items:start}
-  @media(max-width:880px){.instr-grid{grid-template-columns:1fr}}
-  input[type=range]{-webkit-appearance:none;appearance:none;height:5px;background:rgba(90,110,150,.3);border-radius:3px;outline:none;padding:0}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--cy2);box-shadow:0 0 9px var(--cy);cursor:pointer;border:none}
-  input[type=range]::-moz-range-thumb{width:17px;height:17px;border:none;border-radius:50%;background:var(--cy2);box-shadow:0 0 9px var(--cy);cursor:pointer}
-  .epochbar input[type=range]{flex:1}
-  .finestrip{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-bottom:14px;padding:11px 13px;background:rgba(5,9,18,.42);border:1px solid var(--panelb);border-radius:8px}
-  .finestrip .fc{flex:1;min-width:130px}
-  .finestrip .fc .lb{margin-bottom:5px}
-  .finestrip .fc input[type=range]{width:100%}
-  .finestrip .val{color:var(--cy2)}
-  .momcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:16px}
-  .mcard{background:rgba(5,9,18,.55);border:1px solid var(--panelb);border-radius:9px;padding:9px 11px;cursor:pointer;transition:border-color .15s}
-  .mcard:hover{border-color:var(--cy)}
-  .mcard .mk{font-size:9.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--faint);margin-bottom:4px}
-  .mcard .mv{font-size:13px;color:var(--ink);line-height:1.45}
-  .mcard .mv b{color:var(--cy2);font-weight:600}
-  .mcard .big{font-size:20px;margin-right:6px;vertical-align:-2px}
-  #liveBtn.on{color:#0a0;border-color:#0a0;text-shadow:0 0 6px rgba(0,255,0,.5)}
-  .skyN{fill:#03060f}.skyA{fill:#071022}.skyU{fill:#0d1830}.skyC{fill:#1a2a4a}.skyD{fill:#2b4a7a}
-</style>
+<body data-page="home">
+<canvas id="stars" aria-hidden="true"></canvas>
 
-<header>
-  <div class="brand">
-    <div>
-      <div class="eyebrow">Temporal Cycle Observatory</div>
-      <h1>CHAKRA<span class="dot">◉</span></h1>
-    </div>
-    <p class="sub">Fold dated events onto every graha, daśā and planetary cycle at once. Find the frequency, read the sky, hand the result to an AI.</p>
+<div class="hero wrap">
+  <div class="eyebrow">Temporal Cycle Observatory</div>
+  <h1 class="title">CHAKRA<span class="dot">◉</span></h1>
+  <p class="tag">One sky. Many calendars. All of it computed, none of it looked up.</p>
+
+  <div class="instr" role="img" aria-label="The Moon as it appears right now, inside a zodiac ring showing the true positions of the Sun and planets">
+    <svg id="astro" viewBox="0 0 460 460"></svg>
   </div>
-  <div class="glyphrow pulse">☉ ☾ ☿ ♀ ♂ ♃ ♄ ♅ ♆ ☊ ☋</div>
-</header>
+  <div class="nowline" id="nowline">reading the sky…</div>
+  <div class="nowsub" id="nowsub"></div>
 
-<div class="controls">
-  <div class="ctlpanel panel glow">
-    <h3>Events &amp; signal</h3>
-    <label class="lb">Paste events — CSV / TSV / one per line · <span style="color:var(--faint)">YYYY-MM-DD, label &nbsp;|&nbsp; YYYY, label</span></label>
-    <textarea id="events">1990, first marker
-1993, second marker
-1996, third marker
-2005, fourth marker
-2017, fifth marker
-2026, sixth marker</textarea>
-    <div class="evcount" id="evCount"></div>
-    <div class="grid2" style="margin-top:9px">
-      <div class="fld"><label class="lb">Epoch — drag any dial</label><input id="anchor" value="1990"></div>
-      <div class="fld"><label class="lb">Alignment tol ± yr</label><input id="tol" value="1"></div>
-    </div>
-    <label class="lb" style="margin-top:2px">Active cycles</label>
-    <div class="chiprow" id="cycleChips"></div>
-  </div>
-
-  <div class="ctlpanel panel glow">
-    <h3>Reference moment &amp; place</h3>
-    <div class="grid2">
-      <div class="fld"><label class="lb">Date</label><input type="date" id="refDate" value="2026-07-04"></div>
-      <div class="fld"><label class="lb">Time</label><input type="time" id="refTime" value="12:00"></div>
-    </div>
-    <div class="grid3">
-      <div class="fld"><label class="lb">TZ offset (h)</label><input id="tz" value="5.5"></div>
-      <div class="fld"><label class="lb">Latitude</label><input id="lat" value="28.61"></div>
-      <div class="fld"><label class="lb">Longitude</label><input id="lon" value="77.21"></div>
-    </div>
-    <div class="finestrip">
-      <div class="fc"><label class="lb">Date</label><input type="date" id="fDate"></div>
-      <div class="fc"><label class="lb">Time <span class="val" id="fTimeLbl"></span></label><input type="range" id="fTime" min="0" max="1439" step="1"></div>
-      <div class="fc"><label class="lb">Latitude <span class="val" id="fLatLbl"></span></label><input type="range" id="fLat" min="-66" max="66" step="0.05"></div>
-      <div class="fc"><label class="lb">Longitude <span class="val" id="fLonLbl"></span></label><input type="range" id="fLon" min="-180" max="180" step="0.05"></div>
-      <div style="display:flex;gap:6px;flex:none">
-        <button class="act" id="nowBtn">now ⟳</button>
-        <button class="act" id="liveBtn">● live</button>
-        <button class="act" id="gpsBtn" title="use device location">⌖ GPS</button>
-        <button class="act" id="globeBtn" title="pick on globe">🌍</button>
-      </div>
-    </div>
-    <div id="globeWrap" style="display:none;margin-top:4px">
-      <svg id="globe" viewBox="0 0 300 300" style="width:min(300px,100%);touch-action:none;cursor:grab"></svg>
-      <div class="lb" style="margin-top:4px">drag to spin · tap to set place · <span id="globeRead" style="color:var(--cy2)"></span></div>
-    </div>
-    <label class="lb" style="margin-top:2px">Zodiac</label>
-    <div class="miniopts"><div class="seg" id="zodiacSeg">
-      <button data-z="sidereal" class="on">Sidereal (Lahiri)</button>
-      <button data-z="tropical">Tropical</button>
-    </div></div>
-    <div class="readout" style="margin-top:8px;border:0;padding:0" id="momentRead"></div>
+  <div class="ctas">
+    <a class="cta primary" data-keep-theme href="pro.html">Open the Observatory →</a>
+    <a class="cta ghost" data-keep-theme href="learn.html">Learn the mathematics</a>
   </div>
 </div>
 
-<div class="tabs panel">
-  <div class="tab on" data-v="orrery">◉ Observatory</div>
-  <div class="tab" data-v="timeline">Timeline</div>
-  <div class="tab" data-v="wave">Waveforms</div>
-  <div class="tab" data-v="spectrum">Spectrum</div>
-  <div class="tab" data-v="chaos">Dynamics</div>
-  <div class="tab" data-v="lagna">Lagna</div>
-  <div class="tab" data-v="sky">Sky</div>
-  <div class="tab" data-v="almanac">Almanac</div>
-  <div class="tab" data-v="optimize">Optimise + AI</div>
-</div>
+<section class="wrap reveal" id="s-today">
+  <div class="shead"><h2>Today, everywhere</h2><div class="rule"></div><span class="k">ten reckonings · one moment</span></div>
+  <div class="ribbon" id="ribbon"></div>
+</section>
 
-<div class="view on" id="v-orrery">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>The mechanism</h2><span class="h">Drag <em>any</em> ring to turn the whole geared orrery — every dial rotates in proportion to its period and the epoch scrubs beneath your events. The waveforms alongside shift with it; slide until the peaks sit on the event marks.</span></div>
-    <div class="epochbar">
-      <span class="eyebrow">Epoch</span>
-      <input type="range" id="epochSlider" min="1900" max="2040" step="0.1" value="1990">
-      <span class="epochval" id="epochVal">1990.0</span>
-    </div>
-    <div class="instr-grid">
-      <div>
-        <svg id="orrery" viewBox="0 0 640 640" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
-        <div class="legend">
-          <span><i style="background:var(--amber)"></i>event</span>
-          <span><i style="background:var(--cy2)"></i>now-hand</span>
-          <span><i style="background:var(--grn)"></i>coherent ring</span>
-          <span style="color:var(--cy2)">◈ drag a ring to crank the epoch</span>
-        </div>
-      </div>
-      <div>
-        <div class="miniopts"><label class="lb">Waveform · <span style="color:var(--faint)">drag the graph ⇄ to scrub the epoch</span></label>
-          <div class="seg wavesel">
-            <button data-w="sine" class="on">Sine</button><button data-w="rectified">Rectified</button><button data-w="square">Square</button><button data-w="triangle">Triangle</button><button data-w="saw">Saw</button>
-          </div>
-        </div>
-        <svg id="orreryWave" viewBox="0 0 620 600" preserveAspectRatio="xMidYMid meet" style="touch-action:pan-y;cursor:grab"></svg>
-      </div>
-    </div>
-    <div class="momcards" id="momCards"></div>
+<section class="wrap reveal" id="s-up">
+  <div class="shead"><h2>Coming up</h2><div class="rule"></div><span class="k">computed festivals &amp; eclipses</span></div>
+  <div class="events" id="events"></div>
+</section>
+
+<section class="wrap reveal" id="s-doors">
+  <div class="shead"><h2>Four instruments</h2><div class="rule"></div><span class="k">pick a door</span></div>
+  <div class="doors">
+    <a class="door" data-keep-theme href="pro.html"><span class="ic">🔭</span><span class="h">Observatory Pro</span>
+      <span class="p">The full instrument: geared orrery &amp; true orbits, waveforms, spectra, dynamics, lagna, the live sky, an eight-calendar almanac — every graph is an input.</span>
+      <span class="go">enter →</span></a>
+    <a class="door" data-keep-theme href="learn.html"><span class="ic">📖</span><span class="h">The Mathematics</span>
+      <span class="p">Kepler to ayanāṁśa: interactive derivations, the schools and their differences, a history of this science, and how the same equations launch spacecraft.</span>
+      <span class="go">study →</span></a>
+    <a class="door" data-keep-theme href="tour.html"><span class="ic">🚀</span><span class="h">Interstellar Tour</span>
+      <span class="p">Plan a voyage to a real nearby star at a fraction of light-speed. Watch Earth-years and ship-years disagree, and read your arrival date in ten calendars.</span>
+      <span class="go">depart →</span></a>
+    <a class="door" data-keep-theme href="tests.html"><span class="ic">🧪</span><span class="h">Test Console</span>
+      <span class="p">Don't trust — verify. Fetch the public test-plan and run every anchor live in your browser: eclipse dates, festival calculus, calendar cross-checks.</span>
+      <span class="go">run →</span></a>
   </div>
-</div>
+</section>
 
-<div class="view" id="v-timeline">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Timeline stave</h2><span class="h">Linear view: events as gold standards, each active cycle as a return comb, green bands where two or more cycles align.</span></div>
-    <svg id="stave" viewBox="0 0 1160 300" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="legend">
-      <span><i style="background:var(--amber)"></i>event</span>
-      <span><i style="background:var(--grn)"></i>return on an event / conjunction</span>
+<footer>
+  <div class="wrap">
+    <div class="chips" id="chips">
+      <span class="chip"><b>✓</b> 98-assertion test suite</span>
+      <span class="chip"><b>✓</b> 4/4 eclipses of 2026, found by geometry</span>
+      <span class="chip"><b>✓</b> C core with byte-exact parity</span>
+      <span class="chip">offline-first · no trackers · no dependencies</span>
     </div>
+    <div data-sharebar></div>
+    <div class="frow">
+      <span data-claude-badge></span>
+      <a href="https://github.com/project-ilm/chakra" target="_blank" rel="noopener">Source · GitHub</a>
+      <a href="DISCLAIMER.md" target="_blank">Disclaimer</a>
+      <span class="chip">GPL-3.0-or-later · text CC BY-SA 4.0</span>
+      <span style="flex:1"></span>
+      <span data-themesel></span>
+    </div>
+    <div style="margin-top:12px">© 1993–2026 Abhishek Choudhary · CHAKRA is an instrument for study and heritage computation — not for navigation or muhūrta-critical use. Astrological outputs are cultural computations, not predictions.</div>
   </div>
-</div>
-
-<div class="view" id="v-wave">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Waveform superposition</h2><span class="h">Render each cycle as a waveform and stack them. Rectified doubles the beat — hard aspects fire at conjunction <em>and</em> opposition.</span></div>
-    <div class="miniopts">
-      <label class="lb">Waveform</label>
-      <div class="seg wavesel" id="waveSeg">
-        <button data-w="sine" class="on">Sine</button>
-        <button data-w="rectified">Rectified</button>
-        <button data-w="square">Square</button>
-        <button data-w="triangle">Triangle</button>
-        <button data-w="saw">Saw</button>
-      </div>
-      <label style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--dim);cursor:pointer"><input type="checkbox" id="showSum" checked style="width:auto"> show superposition</label>
-    </div>
-    <svg id="wave" viewBox="0 0 1160 380" preserveAspectRatio="xMidYMid meet"></svg>
-  </div>
-</div>
-
-<div class="view" id="v-spectrum">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Phase-coherence spectrum</h2><span class="h">Rayleigh power vs trial period over your irregular event times. Peaks are candidate cycles; dashed guides mark the named grahas and daśās.</span></div>
-    <svg id="spectrum" viewBox="0 0 1160 400" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="readout" id="spectrumRead"></div>
-  </div>
-</div>
-
-<div class="view" id="v-chaos">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Dynamics &amp; chaos</h2><span class="h">The event intervals as a dynamical system, and what commensurability tells us about long-run predictability.</span></div>
-    <div class="grid-2col">
-      <div>
-        <div class="eyebrow" style="margin-bottom:6px">Poincaré return map — Δₙ vs Δₙ₊₁</div>
-        <svg id="returnmap" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
-        <div class="readout" id="chaosRead1"></div>
-      </div>
-      <div>
-        <div class="eyebrow" style="margin-bottom:6px">Commensurability of active cycles</div>
-        <div id="chaosRead2"></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="v-lagna">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Lagna &amp; graha positions</h2><span class="h">Rāśi chart and sky-dial. Retrograde ℞, below-horizon dimmed, above-horizon arc shaded. <b>Drag the Asc hand</b> — the observatory solves for the nearest time with that ascendant.</span></div>
-    <div class="grid-2col">
-      <div>
-        <div class="eyebrow" style="margin-bottom:6px">South-Indian rāśi chart</div>
-        <svg id="rasi" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
-      </div>
-      <div>
-        <div class="eyebrow" style="margin-bottom:6px">Sky dial — drag Asc to time-travel</div>
-        <svg id="skydial" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
-        <div id="lagnaRead" style="margin-top:8px"></div>
-      </div>
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:14px">
-      <div><div class="eyebrow" style="margin-bottom:6px">Yogas at this moment · janma-kuṇḍalī reading</div><div id="yogaRead"></div></div>
-      <div><div class="eyebrow" style="margin-bottom:6px">Vimśottarī daśā · from this Moon</div><div id="dashaRead"></div></div>
-      <div><div class="eyebrow" style="margin-bottom:6px">Telescope · RA/Dec · Alt/Az</div><div id="telescopeRead"></div></div>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="v-sky">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Night sky</h2><span class="h">The same ephemeris, pointed at the actual sky: planets, Moon with phase, ☊☋ nodes on the ecliptic, and 45 stars including every nakṣatra yogatārā. Drag to look around. On a phone, enable sensors and hold the screen to the sky.</span></div>
-    <div class="finestrip" style="margin-bottom:10px">
-      <div class="fc" style="flex:none;min-width:auto"><div class="seg" id="skyModeSeg"><button data-m="dome" class="on">Dome</button><button data-m="ar">Point (AR)</button></div></div>
-      <div class="fc"><label class="lb">FOV <span class="val" id="fovLbl">70°</span></label><input type="range" id="fovSlider" min="25" max="110" step="1" value="70"></div>
-      <div style="display:flex;gap:6px;flex:none">
-        <button class="act" id="sensorBtn">enable sensors</button>
-        <label class="lb" style="display:flex;align-items:center;gap:5px;margin:0"><input type="checkbox" id="yogChk" checked> yogatārā names</label>
-      </div>
-      <span class="lb" id="sensorStat" style="flex:1;min-width:120px"></span>
-    </div>
-    <svg id="skyview" viewBox="0 0 700 700" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab;border-radius:12px"></svg>
-    <div class="lb" style="margin-top:6px">Dome: zenith at centre, horizon at rim, N top / E left (as seen looking up). AR: drag ⇄ to calibrate azimuth against a known object. Star positions J2000 + precession; yogatārā = traditional junction star (its longitude need not fall inside the equal-division nakṣatra span).</div>
-  </div>
-</div>
-
-<div class="view" id="v-almanac">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Sky almanac &amp; world calendars</h2><span class="h">The reference moment read across traditions — moon phase, pañchāṅga, eclipses within ±18 months, and eight calendar systems.</span></div>
-    <div class="grid-2col">
-      <div>
-        <div class="eyebrow" style="margin-bottom:6px">Moon</div>
-        <div style="display:flex;gap:16px;align-items:center"><svg id="moonSvg" viewBox="0 0 140 140" style="width:130px;flex:none"></svg><div style="flex:1" id="moonRead"></div></div>
-        <div class="eyebrow" style="margin:16px 0 6px">Pañchāṅga &amp; lunar mansions</div>
-        <div id="panchangaRead"></div>
-        <div class="eyebrow" style="margin:16px 0 6px">Eclipses · ±18 months <span style="color:var(--faint)">· click a row to jump</span></div>
-        <div id="eclipseRead"></div>
-        <div class="eyebrow" style="margin:16px 0 6px">Sun–Earth–Moon geometry <span style="color:var(--faint)">· drag the Moon — time follows</span></div>
-        <svg id="eclGeo" viewBox="0 0 560 300" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
-        <div style="display:flex;gap:8px;margin-top:6px">
-          <button class="act" id="prevEcl">◀ prev eclipse</button>
-          <button class="act" id="nextEcl">next eclipse ▶</button>
-          <span class="lb" id="eclGeoRead" style="flex:1"></span>
-        </div>
-      </div>
-      <div>
-        <div class="eyebrow" style="margin-bottom:6px">World calendars — same instant</div>
-        <div id="calRead"></div>
-        <div class="eyebrow" style="margin:14px 0 6px">Festivals &amp; observances — <span id="festYear"></span> <button class="act" onclick="window.print()" style="float:right">🖨 print almanac</button></div>
-        <div id="festRead" style="max-height:340px;overflow:auto"></div>
-        <p style="font-size:11px;color:var(--dim);margin-top:14px;line-height:1.65">Traditions spanned: <b>Indic</b> (grahas, daśās, Jaimini, pañchāṅga, Kali / Samvatsara) · <b>Islamic</b> (Hijrī, tabular) · <b>Sufi</b> (28 manāzil al-qamar) · <b>Buddhist</b> (Tibetan Rabjung / Kālachakra 60-yr) · <b>Chinese</b> (sexagenary stem–branch) · <b>Western</b> (tropical planets, precessional age) · <b>Mayan</b> (Long Count, Tzolk'in, Haab') · plus eclipse / lunisolar cycles (Saros, Metonic). Hijrī and Samvatsara are arithmetic and can differ ±1 day / shift at Chaitra; eclipse flags use the Sun–node distance and don't resolve annular vs total.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div class="view" id="v-optimize">
-  <div class="vpanel panel glow">
-    <div class="vhead"><h2>Optimiser &amp; AI hand-off</h2><span class="h">Search all periods for the best fit to your events under the chosen waveform, then open the finding in an AI with web search.</span></div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-      <button class="act" id="runOpt">▶ Optimise fit</button>
-      <button class="act" id="runTile">Exact interval tilings</button>
-    </div>
-    <div class="headline" id="optHead">Run the optimiser to rank every period by how tightly your events lock onto it.</div>
-    <div id="optResults" class="reslist"></div>
-    <div style="margin-top:16px" class="eyebrow">AI analysis hand-off</div>
-    <p style="font-size:11.5px;color:var(--dim);margin:6px 0">Prompt is built from your events, the best-fit periods, spectral peaks and — if computed — the lagna. Opens a new chat with web search.</p>
-    <textarea class="prompt-box" id="aiPrompt" readonly></textarea>
-    <div class="aibtns">
-      <button class="act ai" id="openClaude">◈ Open in Claude</button>
-      <button class="act ai" id="openGPT">Open in ChatGPT</button>
-      <button class="act ai" id="openPplx">Open in Perplexity</button>
-      <button class="act" id="copyPrompt">⧉ Copy prompt</button>
-    </div>
-  </div>
-</div>
-
-<footer id="foot"></footer>
+</footer>
 
 <script src="src/chakra-core.js"></script>
 <script src="src/chakra-kernel.js"></script>
 <script src="src/chakra-api.js"></script>
-<script src="src/chakra-ui.js"></script>
 <script>
-/* Dispatcher: URL API mode vs interactive UI. Copyright (C) 1993-2026 Abhishek Choudhary. GPL-3.0-or-later. */
+/* URL API dispatcher — keeps every published index.html?api= link alive.
+   Copyright (C) 1993-2026 Abhishek Choudhary. GPL-3.0-or-later. */
 (function(){
   var params=new URLSearchParams(location.search);
-  if(params.get("api")){
-    var res=ChakraAPI.handle(params);
-    var ep=String(res.endpoint||"").replace(/[^a-z0-9]/g,"");   /* belt-and-braces: never interpolate raw input */
-    document.open();
-    document.write('<!doctype html><meta charset="utf-8"><title>CHAKRA API · '+ep+'</title>'+
-      '<style>body{margin:0;background:#0b1020;color:#cfe;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace}'+
-      'pre{padding:20px;white-space:pre-wrap;word-break:break-word}a{color:#8fd}h1{font:600 14px system-ui;padding:14px 20px;margin:0;border-bottom:1px solid #23304d;color:#9fb}</style>'+
-      '<h1>CHAKRA · /api/'+ep+' · application/json</h1><pre>'+
-      res.body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</pre>');
-    document.close();
-  } else {
-    if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",ChakraUI.mount);
-    else ChakraUI.mount();
+  if(!params.get("api"))return;
+  var res=ChakraAPI.handle(params);
+  var ep=String(res.endpoint||"").replace(/[^a-z0-9]/g,"");   /* never interpolate raw input */
+  document.open();
+  document.write('<!doctype html><meta charset="utf-8"><title>CHAKRA API \u00b7 '+ep+'</title>'+
+    '<style>body{margin:0;background:#0b1020;color:#cfe;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace}'+
+    'pre{padding:20px;white-space:pre-wrap;word-break:break-word}a{color:#8fd}h1{font:600 14px system-ui;padding:14px 20px;margin:0;border-bottom:1px solid #23304d;color:#9fb}</style>'+
+    '<h1>CHAKRA \u00b7 /api/'+ep+' \u00b7 application/json</h1><pre>'+
+    res.body.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")+'</pre>');
+  document.close();
+})();
+</script>
+<script src="src/chakra-site.js"></script>
+<script>
+(function(){
+"use strict";
+var C=window.Chakra;
+var NS="http://www.w3.org/2000/svg";
+function E(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
+function pad(n){return String(n).padStart(2,"0");}
+
+/* ── the moment ─────────────────────────────────────────────────────── */
+var now=new Date();
+var d=C.dayNo(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),
+              now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600);
+var Y=now.getFullYear();
+var y=C.decYear(now);
+var jdn=C.jdnOf(d);
+
+/* ── hero instrument: moon in an astrolabe ring ─────────────────────── */
+function drawInstrument(){
+  var svg=document.getElementById("astro");while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var cx=230,cy=230,Rr=196,Rm=104;
+  var defs=E("defs",{});
+  defs.innerHTML='<radialGradient id="glit" cx="38%" cy="35%" r="75%">'+
+    '<stop offset="0%" stop-color="#f4f7ff"/><stop offset="55%" stop-color="#dfe6f6"/><stop offset="100%" stop-color="#aeb9d6"/></radialGradient>'+
+    '<radialGradient id="gdark" cx="50%" cy="50%" r="60%">'+
+    '<stop offset="0%" stop-color="#141a2c"/><stop offset="100%" stop-color="#0a0f1e"/></radialGradient>'+
+    '<radialGradient id="ghalo" cx="50%" cy="50%" r="50%">'+
+    '<stop offset="60%" stop-color="rgba(216,169,78,0)"/><stop offset="92%" stop-color="rgba(216,169,78,.14)"/><stop offset="100%" stop-color="rgba(216,169,78,0)"/></radialGradient>';
+  svg.appendChild(defs);
+  svg.appendChild(E("circle",{cx:cx,cy:cy,r:Rr+34,fill:"url(#ghalo)"}));
+
+  var g=E("g",{class:"ring-anim"});
+  svg.appendChild(g);
+  /* ring + ticks */
+  g.appendChild(E("circle",{cx:cx,cy:cy,r:Rr,fill:"none",stroke:"rgba(120,140,190,.35)","stroke-width":1}));
+  g.appendChild(E("circle",{cx:cx,cy:cy,r:Rr-26,fill:"none",stroke:"rgba(120,140,190,.16)","stroke-width":1}));
+  for(var a=0;a<360;a+=5){
+    var maj=a%30===0, mid=a%10===0;
+    var r1=Rr, r2=Rr-(maj?14:mid?9:5);
+    var x1=cx+r1*Math.cos((a-90)*Math.PI/180),y1=cy+r1*Math.sin((a-90)*Math.PI/180);
+    var x2=cx+r2*Math.cos((a-90)*Math.PI/180),y2=cy+r2*Math.sin((a-90)*Math.PI/180);
+    g.appendChild(E("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:maj?"rgba(160,180,220,.5)":"rgba(120,140,190,.25)","stroke-width":maj?1.2:0.7}));
   }
+  /* rāśi glyphs — 0° Aries at top, longitudes increase counterclockwise */
+  var GL=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+  for(var s2=0;s2<12;s2++){
+    var lam=s2*30+15, ang=(-90-lam)*Math.PI/180;
+    var tx=cx+(Rr-38)*Math.cos(ang),ty=cy+(Rr-38)*Math.sin(ang);
+    var t=E("text",{x:tx,y:ty+5,fill:"rgba(160,180,220,.75)","font-size":15,"text-anchor":"middle","font-family":"var(--mono)"});
+    t.textContent=GL[s2];g.appendChild(t);
+  }
+  /* bodies at true tropical longitudes */
+  var gp=C.grahas(d);
+  var BODIES=[["Sun","☉","#e6b450",6],["Mercury","☿","#9fb0c0",3],["Venus","♀","#d08a5a",3.6],
+              ["Mars","♂","#e0685a",3.4],["Jupiter","♃","#d9b24a",4.2],["Saturn","♄","#8a97b8",3.8]];
+  BODIES.forEach(function(b){
+    var ang=(-90-gp[b[0]])*Math.PI/180;
+    var bx=cx+Rr*Math.cos(ang),by=cy+Rr*Math.sin(ang);
+    g.appendChild(E("circle",{cx:bx,cy:by,r:b[3],fill:b[2],style:"filter:drop-shadow(0 0 6px "+b[2]+")"}));
+    var lx=cx+(Rr+16)*Math.cos(ang),ly=cy+(Rr+16)*Math.sin(ang);
+    var tl=E("text",{x:lx,y:ly+4,fill:b[2],"font-size":11,"text-anchor":"middle","font-family":"var(--mono)","fill-opacity":.9});
+    tl.textContent=b[1];g.appendChild(tl);
+  });
+  /* moon marker on ring */
+  var mang=(-90-gp.Moon)*Math.PI/180;
+  g.appendChild(E("circle",{cx:cx+Rr*Math.cos(mang),cy:cy+Rr*Math.sin(mang),r:4,fill:"#e8ecf7",style:"filter:drop-shadow(0 0 6px #cdd6e0)"}));
+
+  /* central moon with real terminator */
+  var ph=C.phaseInfo(d);
+  svg.appendChild(E("circle",{cx:cx,cy:cy,r:Rm,fill:"url(#gdark)",stroke:"rgba(180,195,230,.25)","stroke-width":1}));
+  var e=ph.elong, lit;
+  var k=Math.cos(e*Math.PI/180); /* terminator semi-minor factor: +1 new → -1 full */
+  function lune(rightSide,kk){
+    /* path: outer semicircle on one side + elliptical terminator */
+    var top=cy-Rm, bot=cy+Rm;
+    var sweepOuter=rightSide?1:0;
+    var rx=Math.abs(kk)*Rm;
+    var sweepInner=(kk>0? (rightSide?0:1) : (rightSide?1:0));
+    return "M "+cx+" "+top+
+           " A "+Rm+" "+Rm+" 0 0 "+sweepOuter+" "+cx+" "+bot+
+           " A "+rx+" "+Rm+" 0 0 "+sweepInner+" "+cx+" "+top+" Z";
+  }
+  if(ph.illum>0.004){
+    lit=E("path",{d:lune(ph.waxing,k),fill:"url(#glit)"});
+    svg.appendChild(lit);
+  }
+  /* a few maria for character */
+  [[ -28,-30,26,.10],[18,-6,20,.09],[-6,34,16,.08],[34,26,12,.07]].forEach(function(m){
+    svg.appendChild(E("circle",{cx:cx+m[0],cy:cy+m[1],r:m[2],fill:"#8b96b8","fill-opacity":m[3]}));
+  });
+  svg.appendChild(E("circle",{cx:cx,cy:cy,r:Rm,fill:"none",stroke:"rgba(216,169,78,.28)","stroke-width":1}));
+
+  return {ph:ph,gp:gp};
+}
+var inst=drawInstrument();
+
+/* ── the now-line ───────────────────────────────────────────────────── */
+(function(){
+  var ph=inst.ph, pc=C.panchanga(d,y);
+  var wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][now.getDay()];
+  var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][now.getMonth()];
+  document.getElementById("nowline").innerHTML=
+    '<span class="g">'+ph.name+"</span> · "+(ph.illum*100).toFixed(0)+"% lit · "+pc.tithi;
+  document.getElementById("nowsub").textContent=
+    wd+" "+now.getDate()+" "+mo+" "+Y+" · "+pc.nak+" nakṣatra · "+pc.vara;
+})();
+
+/* ── today, everywhere ──────────────────────────────────────────────── */
+(function(){
+  var R=document.getElementById("ribbon");
+  function card(t,v,s){var c=document.createElement("div");c.className="cal";
+    c.innerHTML='<div class="t">'+t+'</div><div class="v">'+v+'</div>'+(s?'<div class="s">'+s+'</div>':"");
+    R.appendChild(c);}
+  var wd=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][now.getDay()];
+  var mo=["January","February","March","April","May","June","July","August","September","October","November","December"][now.getMonth()];
+  card("Gregorian · civil",wd+", "+now.getDate()+" "+mo+" "+Y,"ISO "+Y+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate()));
+  var sv=C.samvInfo(d,Y);
+  card("Hindu · saṁvatsara",sv.name,"Śaka "+sv.saka+" · Vikrama "+sv.vikrama);
+  var hs=C.hijriSunni(jdn);
+  card("Hijrī · Sunni tabular",hs.d+" "+C.HIJRI_M[hs.m-1]+" "+hs.y+" AH","30-yr cycle, Kuwaiti leap set");
+  var hh=C.hijriShia(jdn);
+  card("Hijrī · Shia tabular",hh.d+" "+C.HIJRI_M[hh.m-1]+" "+hh.y+" AH","Ithnā-ʿAsharī leap set");
+  var sj=C.solarHijri(d,Y);
+  card("Solar Hijrī · Iran/Afghanistan",sj.d+" "+sj.m+" "+sj.y+" SH","Nowruz-anchored, computed equinox");
+  var hb=C.hebrew(jdn);
+  card("Hebrew · civil",hb.d+" "+hb.month+" "+hb.y+" AM",hb.leap?"leap year (Adar I+II)":"regular year");
+  var nk=C.nanakshahi(jdn);
+  card("Sikh · Nanakshahi",nk.d+" "+nk.month+" "+nk.y+" NS","New Year 1 Chet = 14 March");
+  card("Chinese · sexagenary",C.chineseYear(Y),C.tibetYear(Y).split("·")[0]);
+  var my=C.mayan(jdn);
+  card("Maya · Long Count",my.lc,my.tz+" · "+my.haab);
+  var pc=C.panchanga(d,y);
+  card("Pañcāṅga · this instant",pc.tithi.split(" (")[0]+" · "+pc.nak,pc.yoga+" yoga · "+pc.karana+" karaṇa");
+})();
+
+/* ── coming up ──────────────────────────────────────────────────────── */
+(function(){
+  var box=document.getElementById("events");
+  var today=Y+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+  var ev=C.annualEvents(Y).filter(function(e){return e.date>=today;});
+  if(ev.length<5)ev=ev.concat(C.annualEvents(Y+1));
+  ev.slice(0,6).forEach(function(e){
+    var a=document.createElement("a");a.className="ev";a.setAttribute("data-keep-theme","");
+    a.href="pro.html";
+    var dj=C.greg2jdn(+e.date.slice(0,4),+e.date.slice(5,7),+e.date.slice(8,10));
+    var days=dj-jdn;
+    a.innerHTML='<span class="d">'+e.date+'</span><span class="n">'+e.name+'</span>'+
+      '<span class="tr">'+e.tradition+'</span><span class="in">'+(days<=0?"today":"in "+days+" day"+(days===1?"":"s"))+'</span>';
+    box.appendChild(a);
+  });
+})();
+
+/* ── starfield ──────────────────────────────────────────────────────── */
+(function(){
+  var cv=document.getElementById("stars"),ctx=cv.getContext("2d");
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var stars=[],W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1);
+  function size(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";ctx.setTransform(dpr,0,0,dpr,0,0);}
+  size();addEventListener("resize",size);
+  var N=Math.min(170,Math.floor(W*H/9000));
+  for(var i=0;i<N;i++)stars.push({x:Math.random()*W,y:Math.random()*H,r:.4+Math.random()*1.1,p:Math.random()*6.28,s:.4+Math.random()*.9});
+  function frame(t){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){var st=stars[i];
+      var o=.35+.5*(.5+.5*Math.sin(t/1400*st.s+st.p));
+      ctx.globalAlpha=o;ctx.fillStyle="#cfe0ff";
+      ctx.beginPath();ctx.arc((st.x+t*0.0016*st.s)%W,st.y,st.r,0,6.283);ctx.fill();}
+    ctx.globalAlpha=1;
+    if(!reduce)requestAnimationFrame(frame);
+  }
+  if(reduce)frame(0);else requestAnimationFrame(frame);
+})();
+
+/* ── reveal on scroll ───────────────────────────────────────────────── */
+(function(){
+  var els=document.querySelectorAll(".reveal");
+  if(!("IntersectionObserver" in window)){els.forEach(function(e){e.classList.add("on");});return;}
+  var io=new IntersectionObserver(function(en){en.forEach(function(x){if(x.isIntersecting){x.target.classList.add("on");io.unobserve(x.target);}});},{threshold:.12});
+  els.forEach(function(e){io.observe(e);});
+})();
+
+/* keep the moon honest if the page is left open */
+setInterval(function(){
+  now=new Date();
+  d=C.dayNo(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),
+            now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600);
+  inst=drawInstrument();
+},120000);
 })();
 </script>
 </body>
