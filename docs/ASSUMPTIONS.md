@@ -29,7 +29,7 @@ Lahiri (Citrā-pakṣa) via polynomial fit. Divergence from the official Rashtri
 - All astrological output is **cultural/heritage computation, not prediction or advice**.
 
 ## Festival-date convention
-Lunisolar festival rows carry the civil date of the **tithi instant** (UT-noon anchored), not the sunrise-prevailing (udaya-vyāpinī) day. Usually identical; when the instant falls near midnight they differ by one day — e.g. **Dīpāvalī 2026: engine 9 Nov (amāvāsyā instant), common civil practice 8 Nov**. The udaya rule is tracked as FW-2.
+Most lunisolar festival rows carry the civil date of the **tithi instant** (UT-noon anchored). **Dīpāvalī is the exception (v1.3.0):** it uses the classical **pradoṣa-vyāpinī** rule computed at Ujjain (23.18°N, 75.78°E) — the day whose local sunset falls inside the Āśvina amāvāsyā tithi (2026 → 8 Nov, matching civil practice; the bare instant would say 9 Nov). Sunset is geometric (−0.833°). A generalized udaya/pradoṣa/niśītha engine for *all* festivals remains FW-2.
 
 ## Telescope numbers
 RA/Dec are **of-date** (ecliptic→equatorial via mean obliquity), Alt/Az geometric — **no refraction**, no parallax. Fine for finding a planet in a finder scope; do not drive unattended GoTo slews near the horizon from these numbers.

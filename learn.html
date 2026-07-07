@@ -97,7 +97,7 @@
 
 <div class="wrap layout">
   <div class="rail" id="rail">
-    <button data-t="math" class="on">Mathematics<span class="cnt">7 sections · 6 sims</span></button>
+    <button data-t="math" class="on">Mathematics<span class="cnt">8 sections · 6 sims</span></button>
     <button data-t="schools">Schools &amp; traditions</button>
     <button data-t="history">History</button>
     <button data-t="space">Spacecraft</button>
@@ -233,6 +233,23 @@ Saros: 223 synodic ≈ 242 draconic ≈ 239 anomalistic months ≈ 18 y 11 d</di
         <a href="https://en.wikipedia.org/wiki/Saros_(astronomy)" target="_blank" rel="noopener">Wikipedia · Saros</a>
         <a href="https://github.com/project-ilm/chakra/blob/main/src/chakra-core.js" target="_blank" rel="noopener">view the code · eclipses(), checkEcl()</a>
         <button data-copy="Explain why eclipses only occur near the lunar nodes: the 5.1° inclination of the Moon's orbit, ecliptic limits for solar and lunar eclipses, the 173-day eclipse season, the 18.61-year regression of the nodes, and why the Saros cycle (223 synodic months) predicts eclipse repeats so well.">copy AI prompt</button>
+      </div>
+    </section>
+
+    <section class="blk">
+      <h3>8 · Standard ephemerides — how JPL packs the sky into polynomials</h3>
+      <p>This engine computes positions from compact Keplerian elements plus perturbation terms (Schlyter) — kilobytes of code, arcminute-class accuracy, exactly right for calendars. Observatories and spacecraft use the next rung: <strong>numerically integrated ephemerides</strong> such as JPL's DE440, where the equations of motion of the whole solar system (point masses, relativity, 343 asteroids, lunar librations) are integrated once at JPL and the resulting trajectories are shipped as <strong>Chebyshev polynomial coefficients</strong>.</p>
+      <div class="formula">each body · each 8–32-day segment:   x(t) = Σₙ aₙ·Tₙ(τ),   τ = time scaled to [−1, 1]
+Tₙ(τ):  T₀=1 · T₁=τ · Tₙ₊₁ = 2τ·Tₙ − Tₙ₋₁          (evaluate with the Clenshaw recurrence)
+velocity for free:   ẋ(t) = (2/Δt)·Σₙ aₙ·T′ₙ(τ)
+time argument is TDB (≈TT), not civil UTC — they differ by ΔT ≈ 69 s in 2026</div>
+      <p>Why Chebyshev? Of all degree-n polynomials, they minimise the <em>maximum</em> error over the interval (the equioscillation property) — so a dozen coefficients per coordinate per month reproduce the full integration to sub-kilometre precision, and differentiating the same coefficients yields velocity with zero extra storage. All of DE440 (1550–2650) is ~100 MB; a decade of Sun, Moon and planets fits in a few hundred kilobytes.</p>
+      <p class="mut">Roadmap item <a href="https://github.com/project-ilm/chakra/blob/main/docs/BACKLOG.md" target="_blank" rel="noopener">B-20</a> ingests packed DE440 segments as compile-time C arrays behind this same API — Schlyter stays as the zero-asset fallback, and the test console then reports the live delta between the two theories.</p>
+      <div class="links">
+        <a href="https://en.wikipedia.org/wiki/Jet_Propulsion_Laboratory_Development_Ephemeris" target="_blank" rel="noopener">Wikipedia · JPL DE</a>
+        <a href="https://en.wikipedia.org/wiki/Chebyshev_polynomials" target="_blank" rel="noopener">Wikipedia · Chebyshev polynomials</a>
+        <a href="https://en.wikipedia.org/wiki/%CE%94T_(timekeeping)" target="_blank" rel="noopener">Wikipedia · ΔT</a>
+        <button data-copy="Explain how JPL development ephemerides (e.g. DE440) store planetary positions as per-segment Chebyshev polynomial coefficients: why the Chebyshev basis is chosen (minimax/equioscillation), how to evaluate position and velocity with the Clenshaw recurrence, what the TDB time argument is and how it differs from UTC via ΔT, and estimate the storage needed for Sun+Moon+planets over one decade at sub-kilometre accuracy.">copy AI prompt</button>
       </div>
     </section>
   </div>
@@ -463,7 +480,17 @@ function el(id){return document.getElementById(id);}
 function copyText(txt,btn){function done(){var o=btn.textContent;btn.textContent="Copied ✓";setTimeout(function(){btn.textContent=o;},1300);}
   if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(txt).then(done,leg);else leg();
   function leg(){var ta=document.createElement("textarea");ta.value=txt;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");done();}catch(e){}document.body.removeChild(ta);} }
-document.querySelectorAll("button[data-copy]").forEach(function(b){b.onclick=function(){copyText(b.getAttribute("data-copy"),b);};});
+function AIW(x){return "Project: CHAKRA \u2014 Temporal Cycle Observatory. Repo: https://github.com/project-ilm/chakra (GPL-3.0-or-later). Read CONTEXT.md + CONTRACTS.md in the repo before proposing changes. Live site: https://project-ilm.github.io/chakra/\n\n"+x;}
+document.querySelectorAll("button[data-copy]").forEach(function(b){
+  var full=AIW(b.getAttribute("data-copy")), q=encodeURIComponent(full);
+  b.onclick=function(){copyText(full,b);};
+  [["ChatGPT \u2197","https://chatgpt.com/?q="+q],["Claude \u2197","https://claude.ai/new?q="+q]].forEach(function(Lk){
+    var a=document.createElement("a");a.textContent=Lk[0];a.href=Lk[1];a.target="_blank";a.rel="noopener";
+    a.style.cssText="font-family:var(--mono);font-size:10.5px;color:var(--dim);border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;text-decoration:none";
+    a.onmouseenter=function(){a.style.color="var(--cy2)";};a.onmouseleave=function(){a.style.color="var(--dim)";};
+    b.parentNode.insertBefore(a,b.nextSibling);
+  });
+});
 
 /* tabs */
 var rail=el("rail");

@@ -1,0 +1,43 @@
+name: CHAKRA CI — invariant gate
+on:
+  push: { branches: [ main, dev ] }
+  pull_request: { branches: [ main ] }
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+
+      - name: Node test suite
+        run: node test/run.js
+
+      - name: Build C twin and verify byte parity
+        run: |
+          make -C lib vectors.h
+          make -C lib
+          make -C lib test
+
+      - name: Syntax-check every inline page script
+        run: |
+          set -e
+          python3 - <<'PY'
+          import re,subprocess,sys,glob,os
+          os.makedirs("/tmp/ci",exist_ok=True); bad=0
+          for page in ["index.html","pro.html","learn.html","tour.html","tests.html"]:
+            h=open(page,encoding="utf-8").read()
+            for i,s in enumerate(re.findall(r"<script>(.*?)</script>",h,re.S)):
+              p="/tmp/ci/%s_%d.js"%(page.replace('.','_'),i)
+              open(p,"w",encoding="utf-8").write(s)
+              r=subprocess.run(["node","--check",p],capture_output=True,text=True)
+              if r.returncode: bad+=1; print("SYNTAX FAIL",page,i,r.stderr)
+          sys.exit(1 if bad else 0)
+          PY
+
+      - name: Forbidden-name sweep (must be zero)
+        run: |
+          if grep -rilE "$(printf 's''rija|k''atta')" --include='*.js' --include='*.c' --include='*.h' --include='*.html' --include='*.md' . ; then
+            echo "Forbidden name found"; exit 1
+          fi
+          echo "clean"

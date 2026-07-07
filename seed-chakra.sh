@@ -18,6 +18,7 @@ cd "$(cd "$(dirname "$0")" && pwd)"
 say "Guard 1/3 — manifest (am I inside the real CHAKRA tree?)"
 for f in index.html pro.html learn.html tour.html tests.html \
          src/chakra-core.js src/chakra-site.js lib/chakra.c \
+         CONTEXT.md CONTRACTS.md docs/BACKLOG.md \
          docs/FURTHER-WORK.md CHANGELOG.md LICENSE; do
   [ -f "$f" ] || die "missing $f — run this script from INSIDE the extracted chakra/ folder (tar xzf chakra-v$VER.tar.gz && cd chakra && ./seed-chakra.sh). Refusing to seed a wrapper directory."
 done
@@ -105,6 +106,35 @@ while IFS='|' read -r n title; do
     url "$out"
   fi
 done < <(sed -nE 's/^([0-9]+)\. \*\*([^*]+)\*\*.*/\1|\2/p' docs/FURTHER-WORK.md)
+
+say "Issues from docs/BACKLOG.md (B-series)"
+gh label create "backlog" -R "$ORG/$REPO" --color "1d76db" \
+  --description "Planned work from docs/BACKLOG.md" >/dev/null 2>&1 || true
+EXISTING_B="$(gh issue list -R "$ORG/$REPO" --state all --limit 400 --json title -q '.[].title' 2>/dev/null || true)"
+python3 - <<'PYEOF' > /tmp/chakra_backlog_issues.tsv
+import re
+txt=open("docs/BACKLOG.md",encoding="utf-8").read()
+blocks=re.split(r'\n### ',txt)
+for b in blocks[1:]:
+    head,_,body=b.partition("\n")
+    m=re.match(r'(B-\d+): (.*)',head.strip())
+    if not m: continue
+    ident,title=m.group(1),m.group(2).strip()
+    # body до next "## " section header
+    body=body.split("\n## ")[0].strip()
+    print(ident+"\t"+title+"\t"+body.replace("\t"," ").replace("\n","<<NL>>"))
+PYEOF
+while IFS=$'\t' read -r ident title body; do
+  [ -z "${ident:-}" ] && continue
+  full="$ident: $title"
+  if printf '%s\n' "$EXISTING_B" | grep -Fqx "$full"; then
+    say "exists, skipping: $full"
+  else
+    printf '%b' "${body//<<NL>>/\n}" > /tmp/chakra_issue_body.md
+    out="$(gh issue create -R "$ORG/$REPO" --title "$full" --label "backlog" --body-file /tmp/chakra_issue_body.md)"
+    url "$out"
+  fi
+done < /tmp/chakra_backlog_issues.tsv
 
 say "GitHub Pages (best effort)"
 if gh api -X POST "repos/$ORG/$REPO/pages" -f "source[branch]=main" -f "source[path]=/" >/dev/null 2>&1; then

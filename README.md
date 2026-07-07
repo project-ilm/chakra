@@ -5,6 +5,15 @@
 No dependencies. No network. No tracking. Open `index.html` from disk and everything runs.
 
 
+## Collaborate — with Claude, ChatGPT, or by hand
+CHAKRA is built to be extended in small, safe packets:
+1. Pick an issue — `docs/BACKLOG.md` (B-series, 49 seeded) or `docs/FURTHER-WORK.md` (FW-series).
+2. Paste it into Claude/ChatGPT together with `CONTEXT.md` + `CONTRACTS.md` (every AI prompt on the site is pre-seeded with these pointers, and each offers a one-tap **Open in Claude / ChatGPT** link).
+3. Get a patch that respects the invariants (offline, lookup-free, JS↔C parity, zero-alloc in C, sole authorship).
+4. Run the gate: `node test/run.js && make -C lib test`. Green everywhere → open a PR.
+
+CI (`.github/workflows/ci.yml`) re-runs that gate plus an inline-script syntax check and a forbidden-name sweep on every push.
+
 ## The site
 | page | what it is |
 |---|---|
@@ -20,7 +29,7 @@ Themes: append `?theme=solar` (or `terminal`, `contrast`) to any page.
 ```bash
 git clone https://github.com/project-ilm/chakra && cd chakra
 xdg-open index.html          # or just double-click it
-node test/run.js             # 9 suites · 98 assertions · exits non-zero on failure
+node test/run.js             # 10 suites · 115 assertions · exits non-zero on failure
 ```
 
 ## The URL is an API
@@ -37,7 +46,7 @@ Headless too: `require("./src/chakra-kernel.js").create({...}).moment()` in Node
 ## What's inside
 - **Observatory** — draggable geared orrery; drag *any* graph to set the epoch; drag the ascendant hand and CHAKRA solves for the time; click a spectrum peak to phase-lock; click an eclipse or festival to travel there. Every graph is an input.
 - **Calendars, side by side** — Gregorian/JD · tabular Hijrī · **Sunni & Shia tabular reckonings separately** · Solar Hijrī · Vedic (saṁvatsara/Śaka/Vikrama/Kali) · **Hebrew** · **Sikh Nanakshahi** · Chinese sexagenary · Tibetan · Mayan Long Count · precessional age.
-- **Computed festivals** — `annualEvents(Y)`: amānta Hindu months by the classical saṅkrānti rule (adhika-māsa handled), Islamic dates in both reckonings, Jewish, Sikh, all saṅkrāntis, the year's eclipses. 2026 verified: Holi lands on the 3 March lunar eclipse, Dīpāvalī 9 Nov (tithi-instant convention — `docs/ASSUMPTIONS.md`), Mahāśivarātri 15 Feb — 15/15 test assertions.
+- **Computed festivals** — `annualEvents(Y)`: amānta Hindu months by the classical saṅkrānti rule (adhika-māsa handled), Islamic dates in both reckonings, Jewish, Sikh, all saṅkrāntis, the year's eclipses. 2026 verified: Holi lands on the 3 March lunar eclipse, Dīpāvalī 8 Nov (pradoṣa-vyāpinī @ Ujjain — `docs/ASSUMPTIONS.md`), Mahāśivarātri 15 Feb — 15/15 test assertions.
 - **Jyotiṣa** — pañcāṅga (tithi/nakṣatra/yoga/karaṇa + Sufi manzil), rāśi chart, Kālasarpa · Maṅgala Doṣa · Gaja-Kesari · Mahāpuruṣa · Sāḍe-Sātī and more, Vimśottarī mahādaśā timeline. Framed as cultural computation, never prediction.
 - **Sky & telescope** — dome/AR sky with all 27 nakṣatra yogatārās; RA/Dec · Alt/Az · hour-angle for the nine grahas, on screen and over the API.
 - **Printable almanac** — 🖨 button; `@media print` produces a clean festival sheet.

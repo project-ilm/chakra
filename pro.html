@@ -327,8 +327,13 @@
     <div class="vhead"><h2>Lagna &amp; graha positions</h2><span class="h">Rāśi chart and sky-dial. Retrograde ℞, below-horizon dimmed, above-horizon arc shaded. <b>Drag the Asc hand</b> — the observatory solves for the nearest time with that ascendant.</span></div>
     <div class="grid-2col">
       <div>
-        <div class="eyebrow" style="margin-bottom:6px">South-Indian rāśi chart</div>
-        <svg id="rasi" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet"></svg>
+        <div class="eyebrow" style="margin-bottom:6px">Rāśi &amp; divisional charts — drag a graha into a house to time-travel (D1)</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 8px">
+          <span class="seg" id="vgsel"><button data-v="1" class="on">D1</button><button data-v="2">D2</button><button data-v="3">D3</button><button data-v="7">D7</button><button data-v="9">D9</button><button data-v="10">D10</button><button data-v="12">D12</button></span>
+          <span class="seg" id="stysel"><button data-s="south" class="on">South</button><button data-s="north">North</button></span>
+          <span id="vgname" style="font-family:var(--mono);font-size:10px;color:var(--dim)"></span>
+        </div>
+        <svg id="rasi" viewBox="0 0 400 400" preserveAspectRatio="xMidYMid meet" style="touch-action:none;cursor:grab"></svg>
       </div>
       <div>
         <div class="eyebrow" style="margin-bottom:6px">Sky dial — drag Asc to time-travel</div>
@@ -353,6 +358,8 @@
       <div style="display:flex;gap:6px;flex:none">
         <button class="act" id="sensorBtn">enable sensors</button>
         <label class="lb" style="display:flex;align-items:center;gap:5px;margin:0"><input type="checkbox" id="yogChk" checked> yogatārā names</label>
+        <label class="lb" style="display:flex;align-items:center;gap:5px;margin:0"><input type="checkbox" id="constChk" checked> constellations</label>
+        <button id="arExit" class="lb" style="display:none;background:none;border:1px solid var(--panelb);border-radius:999px;color:var(--mag);cursor:pointer;padding:3px 10px">✕ exit AR (Esc)</button>
       </div>
       <span class="lb" id="sensorStat" style="flex:1;min-width:120px"></span>
     </div>

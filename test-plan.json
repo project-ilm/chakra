@@ -1,6 +1,6 @@
 {
  "name": "CHAKRA public test plan",
- "version": "1.2.0",
+ "version": "1.3.0",
  "note": "Executed live in your browser by tests.html against the same engine that renders the site. Anchors are externally verifiable civil dates.",
  "cases": [
   {
@@ -81,7 +81,7 @@
    ]
   },
   {
-   "name": "festivals · Dīpāvalī 2026 = 9 Nov (instant-of-amāvāsyā convention; udaya rule is FW-2)",
+   "name": "festivals · Dīpāvalī 2026 = 8 Nov (pradoṣa-vyāpinī @ Ujjain — computed, matches civil practice)",
    "params": "api=events&year=2026",
    "checks": [
     {
@@ -92,7 +92,7 @@
        "contains": "Dīpāvalī"
       },
       "date": {
-       "eq": "2026-11-09"
+       "eq": "2026-11-08"
       }
      }
     }

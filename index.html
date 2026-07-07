@@ -1,10 +1,11 @@
 <!doctype html>
 <!--
   CHAKRA — Temporal Cycle Observatory · landing
-  The hero is the instrument: the Moon as it is right now, inside an astrolabe
-  ring carrying the Sun and planets at their true ecliptic longitudes.
+  The hero IS the instrument: drag the astrolabe sideways to scrub time and
+  watch ten calendars, the lagna, the Moon's terminator and the coming-up
+  board follow. Tap the little Earth to compute for somewhere else.
   Everything on this page is computed live by src/chakra-core.js — offline,
-  no trackers, no dependencies.
+  no trackers, no dependencies. index.html?api=… still serves JSON.
 
   Copyright (C) 1993-2026 Abhishek Choudhary. Sole author.
   SPDX-License-Identifier: GPL-3.0-or-later
@@ -16,7 +17,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CHAKRA — Temporal Cycle Observatory</title>
-<meta name="description" content="One sky, many calendars. A self-contained observatory: today across ten calendar traditions, the moon as it is right now, coming festivals and eclipses — all computed, never looked up.">
+<meta name="description" content="One sky, many calendars. Drag the astrolabe to scrub time: ten calendar traditions, the live lagna, the Moon's real terminator and coming festivals — all computed, never looked up.">
 <style>
   :root{
     --bg:#05070e; --bg2:#0a0e1a; --panel:rgba(18,24,40,.72); --panelb:rgba(70,199,214,.16);
@@ -34,38 +35,61 @@
   #stars{position:fixed;inset:0;z-index:-1}
   .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
 
-  /* hero */
-  .hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 0 30px}
+  .hero{min-height:92vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 0 26px;position:relative}
+  .aurora{position:absolute;inset:-18% -30%;z-index:-1;pointer-events:none;opacity:.16;filter:blur(70px);
+    background:conic-gradient(from 0deg at 50% 42%,transparent 0 34%,var(--cy) 40%,var(--vio) 50%,var(--mag) 57%,transparent 64% 100%);
+    animation:aur 90s linear infinite}
+  @keyframes aur{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion:reduce){.aurora{animation:none;opacity:.1}}
   .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.34em;text-transform:uppercase;color:var(--dim)}
   h1.title{font-family:var(--serif);font-weight:400;font-size:clamp(44px,7.5vw,84px);letter-spacing:.14em;margin:6px 0 2px;color:var(--paper)}
+  h1.title .tx{background:linear-gradient(100deg,var(--paper) 20%,var(--cy2) 50%,var(--paper) 80%);background-size:220% 100%;
+    -webkit-background-clip:text;background-clip:text;color:transparent;animation:sheen 9s ease-in-out infinite}
+  @keyframes sheen{0%,100%{background-position:0% 0}50%{background-position:100% 0}}
+  @media (prefers-reduced-motion:reduce){h1.title .tx{animation:none;color:var(--paper);background:none;-webkit-background-clip:initial}}
   h1.title .dot{color:var(--cy2);text-shadow:0 0 18px var(--cy)}
-  .tag{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2.2vw,19px);color:var(--dim);margin:0 0 26px}
-  .instr{width:min(72vw,460px);margin:4px auto 10px;position:relative}
+  .tag{font-family:var(--serif);font-style:italic;font-size:clamp(15px,2.2vw,19px);color:var(--dim);margin:0 0 22px}
+  .instr{width:min(72vw,460px);margin:4px auto 8px;position:relative;touch-action:pan-y;cursor:grab}
+  .instr:active{cursor:grabbing}
   .instr svg{width:100%;height:auto;display:block;overflow:visible}
   @keyframes settle{from{transform:rotate(-16deg)}to{transform:rotate(0deg)}}
   .ring-anim{transform-origin:230px 230px;animation:settle 1.3s cubic-bezier(.2,.7,.2,1) both}
   @media (prefers-reduced-motion:reduce){.ring-anim{animation:none}}
-  .nowline{font-family:var(--mono);font-size:clamp(12px,1.7vw,14px);color:var(--paper);margin-top:14px}
+  .nowline{font-family:var(--mono);font-size:clamp(12px,1.7vw,14px);color:var(--paper);margin-top:12px}
   .nowline .g{color:var(--gold)}
   .nowsub{font-family:var(--mono);font-size:11.5px;color:var(--dim);margin-top:4px}
-  .ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:26px}
+  .scrub{font-family:var(--mono);font-size:11px;color:var(--cy2);margin-top:8px;min-height:1.4em}
+  .scrub button{font:inherit;color:var(--cy2);background:none;border:1px solid var(--panelb);border-radius:999px;padding:2px 10px;cursor:pointer;margin-left:8px}
+  .hint{font-family:var(--mono);font-size:10px;color:var(--faint);margin-top:6px;letter-spacing:.08em}
+  .ctas{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:22px}
   .cta{font-family:var(--mono);font-size:13px;text-decoration:none;border-radius:999px;padding:11px 22px;border:1px solid var(--panelb)}
   .cta.primary{color:#04121a;background:linear-gradient(135deg,var(--cy),var(--cy2));box-shadow:0 0 26px rgba(70,199,214,.28)}
   .cta.ghost{color:var(--ink)}
   .cta.ghost:hover{border-color:var(--cy)}
 
-  /* sections */
-  section{padding:56px 0}
-  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:22px}
+  section{padding:52px 0}
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:18px}
   .shead h2{font-family:var(--serif);font-weight:400;font-size:clamp(22px,3.4vw,30px);letter-spacing:.04em;color:var(--paper);margin:0}
   .shead .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--panelb),transparent)}
   .shead .k{font-family:var(--mono);font-size:11px;color:var(--faint);letter-spacing:.2em;text-transform:uppercase}
+
+  .instruments{display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:stretch}
+  @media(max-width:840px){.instruments{grid-template-columns:1fr}}
+  .card{background:var(--panel);border:1px solid var(--panelb);border-radius:12px;padding:14px;backdrop-filter:blur(8px)}
+  .card .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-bottom:8px;display:flex;justify-content:space-between;gap:8px}
+  .card .t b{color:var(--gold);font-weight:600;letter-spacing:.1em}
+  #miniGlobe{display:block;margin:0 auto;touch-action:none;cursor:grab}
+  .locline{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
+  #lagnaMini{display:block;margin:0 auto;max-width:320px;width:100%}
+  .lagline{font-family:var(--mono);font-size:11px;color:var(--dim);text-align:center;margin-top:8px}
+  .lagline b{color:var(--cy2)}
 
   .ribbon{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}
   .cal{background:var(--panel);border:1px solid var(--panelb);border-radius:10px;padding:12px 14px;backdrop-filter:blur(8px)}
   .cal .t{font-family:var(--mono);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--faint);margin-bottom:6px}
   .cal .v{font-size:14.5px;color:var(--paper);line-height:1.4}
   .cal .s{font-family:var(--mono);font-size:11px;color:var(--dim);margin-top:3px}
+  .rotnote{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:10px;letter-spacing:.05em}
 
   .events{display:flex;flex-direction:column;gap:8px}
   .ev{display:flex;gap:14px;align-items:baseline;background:var(--panel);border:1px solid var(--panelb);border-radius:10px;padding:11px 14px;text-decoration:none;color:inherit}
@@ -76,9 +100,8 @@
   .ev .in{font-family:var(--mono);font-size:11px;color:var(--cy2);white-space:nowrap}
 
   .doors{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
-  .door{background:var(--panel);border:1px solid var(--panelb);border-radius:12px;padding:18px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px}
+  .door{background:var(--panel);border:1px solid var(--panelb);border-radius:12px;padding:18px;text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:6px;transition:transform .18s ease,border-color .18s ease}
   .door:hover{border-color:var(--cy);transform:translateY(-2px)}
-  .door{transition:transform .18s ease,border-color .18s ease}
   @media (prefers-reduced-motion:reduce){.door{transition:none}.door:hover{transform:none}}
   .door .ic{font-size:22px}
   .door .h{font-family:var(--serif);font-size:19px;color:var(--paper);letter-spacing:.03em}
@@ -101,15 +124,18 @@
 <canvas id="stars" aria-hidden="true"></canvas>
 
 <div class="hero wrap">
+  <div class="aurora" aria-hidden="true"></div>
   <div class="eyebrow">Temporal Cycle Observatory</div>
-  <h1 class="title">CHAKRA<span class="dot">◉</span></h1>
+  <h1 class="title"><span class="tx">CHAKRA</span><span class="dot">◉</span></h1>
   <p class="tag">One sky. Many calendars. All of it computed, none of it looked up.</p>
 
-  <div class="instr" role="img" aria-label="The Moon as it appears right now, inside a zodiac ring showing the true positions of the Sun and planets">
+  <div class="instr" id="instr" role="img" aria-label="The Moon as it appears right now, inside a zodiac ring showing the true positions of the Sun and planets. Drag sideways to travel in time.">
     <svg id="astro" viewBox="0 0 460 460"></svg>
   </div>
   <div class="nowline" id="nowline">reading the sky…</div>
   <div class="nowsub" id="nowsub"></div>
+  <div class="scrub" id="scrub"></div>
+  <div class="hint">⟵ drag the instrument to scrub time · double-tap to return ⟶</div>
 
   <div class="ctas">
     <a class="cta primary" data-keep-theme href="pro.html">Open the Observatory →</a>
@@ -117,9 +143,26 @@
   </div>
 </div>
 
+<section class="wrap reveal" id="s-here">
+  <div class="shead"><h2>Here &amp; now</h2><div class="rule"></div><span class="k">this sky, this ground</span></div>
+  <div class="instruments">
+    <div class="card">
+      <div class="t"><span>where you stand</span><b>EARTH</b></div>
+      <svg id="miniGlobe" viewBox="0 0 300 300" width="272" height="272"></svg>
+      <div class="locline" id="locline">drag to spin · tap to relocate</div>
+    </div>
+    <div class="card">
+      <div class="t"><span>lagna — the rising sign, live</span><b>NORTH-INDIAN STYLE</b></div>
+      <svg id="lagnaMini" viewBox="0 0 300 240"></svg>
+      <div class="lagline" id="lagline"></div>
+    </div>
+  </div>
+</section>
+
 <section class="wrap reveal" id="s-today">
-  <div class="shead"><h2>Today, everywhere</h2><div class="rule"></div><span class="k">ten reckonings · one moment</span></div>
+  <div class="shead"><h2 id="todayH">Today, everywhere</h2><div class="rule"></div><span class="k">ten reckonings · one moment</span></div>
   <div class="ribbon" id="ribbon"></div>
+  <div class="rotnote">the order of these cards rotates daily — no tradition owns the top slot.</div>
 </section>
 
 <section class="wrap reveal" id="s-up">
@@ -131,16 +174,16 @@
   <div class="shead"><h2>Four instruments</h2><div class="rule"></div><span class="k">pick a door</span></div>
   <div class="doors">
     <a class="door" data-keep-theme href="pro.html"><span class="ic">🔭</span><span class="h">Observatory Pro</span>
-      <span class="p">The full instrument: geared orrery &amp; true orbits, waveforms, spectra, dynamics, lagna, the live sky, an eight-calendar almanac — every graph is an input.</span>
+      <span class="p">The full instrument: geared orrery &amp; true orbits, waveforms, spectra, dynamics, D1–D12 lagna charts you can drag planets across, the live sky with constellations, an eight-calendar almanac.</span>
       <span class="go">enter →</span></a>
     <a class="door" data-keep-theme href="learn.html"><span class="ic">📖</span><span class="h">The Mathematics</span>
-      <span class="p">Kepler to ayanāṁśa: interactive derivations, the schools and their differences, a history of this science, and how the same equations launch spacecraft.</span>
+      <span class="p">Kepler to ayanāṁśa to Chebyshev ephemerides: interactive derivations, the schools and their differences, a history of this science, and how the same equations launch spacecraft.</span>
       <span class="go">study →</span></a>
     <a class="door" data-keep-theme href="tour.html"><span class="ic">🚀</span><span class="h">Interstellar Tour</span>
-      <span class="p">Plan a voyage to a real nearby star at a fraction of light-speed. Watch Earth-years and ship-years disagree, and read your arrival date in ten calendars.</span>
+      <span class="p">Plan a voyage to a real nearby star at a fraction of light-speed — with a warp-field view that goes properly Star-Trek as β→1 — and read your arrival in ten calendars.</span>
       <span class="go">depart →</span></a>
     <a class="door" data-keep-theme href="tests.html"><span class="ic">🧪</span><span class="h">Test Console</span>
-      <span class="p">Don't trust — verify. Fetch the public test-plan and run every anchor live in your browser: eclipse dates, festival calculus, calendar cross-checks.</span>
+      <span class="p">Don't trust — verify. Fetch the public test-plan and run every anchor live in your browser: eclipse dates, the pradoṣa Dīpāvalī rule, calendar cross-checks.</span>
       <span class="go">run →</span></a>
   </div>
 </section>
@@ -148,15 +191,16 @@
 <footer>
   <div class="wrap">
     <div class="chips" id="chips">
-      <span class="chip"><b>✓</b> 98-assertion test suite</span>
+      <span class="chip"><b>✓</b> 115-assertion test suite</span>
       <span class="chip"><b>✓</b> 4/4 eclipses of 2026, found by geometry</span>
-      <span class="chip"><b>✓</b> C core with byte-exact parity</span>
+      <span class="chip"><b>✓</b> C core with byte-exact parity (6,590 checks)</span>
       <span class="chip">offline-first · no trackers · no dependencies</span>
     </div>
     <div data-sharebar></div>
     <div class="frow">
       <span data-claude-badge></span>
       <a href="https://github.com/project-ilm/chakra" target="_blank" rel="noopener">Source · GitHub</a>
+      <a href="https://github.com/project-ilm/chakra/releases" target="_blank" rel="noopener">Releases</a>
       <a href="DISCLAIMER.md" target="_blank">Disclaimer</a>
       <span class="chip">GPL-3.0-or-later · text CC BY-SA 4.0</span>
       <span style="flex:1"></span>
@@ -194,17 +238,20 @@ var C=window.Chakra;
 var NS="http://www.w3.org/2000/svg";
 function E(t,a){var e=document.createElementNS(NS,t);for(var k in a)e.setAttribute(k,a[k]);return e;}
 function pad(n){return String(n).padStart(2,"0");}
+var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/* ── the moment ─────────────────────────────────────────────────────── */
+/* ── shared state: scrub offset + observer ───────────────────────────── */
+var L={off:0, lat:17.385, lon:78.486};
 var now=new Date();
-var d=C.dayNo(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),
-              now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600);
-var Y=now.getFullYear();
-var y=C.decYear(now);
-var jdn=C.jdnOf(d);
+function d0(){return C.dayNo(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),
+              now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600);}
+function dCur(){return d0()+L.off;}
+var evCache={};
+function eventsOf(Y){if(!evCache[Y])evCache[Y]=C.annualEvents(Y);return evCache[Y];}
+function refY(d){var g=C.jdn2greg(C.jdnOf(d));return g.Y+((g.M-1)*30.44+g.D)/365.25;}
 
-/* ── hero instrument: moon in an astrolabe ring ─────────────────────── */
-function drawInstrument(){
+/* ── hero instrument ─────────────────────────────────────────────────── */
+function drawInstrument(d){
   var svg=document.getElementById("astro");while(svg.firstChild)svg.removeChild(svg.firstChild);
   var cx=230,cy=230,Rr=196,Rm=104;
   var defs=E("defs",{});
@@ -216,10 +263,8 @@ function drawInstrument(){
     '<stop offset="60%" stop-color="rgba(216,169,78,0)"/><stop offset="92%" stop-color="rgba(216,169,78,.14)"/><stop offset="100%" stop-color="rgba(216,169,78,0)"/></radialGradient>';
   svg.appendChild(defs);
   svg.appendChild(E("circle",{cx:cx,cy:cy,r:Rr+34,fill:"url(#ghalo)"}));
-
-  var g=E("g",{class:"ring-anim"});
+  var g=E("g",{class:L.off===0?"ring-anim":""});
   svg.appendChild(g);
-  /* ring + ticks */
   g.appendChild(E("circle",{cx:cx,cy:cy,r:Rr,fill:"none",stroke:"rgba(120,140,190,.35)","stroke-width":1}));
   g.appendChild(E("circle",{cx:cx,cy:cy,r:Rr-26,fill:"none",stroke:"rgba(120,140,190,.16)","stroke-width":1}));
   for(var a=0;a<360;a+=5){
@@ -229,7 +274,6 @@ function drawInstrument(){
     var x2=cx+r2*Math.cos((a-90)*Math.PI/180),y2=cy+r2*Math.sin((a-90)*Math.PI/180);
     g.appendChild(E("line",{x1:x1,y1:y1,x2:x2,y2:y2,stroke:maj?"rgba(160,180,220,.5)":"rgba(120,140,190,.25)","stroke-width":maj?1.2:0.7}));
   }
-  /* rāśi glyphs — 0° Aries at top, longitudes increase counterclockwise */
   var GL=["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
   for(var s2=0;s2<12;s2++){
     var lam=s2*30+15, ang=(-90-lam)*Math.PI/180;
@@ -237,7 +281,6 @@ function drawInstrument(){
     var t=E("text",{x:tx,y:ty+5,fill:"rgba(160,180,220,.75)","font-size":15,"text-anchor":"middle","font-family":"var(--mono)"});
     t.textContent=GL[s2];g.appendChild(t);
   }
-  /* bodies at true tropical longitudes */
   var gp=C.grahas(d);
   var BODIES=[["Sun","☉","#e6b450",6],["Mercury","☿","#9fb0c0",3],["Venus","♀","#d08a5a",3.6],
               ["Mars","♂","#e0685a",3.4],["Jupiter","♃","#d9b24a",4.2],["Saturn","♄","#8a97b8",3.8]];
@@ -249,84 +292,179 @@ function drawInstrument(){
     var tl=E("text",{x:lx,y:ly+4,fill:b[2],"font-size":11,"text-anchor":"middle","font-family":"var(--mono)","fill-opacity":.9});
     tl.textContent=b[1];g.appendChild(tl);
   });
-  /* moon marker on ring */
   var mang=(-90-gp.Moon)*Math.PI/180;
   g.appendChild(E("circle",{cx:cx+Rr*Math.cos(mang),cy:cy+Rr*Math.sin(mang),r:4,fill:"#e8ecf7",style:"filter:drop-shadow(0 0 6px #cdd6e0)"}));
-
-  /* central moon with real terminator */
   var ph=C.phaseInfo(d);
   svg.appendChild(E("circle",{cx:cx,cy:cy,r:Rm,fill:"url(#gdark)",stroke:"rgba(180,195,230,.25)","stroke-width":1}));
-  var e=ph.elong, lit;
-  var k=Math.cos(e*Math.PI/180); /* terminator semi-minor factor: +1 new → -1 full */
+  var k=Math.cos(ph.elong*Math.PI/180);
   function lune(rightSide,kk){
-    /* path: outer semicircle on one side + elliptical terminator */
     var top=cy-Rm, bot=cy+Rm;
     var sweepOuter=rightSide?1:0;
     var rx=Math.abs(kk)*Rm;
     var sweepInner=(kk>0? (rightSide?0:1) : (rightSide?1:0));
-    return "M "+cx+" "+top+
-           " A "+Rm+" "+Rm+" 0 0 "+sweepOuter+" "+cx+" "+bot+
+    return "M "+cx+" "+top+" A "+Rm+" "+Rm+" 0 0 "+sweepOuter+" "+cx+" "+bot+
            " A "+rx+" "+Rm+" 0 0 "+sweepInner+" "+cx+" "+top+" Z";
   }
-  if(ph.illum>0.004){
-    lit=E("path",{d:lune(ph.waxing,k),fill:"url(#glit)"});
-    svg.appendChild(lit);
-  }
-  /* a few maria for character */
-  [[ -28,-30,26,.10],[18,-6,20,.09],[-6,34,16,.08],[34,26,12,.07]].forEach(function(m){
+  if(ph.illum>0.004)svg.appendChild(E("path",{d:lune(ph.waxing,k),fill:"url(#glit)"}));
+  [[-28,-30,26,.10],[18,-6,20,.09],[-6,34,16,.08],[34,26,12,.07]].forEach(function(m){
     svg.appendChild(E("circle",{cx:cx+m[0],cy:cy+m[1],r:m[2],fill:"#8b96b8","fill-opacity":m[3]}));
   });
   svg.appendChild(E("circle",{cx:cx,cy:cy,r:Rm,fill:"none",stroke:"rgba(216,169,78,.28)","stroke-width":1}));
-
   return {ph:ph,gp:gp};
 }
-var inst=drawInstrument();
 
-/* ── the now-line ───────────────────────────────────────────────────── */
-(function(){
-  var ph=inst.ph, pc=C.panchanga(d,y);
-  var wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][now.getDay()];
-  var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][now.getMonth()];
+/* ── mini location globe (coastlines + terminator; drag spin, tap set) ── */
+var gl={lam0:70,phi0:18};
+function orthoXY(lat,lon,cx,cy,R){var dl=(lon-gl.lam0)*Math.PI/180,la=lat*Math.PI/180,p0=gl.phi0*Math.PI/180;
+  var x=Math.cos(la)*Math.sin(dl), y=Math.cos(p0)*Math.sin(la)-Math.sin(p0)*Math.cos(la)*Math.cos(dl),
+      z=Math.sin(p0)*Math.sin(la)+Math.cos(p0)*Math.cos(la)*Math.cos(dl);
+  return z<0?null:[cx+R*x,cy-R*y];}
+function drawGlobe(d){
+  var svg=document.getElementById("miniGlobe");while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var cx=150,cy=150,R=136;
+  svg.appendChild(E("circle",{cx:cx,cy:cy,r:R,fill:"rgba(8,14,28,.92)",stroke:"rgba(70,199,214,.4)"}));
+  function path(pts,st){var pp="",pen=false;
+    for(var i=0;i<pts.length;i++){var p=pts[i]&&orthoXY(pts[i][0],pts[i][1],cx,cy,R);
+      if(!p){pen=false;continue;}pp+=(pen?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)+" ";pen=true;}
+    if(pp){var attrs={d:pp,fill:"none"};for(var kk in st)attrs[kk]=st[kk];svg.appendChild(E("path",attrs));}}
+  for(var la=-60;la<=60;la+=30){var gA=[];for(var lo=0;lo<=360;lo+=8)gA.push([la,lo]);path(gA,{stroke:"rgba(90,110,150,.14)"});}
+  for(var lo2=0;lo2<360;lo2+=30){var gB=[];for(var la2=-88;la2<=88;la2+=6)gB.push([la2,lo2]);path(gB,{stroke:"rgba(90,110,150,.10)"});}
+  for(var r0=0;r0<C.COAST.length;r0++){var ring=C.COAST[r0],gC=[];
+    for(var i2=0;i2<ring.length;i2+=2)gC.push([ring[i2+1]/10,ring[i2]/10]);
+    path(gC,{stroke:"rgba(120,200,180,.38)","stroke-width":0.8});}
+  var ls=C.sunLon(d).lon,ee=C.obliq(d);
+  var Sd=function(x){return Math.sin(x*Math.PI/180);},Cd=function(x){return Math.cos(x*Math.PI/180);};
+  var aS=C.atan2d(Sd(ls)*Cd(ee),Cd(ls)), latS=Math.asin(Sd(ls)*Sd(ee))*180/Math.PI;
+  var lonS=((aS-C.gmst(d))%360+540)%360-180;
+  var n=[Cd(latS)*Cd(lonS),Cd(latS)*Sd(lonS),Sd(latS)];
+  var e1=[-Sd(lonS),Cd(lonS),0];
+  var e2=[n[1]*e1[2]-n[2]*e1[1],n[2]*e1[0]-n[0]*e1[2],n[0]*e1[1]-n[1]*e1[0]];
+  var term=[];for(var tt=0;tt<=360;tt+=4){var v=[e1[0]*Cd(tt)+e2[0]*Sd(tt),e1[1]*Cd(tt)+e2[1]*Sd(tt),e1[2]*Cd(tt)+e2[2]*Sd(tt)];
+    term.push([Math.asin(v[2])*180/Math.PI,C.atan2d(v[1],v[0])]);}
+  path(term,{stroke:"rgba(230,180,80,.6)","stroke-width":1.1,"stroke-dasharray":"4 3"});
+  var sp=orthoXY(latS,lonS,cx,cy,R);
+  if(sp)svg.appendChild(E("circle",{cx:sp[0],cy:sp[1],r:4,fill:"var(--sun)",style:"filter:drop-shadow(0 0 7px var(--sun))"}));
+  var mp=orthoXY(L.lat,L.lon,cx,cy,R);
+  if(mp){svg.appendChild(E("circle",{cx:mp[0],cy:mp[1],r:8,fill:"none",stroke:"var(--cy2)","stroke-width":1}));
+    svg.appendChild(E("circle",{cx:mp[0],cy:mp[1],r:3,fill:"var(--cy2)",style:"filter:drop-shadow(0 0 6px var(--cy))"}));}
+}
+function invOrtho(px,py,cx,cy,R){
+  var x=(px-cx)/R,y=(cy-py)/R,rho=Math.hypot(x,y);
+  if(rho>1)return null;
+  var c=Math.asin(Math.min(1,rho)),p0=gl.phi0*Math.PI/180;
+  var lat,lon;
+  if(rho<1e-9){lat=gl.phi0;lon=gl.lam0;}
+  else{
+    lat=Math.asin(Math.cos(c)*Math.sin(p0)+y*Math.sin(c)*Math.cos(p0)/rho)*180/Math.PI;
+    lon=gl.lam0+Math.atan2(x*Math.sin(c),rho*Math.cos(p0)*Math.cos(c)-y*Math.sin(p0)*Math.sin(c))*180/Math.PI;
+  }
+  return [lat,((lon%360)+540)%360-180];
+}
+
+/* ── mini North-Indian lagna chart ───────────────────────────────────── */
+var NPOLY=[
+  [[150,10],[75,85],[150,160],[225,85]],
+  [[10,10],[150,10],[75,85]],
+  [[10,10],[75,85],[10,160]],
+  [[10,160],[75,85],[150,160],[75,235]],
+  [[10,310],[10,160],[75,235]],
+  [[10,310],[75,235],[150,310]],
+  [[150,310],[75,235],[150,160],[225,235]],
+  [[290,310],[150,310],[225,235]],
+  [[290,310],[225,235],[290,160]],
+  [[290,160],[225,235],[150,160],[225,85]],
+  [[290,10],[290,160],[225,85]],
+  [[290,10],[225,85],[150,10]]
+];
+function centroid(poly){var x=0,y=0;poly.forEach(function(p){x+=p[0];y+=p[1];});return [x/poly.length,y/poly.length];}
+function drawLagna(d){
+  var svg=document.getElementById("lagnaMini");while(svg.firstChild)svg.removeChild(svg.firstChild);
+  var y=refY(d);
+  var g=C.grahas(d);
+  var ay=C.ayan(y);
+  var asc=C.rev(C.ascendant(d,L.lat,L.lon)-ay);
+  var ascSign=Math.floor(asc/30);
+  var inH={};for(var h=1;h<=12;h++)inH[h]=[];
+  ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].forEach(function(nm){
+    var s=Math.floor(C.rev(g[nm]-ay)/30);var hh=((s-ascSign+12)%12)+1;inH[hh].push(nm);});
+  var sy=240/320, sx=1;
+  function pt(p){return (p[0]*sx).toFixed(1)+","+((p[1]-10)*sy+8).toFixed(1);}
+  NPOLY.forEach(function(poly,i){
+    var h=i+1;
+    svg.appendChild(E("polygon",{points:poly.map(pt).join(" "),
+      fill:h===1?"rgba(70,199,214,.08)":"rgba(5,9,18,.35)",
+      stroke:h===1?"var(--cy)":"rgba(90,110,150,.35)","stroke-width":h===1?1.4:1}));
+    var cxy=centroid(poly);var cx=cxy[0]*sx,cy=(cxy[1]-10)*sy+8;
+    var sn=(ascSign+h-1)%12+1;
+    var tn=E("text",{x:cx,y:cy-7,fill:"var(--mag)","font-size":10,"text-anchor":"middle","font-family":"var(--mono)","opacity":.8});
+    tn.textContent=sn;svg.appendChild(tn);
+    var row=inH[h].slice(0,4).map(function(nm){return C.GRAHA_GLYPH[nm];}).join(" ");
+    if(inH[h].length>4)row+=" +"+(inH[h].length-4);
+    if(row){var tg=E("text",{x:cx,y:cy+9,fill:"var(--paper)","font-size":11.5,"text-anchor":"middle","font-family":"var(--mono)"});
+      tg.textContent=row;svg.appendChild(tg);}
+  });
+  document.getElementById("lagline").innerHTML=
+    "lagna <b>"+C.RASHI[ascSign][0]+"</b> "+(asc%30).toFixed(1)+"° · sidereal (Lahiri) · <a data-keep-theme href='pro.html' style='color:var(--cy)'>full D1–D12 chart →</a>";
+}
+
+/* ── now-line, ribbon, events ────────────────────────────────────────── */
+function drawNow(d,inst){
+  var ph=inst.ph, y=refY(d), pc=C.panchanga(d,y);
+  var g=C.jdn2greg(C.jdnOf(d));
+  var wd=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][(C.jdnOf(d)+1)%7];
+  var mo=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][g.M-1];
   document.getElementById("nowline").innerHTML=
     '<span class="g">'+ph.name+"</span> · "+(ph.illum*100).toFixed(0)+"% lit · "+pc.tithi;
   document.getElementById("nowsub").textContent=
-    wd+" "+now.getDate()+" "+mo+" "+Y+" · "+pc.nak+" nakṣatra · "+pc.vara;
-})();
-
-/* ── today, everywhere ──────────────────────────────────────────────── */
-(function(){
-  var R=document.getElementById("ribbon");
-  function card(t,v,s){var c=document.createElement("div");c.className="cal";
-    c.innerHTML='<div class="t">'+t+'</div><div class="v">'+v+'</div>'+(s?'<div class="s">'+s+'</div>':"");
-    R.appendChild(c);}
-  var wd=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][now.getDay()];
-  var mo=["January","February","March","April","May","June","July","August","September","October","November","December"][now.getMonth()];
-  card("Gregorian · civil",wd+", "+now.getDate()+" "+mo+" "+Y,"ISO "+Y+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate()));
-  var sv=C.samvInfo(d,Y);
+    wd+" "+g.D+" "+mo+" "+g.Y+" · "+pc.nak+" nakṣatra · "+pc.vara;
+  var sc=document.getElementById("scrub");
+  if(Math.abs(L.off)>0.04){
+    var dd=L.off>0?"+":"−";
+    sc.innerHTML="Δ "+dd+Math.abs(L.off).toFixed(Math.abs(L.off)<2?1:0)+" days from now"+
+      '<button id="backNow">⟲ now</button>';
+    document.getElementById("backNow").onclick=function(){L.off=0;renderAll();};
+  }else sc.textContent="";
+  document.getElementById("todayH").textContent=Math.abs(L.off)>0.04?"That day, everywhere":"Today, everywhere";
+}
+function drawRibbon(d){
+  var R=document.getElementById("ribbon");R.innerHTML="";
+  var y=refY(d), jdn=C.jdnOf(d), g=C.jdn2greg(jdn);
+  var cards=[];
+  function card(t,v,s){cards.push([t,v,s]);}
+  var wd=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][(jdn+1)%7];
+  var mo=["January","February","March","April","May","June","July","August","September","October","November","December"][g.M-1];
+  card("Gregorian · civil",wd+", "+g.D+" "+mo+" "+g.Y,"ISO "+g.Y+"-"+pad(g.M)+"-"+pad(g.D));
+  var sv=C.samvInfo(d,g.Y);
   card("Hindu · saṁvatsara",sv.name,"Śaka "+sv.saka+" · Vikrama "+sv.vikrama);
   var hs=C.hijriSunni(jdn);
   card("Hijrī · Sunni tabular",hs.d+" "+C.HIJRI_M[hs.m-1]+" "+hs.y+" AH","30-yr cycle, Kuwaiti leap set");
   var hh=C.hijriShia(jdn);
   card("Hijrī · Shia tabular",hh.d+" "+C.HIJRI_M[hh.m-1]+" "+hh.y+" AH","Ithnā-ʿAsharī leap set");
-  var sj=C.solarHijri(d,Y);
+  var sj=C.solarHijri(d,g.Y);
   card("Solar Hijrī · Iran/Afghanistan",sj.d+" "+sj.m+" "+sj.y+" SH","Nowruz-anchored, computed equinox");
   var hb=C.hebrew(jdn);
   card("Hebrew · civil",hb.d+" "+hb.month+" "+hb.y+" AM",hb.leap?"leap year (Adar I+II)":"regular year");
   var nk=C.nanakshahi(jdn);
   card("Sikh · Nanakshahi",nk.d+" "+nk.month+" "+nk.y+" NS","New Year 1 Chet = 14 March");
-  card("Chinese · sexagenary",C.chineseYear(Y),C.tibetYear(Y).split("·")[0]);
+  card("Chinese · sexagenary",C.chineseYear(g.Y),C.tibetYear(g.Y).split("·")[0]);
   var my=C.mayan(jdn);
   card("Maya · Long Count",my.lc,my.tz+" · "+my.haab);
   var pc=C.panchanga(d,y);
   card("Pañcāṅga · this instant",pc.tithi.split(" (")[0]+" · "+pc.nak,pc.yoga+" yoga · "+pc.karana+" karaṇa");
-})();
-
-/* ── coming up ──────────────────────────────────────────────────────── */
-(function(){
-  var box=document.getElementById("events");
-  var today=Y+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
-  var ev=C.annualEvents(Y).filter(function(e){return e.date>=today;});
-  if(ev.length<5)ev=ev.concat(C.annualEvents(Y+1));
+  var rot=((jdn%cards.length)+cards.length)%cards.length;
+  cards=cards.slice(rot).concat(cards.slice(0,rot));
+  cards.forEach(function(cv){
+    var c=document.createElement("div");c.className="cal";
+    c.innerHTML='<div class="t">'+cv[0]+'</div><div class="v">'+cv[1]+'</div>'+(cv[2]?'<div class="s">'+cv[2]+'</div>':"");
+    R.appendChild(c);
+  });
+}
+function drawEvents(d){
+  var box=document.getElementById("events");box.innerHTML="";
+  var jdn=C.jdnOf(d), g=C.jdn2greg(jdn);
+  var today=g.Y+"-"+pad(g.M)+"-"+pad(g.D);
+  var ev=eventsOf(g.Y).filter(function(e){return e.date>=today;});
+  if(ev.length<6)ev=ev.concat(eventsOf(g.Y+1));
   ev.slice(0,6).forEach(function(e){
     var a=document.createElement("a");a.className="ev";a.setAttribute("data-keep-theme","");
     a.href="pro.html";
@@ -336,13 +474,62 @@ var inst=drawInstrument();
       '<span class="tr">'+e.tradition+'</span><span class="in">'+(days<=0?"today":"in "+days+" day"+(days===1?"":"s"))+'</span>';
     box.appendChild(a);
   });
+}
+function drawLoc(){
+  document.getElementById("locline").innerHTML=
+    L.lat.toFixed(2)+"°, "+L.lon.toFixed(2)+"° · drag to spin · <b style='color:var(--cy2)'>tap to relocate</b>";
+}
+
+/* ── the one render ──────────────────────────────────────────────────── */
+var raf=0;
+function renderAll(){
+  if(raf)return; raf=requestAnimationFrame(function(){raf=0;
+    var d=dCur();
+    var inst=drawInstrument(d);
+    drawNow(d,inst);
+    drawGlobe(d);
+    drawLagna(d);
+    drawRibbon(d);
+    drawEvents(d);
+    drawLoc();
+  });
+}
+renderAll();
+
+/* ── interactions ────────────────────────────────────────────────────── */
+(function(){ /* astrolabe scrub */
+  var el=document.getElementById("instr"),dr=null;
+  el.addEventListener("pointerdown",function(ev){dr={x:ev.clientX,off:L.off};try{el.setPointerCapture(ev.pointerId);}catch(e){}});
+  el.addEventListener("pointermove",function(ev){if(!dr)return;
+    L.off=dr.off+(ev.clientX-dr.x)/5; renderAll(); ev.preventDefault();});
+  var end=function(){dr=null;};
+  el.addEventListener("pointerup",end);el.addEventListener("pointercancel",end);
+  el.addEventListener("dblclick",function(){L.off=0;renderAll();});
+})();
+(function(){ /* globe spin / relocate */
+  var svg=document.getElementById("miniGlobe"),dr=null;
+  svg.addEventListener("pointerdown",function(ev){
+    var r=svg.getBoundingClientRect();
+    dr={x:ev.clientX,y:ev.clientY,lam:gl.lam0,phi:gl.phi0,moved:0,r:r};
+    try{svg.setPointerCapture(ev.pointerId);}catch(e){}});
+  svg.addEventListener("pointermove",function(ev){if(!dr)return;
+    var dx=ev.clientX-dr.x,dy=ev.clientY-dr.y;dr.moved=Math.max(dr.moved,Math.hypot(dx,dy));
+    gl.lam0=dr.lam-dx*0.5;gl.phi0=Math.max(-75,Math.min(75,dr.phi+dy*0.5));
+    renderAll();ev.preventDefault();});
+  svg.addEventListener("pointerup",function(ev){
+    if(dr&&dr.moved<5){
+      var r=dr.r;var px=(ev.clientX-r.left)*300/r.width,py=(ev.clientY-r.top)*300/r.height;
+      var ll=invOrtho(px,py,150,150,136);
+      if(ll){L.lat=ll[0];L.lon=ll[1];renderAll();}
+    }
+    dr=null;});
+  svg.addEventListener("pointercancel",function(){dr=null;});
 })();
 
-/* ── starfield ──────────────────────────────────────────────────────── */
+/* ── starfield + shooting stars ──────────────────────────────────────── */
 (function(){
   var cv=document.getElementById("stars"),ctx=cv.getContext("2d");
-  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var stars=[],W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1);
+  var stars=[],shots=[],W=0,H=0,dpr=Math.min(2,window.devicePixelRatio||1),nextShot=2500;
   function size(){W=innerWidth;H=innerHeight;cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+"px";cv.style.height=H+"px";ctx.setTransform(dpr,0,0,dpr,0,0);}
   size();addEventListener("resize",size);
   var N=Math.min(170,Math.floor(W*H/9000));
@@ -353,13 +540,25 @@ var inst=drawInstrument();
       var o=.35+.5*(.5+.5*Math.sin(t/1400*st.s+st.p));
       ctx.globalAlpha=o;ctx.fillStyle="#cfe0ff";
       ctx.beginPath();ctx.arc((st.x+t*0.0016*st.s)%W,st.y,st.r,0,6.283);ctx.fill();}
+    if(!reduce){
+      if(t>nextShot){nextShot=t+5000+Math.random()*8000;
+        shots.push({x:Math.random()*W*0.7,y:Math.random()*H*0.35,vx:5+Math.random()*4,vy:2+Math.random()*2,life:1});}
+      for(var j=shots.length-1;j>=0;j--){var sh=shots[j];
+        sh.x+=sh.vx;sh.y+=sh.vy;sh.life-=0.02;
+        if(sh.life<=0){shots.splice(j,1);continue;}
+        var grad=ctx.createLinearGradient(sh.x,sh.y,sh.x-sh.vx*9,sh.y-sh.vy*9);
+        grad.addColorStop(0,"rgba(230,240,255,"+(0.85*sh.life)+")");
+        grad.addColorStop(1,"rgba(230,240,255,0)");
+        ctx.strokeStyle=grad;ctx.lineWidth=1.4;ctx.globalAlpha=1;
+        ctx.beginPath();ctx.moveTo(sh.x,sh.y);ctx.lineTo(sh.x-sh.vx*9,sh.y-sh.vy*9);ctx.stroke();}
+    }
     ctx.globalAlpha=1;
     if(!reduce)requestAnimationFrame(frame);
   }
   if(reduce)frame(0);else requestAnimationFrame(frame);
 })();
 
-/* ── reveal on scroll ───────────────────────────────────────────────── */
+/* ── reveal on scroll ────────────────────────────────────────────────── */
 (function(){
   var els=document.querySelectorAll(".reveal");
   if(!("IntersectionObserver" in window)){els.forEach(function(e){e.classList.add("on");});return;}
@@ -367,13 +566,7 @@ var inst=drawInstrument();
   els.forEach(function(e){io.observe(e);});
 })();
 
-/* keep the moon honest if the page is left open */
-setInterval(function(){
-  now=new Date();
-  d=C.dayNo(now.getUTCFullYear(),now.getUTCMonth()+1,now.getUTCDate(),
-            now.getUTCHours()+now.getUTCMinutes()/60+now.getUTCSeconds()/3600);
-  inst=drawInstrument();
-},120000);
+setInterval(function(){now=new Date();if(Math.abs(L.off)<0.04)renderAll();},120000);
 })();
 </script>
 </body>

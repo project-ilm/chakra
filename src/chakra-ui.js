@@ -47,7 +47,7 @@ const DEFAULT_ON=["jupiter","saturn","nodes","uranus","vimsottari","yogini","ras
 /* ---------------- helpers ---------------- */
 
 /* ---------------- state ---------------- */
-const state={
+const state={varga:1,chartStyle:"south",
   events:[], tol:1, anchor:1990,
   on:new Set(DEFAULT_ON), waveform:"sine", orbmode:"sch", showSum:true,
   refDate:"2026-07-04", refTime:"12:00", tz:5.5, lat:28.61, lon:77.21, zodiac:"sidereal",
@@ -397,22 +397,34 @@ function renderLagna(){
     B[nm]={disp:siderealAdj(rawLon,y),alt:altOf(rawLon,beta,d,lat,lon),retro:isR};});
   const ascD=siderealAdj(ascRaw,y), mcD=siderealAdj(mcRaw,y);
 
-  // ---- rasi chart ----
-  const svg=clr("rasi");const m=18,cell=(400-2*m)/4;const inSign={};for(let s=0;s<12;s++)inSign[s]=[];
-  BODIES.forEach(nm=>inSign[Math.floor(B[nm].disp/30)].push(nm));
-  const ascSign=Math.floor(ascD/30);
-  for(let s=0;s<12;s++){const [r,c]=SIGN_CELL[s];const x=m+c*cell,yy=m+r*cell;const lagna=s===ascSign;
-    svg.appendChild(E("rect",{x,y:yy,width:cell,height:cell,fill:lagna?"rgba(70,199,214,.07)":"rgba(5,9,18,.4)",stroke:lagna?"var(--cy)":"rgba(90,110,150,.28)","stroke-width":lagna?1.6:1}));
-    svg.appendChild(T(x+5,yy+13,RASHI[s][1],{fill:"var(--mag)","font-size":11,"font-family":"var(--mono)","opacity":.75}));
-    if(lagna)svg.appendChild(T(x+cell-5,yy+13,"La",{fill:"var(--cy2)","font-size":10,"text-anchor":"end","font-family":"var(--mono)"}));
-    let gx=x+6,gy=yy+30;inSign[s].forEach((nm,k)=>{
-      svg.appendChild(T(gx,gy,GRAHA_GLYPH[nm],{fill:GRAHA_COL[nm],"font-size":13,"font-family":"var(--mono)","opacity":B[nm].alt>0?1:0.45}));
-      if(B[nm].retro)svg.appendChild(T(gx+9,gy-6,"℞",{fill:"var(--mars)","font-size":8,"font-family":"var(--mono)"}));
-      gx+=20;if((k+1)%4===0){gx=x+6;gy+=17;}});
+  // ---- rasi / varga chart (south grid or north diamond; drag→house time-solve on D1) ----
+  const V=state.varga||1;
+  const VG_NAME={1:"D1 · Rāśi",2:"D2 · Horā",3:"D3 · Drekkāṇa",7:"D7 · Saptāṁśa",9:"D9 · Navāṁśa",10:"D10 · Daśāṁśa",12:"D12 · Dvādaśāṁśa"};
+  const Bv={};BODIES.forEach(nm=>Bv[nm]=CK.vargaLon(B[nm].disp,V));
+  const ascV=CK.vargaLon(ascD,V);
+  const svg=clr("rasi");const inSign={};for(let s=0;s<12;s++)inSign[s]=[];
+  BODIES.forEach(nm=>inSign[Math.floor(Bv[nm]/30)].push(nm));
+  const ascSign=Math.floor(ascV/30);
+  {const vn=document.getElementById("vgname");if(vn)vn.textContent=(VG_NAME[V]||("D"+V))+(V!==1?" — drag lives on D1":"");}
+  rasiHit.cells.length=0;rasiHit.glyphs.length=0;rasiHit.style=state.chartStyle;
+  if(state.chartStyle==="north"){renderNorth(svg,inSign,ascSign,B);}
+  else{
+    const m=18,cell=(400-2*m)/4;
+    for(let s=0;s<12;s++){const [r,cx0]=SIGN_CELL[s];const x=m+cx0*cell,yy=m+r*cell;const lagna=s===ascSign;
+      rasiHit.cells.push({sign:s,x:x,y:yy,w:cell,h:cell});
+      svg.appendChild(E("rect",{x,y:yy,width:cell,height:cell,fill:lagna?"rgba(70,199,214,.07)":"rgba(5,9,18,.4)",stroke:lagna?"var(--cy)":"rgba(90,110,150,.28)","stroke-width":lagna?1.6:1}));
+      svg.appendChild(T(x+5,yy+13,RASHI[s][1],{fill:"var(--mag)","font-size":11,"font-family":"var(--mono)","opacity":.75}));
+      if(lagna)svg.appendChild(T(x+cell-5,yy+13,"La",{fill:"var(--cy2)","font-size":10,"text-anchor":"end","font-family":"var(--mono)"}));
+      let gx=x+6,gy=yy+30;inSign[s].forEach((nm,k)=>{
+        rasiHit.glyphs.push({nm:nm,x:gx+4,y:gy-4});
+        svg.appendChild(T(gx,gy,GRAHA_GLYPH[nm],{fill:GRAHA_COL[nm],"font-size":13,"font-family":"var(--mono)","opacity":B[nm].alt>0?1:0.45}));
+        if(B[nm].retro)svg.appendChild(T(gx+9,gy-6,"℞",{fill:"var(--mars)","font-size":8,"font-family":"var(--mono)"}));
+        gx+=20;if((k+1)%4===0){gx=x+6;gy+=17;}});
+    }
   }
-  svg.appendChild(T(200,188,state.zodiac==="sidereal"?"SIDEREAL":"TROPICAL",{fill:"var(--dim)","font-size":11,"text-anchor":"middle","letter-spacing":"2","font-family":"var(--mono)"}));
+  svg.appendChild(T(200,188,(VG_NAME[V]||("D"+V))+" · "+(state.zodiac==="sidereal"?"SIDEREAL":"TROPICAL"),{fill:"var(--dim)","font-size":10.5,"text-anchor":"middle","letter-spacing":"1.5","font-family":"var(--mono)"}));
   svg.appendChild(T(200,204,state.refDate+" "+state.refTime,{fill:"var(--faint)","font-size":9.5,"text-anchor":"middle","font-family":"var(--mono)"}));
-  svg.appendChild(T(200,218,"℞ retrograde · dim = below horizon",{fill:"var(--faint)","font-size":8,"text-anchor":"middle","font-family":"var(--mono)"}));
+  svg.appendChild(T(200,218,V===1?"drag a graha into a house — the observatory solves the time":"℞ retrograde · dim = below horizon",{fill:"var(--faint)","font-size":8,"text-anchor":"middle","font-family":"var(--mono)"}));
 
   // ---- sky dial ----
   const s2=clr("skydial");const cx=200,cy=200,rO=160,rI=120;
@@ -459,6 +471,60 @@ function renderLagna(){
   if(tEl){const eph=ephemerisTable(d,lat,lon);
     tEl.innerHTML=Object.keys(eph).map(nm=>{const bb=eph[nm];return `<div class="kv"><span class="k" style="color:${GRAHA_COL[nm]||"inherit"}">${GRAHA_GLYPH[nm]||""} ${nm}</span><span class="v">RA ${bb.raH.toFixed(2)}\u02b0 \u00b7 Dec ${bb.dec>=0?"+":""}${bb.dec.toFixed(1)}\u00b0 \u00b7 Alt ${bb.alt.toFixed(1)}\u00b0 \u00b7 Az ${bb.az.toFixed(1)}\u00b0${bb.alt>0?"":" \u00b7 below horizon"}</span></div>`;}).join("")+
     `<div class="empty" style="margin-top:4px">RA/Dec \u2192 equatorial GoTo \u00b7 Alt/Az \u2192 alt-az mounts \u00b7 ?api=telescope for JSON</div>`;}
+}
+
+/* ---- rāśi-chart shared hit map, North-Indian renderer, drag→house solver ---- */
+const rasiHit={cells:[],glyphs:[],style:"south"};
+const NORTH_POLYS=(function(){var s=10,e=390,m=200;
+  var TL=[s,s],TR=[e,s],BR=[e,e],BL=[s,e],TM=[m,s],RM=[e,m],BM=[m,e],LM=[s,m],Cc=[m,m];
+  var TLq=[(s+m)/2,(s+m)/2],TRq=[(e+m)/2,(s+m)/2],BRq=[(e+m)/2,(e+m)/2],BLq=[(s+m)/2,(e+m)/2];
+  return [[TM,TRq,Cc,TLq],[TL,TM,TLq],[TL,TLq,LM],[LM,TLq,Cc,BLq],[BL,LM,BLq],[BL,BLq,BM],
+          [BM,BLq,Cc,BRq],[BR,BM,BRq],[BR,BRq,RM],[RM,BRq,Cc,TRq],[TR,RM,TRq],[TR,TRq,TM]];})();
+function polyCentroid(p){var x=0,y=0;p.forEach(function(q){x+=q[0];y+=q[1];});return [x/p.length,y/p.length];}
+function pointInPoly(x,y,p){var inside=false;for(var i=0,j=p.length-1;i<p.length;j=i++){var xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];
+  if(((yi>y)!==(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))inside=!inside;}return inside;}
+function renderNorth(svg,inSign,ascSign,B){
+  svg.appendChild(E("rect",{x:10,y:10,width:380,height:380,fill:"rgba(5,9,18,.4)",stroke:"rgba(90,110,150,.35)"}));
+  [[10,10,390,390],[390,10,10,390],[200,10,390,200],[390,200,200,390],[200,390,10,200],[10,200,200,10]]
+    .forEach(function(l){svg.appendChild(E("line",{x1:l[0],y1:l[1],x2:l[2],y2:l[3],stroke:"rgba(90,110,150,.35)"}));});
+  NORTH_POLYS.forEach(function(poly,h){var sign=(ascSign+h)%12;var ct=polyCentroid(poly);
+    rasiHit.cells.push({sign:sign,poly:poly});
+    if(h===0)svg.appendChild(E("path",{d:"M "+poly.map(function(p){return p.join(" ");}).join(" L ")+" Z",fill:"rgba(70,199,214,.07)"}));
+    var list=inSign[sign];
+    svg.appendChild(T(ct[0],ct[1]-(list.length?14:0),String(sign+1),{fill:"var(--mag)","font-size":11,"text-anchor":"middle","font-family":"var(--mono)","opacity":.75}));
+    if(h===0)svg.appendChild(T(ct[0],ct[1]-27,"La",{fill:"var(--cy2)","font-size":9,"text-anchor":"middle","font-family":"var(--mono)"}));
+    var per=3;
+    list.forEach(function(nm,k){var row=Math.floor(k/per),colN=Math.min(list.length-row*per,per);
+      var gx=ct[0]-((colN-1)*9)+(k%per)*18, gy=ct[1]+6+row*15;
+      rasiHit.glyphs.push({nm:nm,x:gx,y:gy-4});
+      svg.appendChild(T(gx-5,gy,GRAHA_GLYPH[nm],{fill:GRAHA_COL[nm],"font-size":13,"font-family":"var(--mono)","opacity":B[nm].alt>0?1:0.45}));
+      if(B[nm].retro)svg.appendChild(T(gx+4,gy-6,"℞",{fill:"var(--mars)","font-size":8,"font-family":"var(--mono)"}));});
+  });
+}
+function setupRasiDrag(){
+  const svg=document.getElementById("rasi");if(!svg)return;
+  let dr=null,ghost=null;
+  const pt=ev=>{const r=svg.getBoundingClientRect();return [(ev.clientX-r.left)*400/r.width,(ev.clientY-r.top)*400/r.height];};
+  svg.addEventListener("pointerdown",ev=>{
+    const q=pt(ev),x=q[0],y=q[1];let best=null,bd=18;
+    for(const g of rasiHit.glyphs){const d2=Math.hypot(g.x-x,g.y-y);if(d2<bd){bd=d2;best=g;}}
+    if(!best)return;
+    if(state.varga!==1){const vn=document.getElementById("vgname");
+      if(vn){const o=vn.textContent;vn.textContent="switch to D1 to drag grahas";setTimeout(()=>{vn.textContent=o;},1600);}return;}
+    dr={nm:best.nm};try{svg.setPointerCapture(ev.pointerId);}catch(e){}
+    ghost=E("circle",{cx:x,cy:y,r:11,fill:"none",stroke:GRAHA_COL[best.nm],"stroke-width":1.5,"stroke-dasharray":"3 3"});
+    svg.appendChild(ghost);ev.preventDefault();});
+  svg.addEventListener("pointermove",ev=>{if(!dr||!ghost)return;const q=pt(ev);ghost.setAttribute("cx",q[0]);ghost.setAttribute("cy",q[1]);ev.preventDefault();});
+  const up=ev=>{if(!dr)return;const q=pt(ev),x=q[0],y=q[1];const nm=dr.nm;dr=null;
+    if(ghost&&ghost.parentNode)ghost.parentNode.removeChild(ghost);ghost=null;
+    let tgt=null;
+    for(const cell of rasiHit.cells){
+      if(cell.poly?pointInPoly(x,y,cell.poly):(x>=cell.x&&x<=cell.x+cell.w&&y>=cell.y&&y<=cell.y+cell.h)){tgt=cell.sign;break;}}
+    if(tgt==null)return;
+    const y2=refYear();const trop=rev(tgt*30+15+CK.ayan(y2));
+    setMomentFromDayNo(solveWhenLon(nm,trop,refDayNo()));refreshMoment();};
+  svg.addEventListener("pointerup",up);
+  svg.addEventListener("pointercancel",()=>{dr=null;if(ghost&&ghost.parentNode)ghost.parentNode.removeChild(ghost);ghost=null;});
 }
 
 /* ---------------- OPTIMISER + TILING ---------------- */
@@ -638,7 +704,22 @@ function makeEpochDrag(id,yearsPerPx){
 /* ---- sky view: dome + AR ---- */
 const skyS={mode:"dome",fov:70,az:180,alt:30,roll:0,azOff:0,sensor:false,raf:0};
 function starsNow(y){const pr=0.0139552*(y-2000);
-  return STARS.map(s=>({lam:rev(s[0]+pr),bet:s[1],mag:s[2],nm:s[3],yg:s[4]}));}
+  return STARS.map(s=>{let lam=s[0],bet=s[1];
+    if(s[5]){const e=23.4393,ra=s[0],dec=s[1];
+      lam=CK.atan2d(CK.S(ra)*CK.C(e)+CK.Tn(dec)*CK.S(e),CK.C(ra));
+      bet=Math.asin(Math.max(-1,Math.min(1,CK.S(dec)*CK.C(e)-CK.C(dec)*CK.S(e)*CK.S(ra))))*CK.R2D;}
+    return {lam:rev(lam+pr),bet:bet,mag:s[2],nm:s[3],yg:s[4]};});}
+
+const CONST_FIGS=[
+ {nm:"Orion",l:[["Betelgeuse","Alnitak","Alnilam","Mintaka","Bellatrix","Betelgeuse"],["Mintaka","Rigel"],["Alnitak","Saiph"],["Betelgeuse","Meissa","Bellatrix"]]},
+ {nm:"Ursa Major",l:[["Dubhe","Merak","Phecda","Megrez","Dubhe"],["Megrez","Alioth","Mizar","Alkaid"]]},
+ {nm:"Cassiopeia",l:[["Caph","Schedar","γ Cas","Ruchbah","Segin"]]},
+ {nm:"Scorpius",l:[["Dschubba","Antares","ε Sco","Sargas","Shaula"]]},
+ {nm:"Crux",l:[["Acrux","Gacrux"],["Mimosa","δ Cru"]]},
+ {nm:"Cygnus",l:[["Deneb","Sadr","Albireo"]]},
+ {nm:"Gemini",l:[["Castor","Pollux","Alhena"]]},
+ {nm:"Leo",l:[["Regulus","Algieba","Zosma","Denebola"]]},
+ {nm:"Taurus",l:[["Aldebaran","Alcyone"]]}];
 function skyBodies(d){
   const g=grahas(d);
   const P=[["Sun","☉","var(--sun)"],["Moon","☾","var(--moon)"],["Mercury","☿","var(--merc)"],["Venus","♀","var(--ven)"],["Mars","♂","var(--mars)"],["Jupiter","♃","var(--jup)"],["Saturn","♄","var(--sat)"],["Rahu","☊","var(--rahu)"],["Ketu","☋","var(--rahu)"],["Uranus","♅","var(--ura)"],["Neptune","♆","var(--nep)"]];
@@ -678,7 +759,19 @@ function renderSky(){
   {const g=[];for(let l=0;l<=360;l+=3){const h=altAz(l,0,d,lat,lon);g.push([h.az,h.alt]);}
    path(g,{stroke:"rgba(70,199,214,.35)","stroke-dasharray":"5 4","stroke-width":1.3});}
   const yc=document.getElementById("yogChk");const showYg=!yc||yc.checked!==false;
-  for(const s of starsNow(y)){const h=altAz(s.lam,s.bet,d,lat,lon);const p=proj(h.az,h.alt);if(!p)continue;
+  const _stars=starsNow(y),_sp={};
+  for(const s of _stars){const h=altAz(s.lam,s.bet,d,lat,lon);_sp[s.nm]=proj(h.az,h.alt);}
+  {const _cc=document.getElementById("constChk");
+   if(!_cc||_cc.checked!==false){
+    for(const fig of CONST_FIGS){let sx=0,sy=0,sn=0;
+      for(const line of fig.l){let pp="",pen=false;
+        for(const nmm of line){const p2=_sp[nmm];
+          if(!p2){pen=false;continue;}
+          pp+=(pen?"L":"M")+p2[0].toFixed(1)+" "+p2[1].toFixed(1)+" ";pen=true;sx+=p2[0];sy+=p2[1];sn++;}
+        if(pp)svg.appendChild(E("path",{d:pp,fill:"none",stroke:"rgba(140,165,215,.30)","stroke-width":0.9}));}
+      if(sn>=3)svg.appendChild(T(sx/sn,sy/sn,fig.nm,{fill:"rgba(140,165,215,.5)","font-size":9,"text-anchor":"middle","font-family":"var(--mono)"}));
+    }}}
+  for(const s of _stars){const p=_sp[s.nm];if(!p)continue;
     const r=Math.max(0.9,3.4-0.62*s.mag);
     svg.appendChild(E("circle",{cx:p[0],cy:p[1],r,fill:"#e8ecff","fill-opacity":Math.max(.35,1-0.13*s.mag)}));
     const lbl=s.yg&&showYg? s.nm+" · "+s.yg : (s.mag<1.7? s.nm : null);
@@ -692,7 +785,8 @@ function renderSky(){
     svg.appendChild(T(p[0],p[1]+18,b.nm,{fill:b.col,"font-size":8.5,"text-anchor":"middle","font-family":"var(--mono)","fill-opacity":.8}));}
   if(dome)svg.appendChild(E("circle",{cx,cy,r:R,fill:"none",stroke:"rgba(90,110,150,.5)","stroke-width":1.5}));
   const st=document.getElementById("sensorStat");
-  if(st)st.textContent=(dome?"dome":"AR "+skyS.fov+"°")+" · "+(skyS.sensor?"sensors live — drag ⇄ to trim azimuth":"drag to look · drag a body to time-travel")+" · "+dayStateShort(sunA);
+  if(st)st.textContent=(dome?"dome":"AR "+skyS.fov+"°")+" · "+(skyS.sensor?"sensors live — drag ⇄ to trim azimuth":"drag to look · drag a body to time-travel")+" · "+dayStateShort(sunA)+(dome?"":" · Esc exits");
+  {const xb2=document.getElementById("arExit");if(xb2)xb2.style.display=(dome&&!skyS.sensor)?"none":"";}
 }
 function skyInv(x,y){
   const cx=350,cy=350,R=330;
@@ -741,13 +835,14 @@ function setupSky(){
   const fs=document.getElementById("fovSlider");
   if(fs)fs.addEventListener("input",e=>{skyS.fov=+e.target.value;const L=document.getElementById("fovLbl");if(L)L.textContent=skyS.fov+"°";if(skyS.mode==="ar")renderSky();});
   const yc=document.getElementById("yogChk");if(yc)yc.onchange=()=>renderSky();
+  const cc2=document.getElementById("constChk");if(cc2)cc2.onchange=()=>renderSky();
   const sb=document.getElementById("sensorBtn");
   if(sb)sb.onclick=async()=>{
     const stat=document.getElementById("sensorStat");
     try{
       if(typeof DeviceOrientationEvent!=="undefined"&&DeviceOrientationEvent.requestPermission){
         const p=await DeviceOrientationEvent.requestPermission();if(p!=="granted"){if(stat)stat.textContent="sensor permission denied";return;}}
-      const handler=ev=>{if(ev.alpha==null)return;skyS.sensor=true;
+      const handler=skyS._h=ev=>{if(ev.alpha==null)return;skyS.sensor=true;
         let alpha=ev.alpha;if(ev.webkitCompassHeading!=null)alpha=360-ev.webkitCompassHeading;
         const B=devBasis(alpha,ev.beta||0,ev.gamma||0);
         skyS.az=atan2d(B.fwd[0],B.fwd[1]);skyS.alt=Math.asin(Math.max(-1,Math.min(1,B.fwd[2])))*R2D;
@@ -760,6 +855,18 @@ function setupSky(){
       setTimeout(()=>{if(!skyS.sensor&&stat)stat.textContent="no sensor data — drag to look instead";},2500);
     }catch(e){if(stat)stat.textContent="sensors unavailable — drag to look";}
   };
+  function exitAR(){
+    skyS.sensor=false;skyS.mode="dome";skyS.roll=0;
+    if(skyS._h){window.removeEventListener("deviceorientationabsolute",skyS._h,true);
+      window.removeEventListener("deviceorientation",skyS._h,true);skyS._h=null;}
+    if(document.fullscreenElement&&document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+    document.querySelectorAll("#skyModeSeg button").forEach(x=>x.classList.toggle("on",x.dataset.m==="dome"));
+    const st2=document.getElementById("sensorStat");if(st2)st2.textContent="dome view — press Esc anytime to leave AR";
+    renderSky();
+  }
+  skyS.exitAR=exitAR;
+  {const xb=document.getElementById("arExit");if(xb)xb.onclick=exitAR;}
+  document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&(skyS.mode==="ar"||skyS.sensor))exitAR();});
 }
 function devBasis(al,be,ga){const ca=C(al),sa=S(al),cb=C(be),sb=S(be),cg=C(ga),sg=S(ga);
   const R=[[ca*cg-sa*sb*sg,-sa*cb,ca*sg+sa*sb*cg],[sa*cg+ca*sb*sg,ca*cb,sa*sg-ca*sb*cg],[-cb*sg,sb,cb*cg]];
@@ -780,7 +887,10 @@ function renderGlobe(){
     if(pp)svg.appendChild(E("path",Object.assign({d:pp,fill:"none"},st)));};
   for(let la=-60;la<=60;la+=30){const g=[];for(let lo=0;lo<=360;lo+=6)g.push([la,lo]);path(g,{stroke:"rgba(90,110,150,.16)"});}
   for(let lo=0;lo<360;lo+=30){const g=[];for(let la=-88;la<=88;la+=4)g.push([la,lo]);path(g,{stroke:"rgba(90,110,150,.12)"});}
-  /* reference circles, not maps: equator, tropics, polar circles */
+  /* continent coastlines (COAST: flattened [lon×10,lat×10] pairs) */
+  for(const ring of COAST){const g=[];for(let i=0;i<ring.length;i+=2)g.push([ring[i+1]/10,ring[i]/10]);
+    path(g,{stroke:"rgba(120,200,180,.35)","stroke-width":0.7});}
+  /* reference circles: equator, tropics, polar circles */
   [[0,"rgba(70,199,214,.55)",1.4,""],[23.44,"rgba(230,180,80,.42)",1,"3 4"],[-23.44,"rgba(230,180,80,.42)",1,"3 4"],[66.56,"rgba(90,110,150,.3)",1,"2 5"],[-66.56,"rgba(90,110,150,.3)",1,"2 5"]]
     .forEach(([la,st,w,da])=>{const g=[];for(let lo=0;lo<=360;lo+=4)g.push([la,lo]);
       path(g,Object.assign({stroke:st,"stroke-width":w},da?{"stroke-dasharray":da}:{}));});
@@ -973,6 +1083,11 @@ function setWave(w){state.waveform=w;document.querySelectorAll(".wavesel button"
 
   /* ---- mount: bind DOM + boot (was top-level in v2) ---- */
   function mount(){
+    document.querySelectorAll("#vgsel button").forEach(b=>b.onclick=()=>{state.varga=+b.dataset.v;
+      document.querySelectorAll("#vgsel button").forEach(x=>x.classList.toggle("on",x===b));renderLagna();});
+    document.querySelectorAll("#stysel button").forEach(b=>b.onclick=()=>{state.chartStyle=b.dataset.s;
+      document.querySelectorAll("#stysel button").forEach(x=>x.classList.toggle("on",x===b));renderLagna();});
+    setupRasiDrag();
 document.getElementById("events").addEventListener("input",renderAll);
 ["anchor","tol","refDate","refTime","tz","lat","lon"].forEach(id=>document.getElementById(id).addEventListener("input",()=>{readCtl();renderAll();}));
 document.getElementById("epochSlider").addEventListener("input",e=>{state.anchor=parseFloat(e.target.value);reflectEpoch();renderInstrument();});

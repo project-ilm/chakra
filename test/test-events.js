@@ -10,7 +10,11 @@ ok("Buddha Pūrṇimā = 2026-05-01",find("Buddha").indexOf("2026-05-01")>=0);
 ok("Rakṣā Bandhana late Aug",within(find("Rakṣā"),"2026-08-26","2026-08-30"));
 ok("Janmāṣṭamī early Sep",within(find("Janmāṣṭamī"),"2026-09-02","2026-09-06"));
 ok("Vijayadaśamī ~20 Oct",within(find("Vijayadaśamī"),"2026-10-18","2026-10-22"));
-ok("Dīpāvalī ~8 Nov",within(find("Dīpāvalī"),"2026-11-07","2026-11-10"));
+const dip=ev.find(e=>e.name.indexOf("Dīpāvalī")>=0);
+ok("Dīpāvalī 2026 = 8 Nov exactly (pradoṣa-vyāpinī @ Ujjain)",dip.date==="2026-11-08");
+ok("Dīpāvalī note names the rule",dip.note.indexOf("pradoṣa")>=0);
+{const ss=C.sunsetUT(C.greg2jdn(2026,11,8),23.1793,75.7849);
+ ok("Ujjain sunset 8 Nov 2026 ≈ 12.25h UT",Math.abs((ss%1)*24-12.25)<0.2);}
 ok("Pesach = 2026-04-02",find("Pesach").indexOf("2026-04-02")>=0);
 ok("Rosh Hashana Sep 2026",within(find("Rosh Hashana"),"2026-09-11","2026-09-13"));
 ok("Eid al-Fiṭr ~20 Mar (tabular)",within(find("Eid al-Fiṭr"),"2026-03-18","2026-03-22"));

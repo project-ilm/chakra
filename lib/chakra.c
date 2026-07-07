@@ -478,6 +478,23 @@ void ck_vimshottari(double moonSid,double birthYear,ck_vims*o){
 typedef struct { ck_event e; int idx; } ev_slot;
 static void gs(long j,char out[12]){int Y,M,D;ck_jdn2greg(j,&Y,&M,&D);snprintf(out,12,"%d-%02d-%02d",Y,M,D);}
 static double dOf(long j){int Y,M,D;ck_jdn2greg(j,&Y,&M,&D);return ck_dayno(Y,M,D,12);}
+
+/* geometric sunset (alt = -0.833° descending), UT day-number; Ujjain drives the pradoṣa rule */
+double ck_sunset_ut(long jdn,double lat,double lonE){
+  int Y,M,D; ck_jdn2greg(jdn,&Y,&M,&D);
+  double t=ck_dayno(Y,M,D,18.0-lonE/15.0);
+  double lo=t-0.14,hi=t+0.14,alt,az;
+  ck_altaz(ck_sun_lon(lo),0,lo,lat,lonE,&alt,&az); double aLo=alt+0.833;
+  ck_altaz(ck_sun_lon(hi),0,hi,lat,lonE,&alt,&az); double aHi=alt+0.833;
+  if(!(aLo>0&&aHi<0)){lo=t-0.3;hi=t+0.3;
+    ck_altaz(ck_sun_lon(lo),0,lo,lat,lonE,&alt,&az); aLo=alt+0.833;
+    ck_altaz(ck_sun_lon(hi),0,hi,lat,lonE,&alt,&az); aHi=alt+0.833;}
+  if(!(aLo>0&&aHi<0))return t;
+  for(int i=0;i<34;i++){double m=(lo+hi)/2;
+    ck_altaz(ck_sun_lon(m),0,m,lat,lonE,&alt,&az);
+    if(alt+0.833>0)lo=m;else hi=m;}
+  return (lo+hi)/2;
+}
 static void push_ev(ev_slot*ev,int*n,int max,long j,const char*date,
                     const char*name,const char*trad,const char*note){
   if(*n>=max)return;
@@ -577,7 +594,9 @@ int ck_annual_events(int Y,ck_event*out,int max){
         if(nv>-1e17&&INY(nv))push_ev(ev,&n,CAP,ck_jdn_of(nv),NULL,"Śāradīya Navarātri begins","Hindu","Āśvina śukla pratipadā");
         double vj=tithi_day_after(a,9,14);
         if(vj>-1e17&&INY(vj))push_ev(ev,&n,CAP,ck_jdn_of(vj),NULL,"Vijayadaśamī (Daśahrā)","Hindu","Āśvina śukla daśamī");
-        if(INY(b))push_ev(ev,&n,CAP,ck_jdn_of(b),NULL,"Dīpāvalī (Lakṣmī Pūjā)","Hindu","Āśvina amāvāsyā (amānta)");
+        {double tS=ck_solve_elong(b-1.2,348);long dv=ck_jdn_of(b);long cd[2];cd[0]=ck_jdn_of(b)-1;cd[1]=ck_jdn_of(b);
+          for(int qi=0;qi<2;qi++){double ss=ck_sunset_ut(cd[qi],23.1793,75.7849);if(ss>=tS&&ss<=b)dv=cd[qi];}
+          if(INY(dOf(dv)))push_ev(ev,&n,CAP,dv,NULL,"Dīpāvalī (Lakṣmī Pūjā)","Hindu","Āśvina amāvāsyā (amānta) · pradoṣa-vyāpinī @ Ujjain");}
       }
       if(nameIdx==7&&INY(F))push_ev(ev,&n,CAP,ck_jdn_of(F),NULL,"Kārtika Pūrṇimā · Guru Nanak Gurpurab","Hindu/Sikh","");
       if(nameIdx==0){

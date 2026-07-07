@@ -204,6 +204,9 @@
     ]
   };
 
+  var AI_CTX = "Project: CHAKRA \u2014 Temporal Cycle Observatory. Repo: https://github.com/project-ilm/chakra (GPL-3.0-or-later). Read CONTEXT.md + CONTRACTS.md in the repo before proposing changes. Live site: https://project-ilm.github.io/chakra/\n\n";
+  function aiWrap(t) { return AI_CTX + t; }
+
   function mountPromptFab() {
     if (document.body.getAttribute("data-page") !== "pro") return;
     var css = document.createElement("style");
@@ -234,15 +237,24 @@
       card.appendChild(x);
       var h = document.createElement("h3"); h.textContent = "Seed an AI conversation — " + view; card.appendChild(h);
       var sub = document.createElement("div"); sub.className = "sub";
-      sub.textContent = "Copy a prompt into any AI assistant. Each is self-contained; paste the observatory's JSON hand-off alongside it for concrete numbers.";
+      sub.textContent = "Open a prompt directly in Claude or ChatGPT, or copy it anywhere. Each is prefixed with the repo + CONTEXT/CONTRACTS pointers, so the conversation can end in a pull request.";
       card.appendChild(sub);
       list.forEach(function (p) {
         var box = document.createElement("div"); box.className = "ck-p";
         var b = document.createElement("b"); b.textContent = p[0]; box.appendChild(b);
         var pre = document.createElement("pre"); pre.textContent = p[1]; box.appendChild(pre);
+        var row = document.createElement("div");
+        row.style.cssText = "display:flex;flex-wrap:wrap;gap:6px";
         var btn = document.createElement("button"); btn.textContent = "Copy prompt";
-        btn.onclick = function () { copyText(p[1], btn); };
-        box.appendChild(btn); card.appendChild(box);
+        btn.onclick = function () { copyText(aiWrap(p[1]), btn); };
+        row.appendChild(btn);
+        var q = encodeURIComponent(aiWrap(p[1]));
+        [["Claude \u2197", "https://claude.ai/new?q=" + q], ["ChatGPT \u2197", "https://chatgpt.com/?q=" + q]].forEach(function (Lk) {
+          var a2 = document.createElement("a"); a2.textContent = Lk[0]; a2.href = Lk[1]; a2.target = "_blank"; a2.rel = "noopener";
+          a2.style.cssText = "font-size:10.5px;color:var(--cy2);border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;text-decoration:none;font-family:inherit";
+          row.appendChild(a2);
+        });
+        box.appendChild(row); card.appendChild(box);
       });
       m.appendChild(card); document.body.appendChild(m);
       function close() { document.body.removeChild(m); document.removeEventListener("keydown", esc); }
@@ -267,5 +279,5 @@
     else init();
   }
 
-  return { THEMES: THEMES, PROMPTS: PROMPTS, applyTheme: typeof document !== "undefined" ? applyTheme : null, version: "1.2.0" };
+  return { THEMES: THEMES, PROMPTS: PROMPTS, applyTheme: typeof document !== "undefined" ? applyTheme : null, version: "1.3.0" };
 });

@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#define CK_VERSION "1.2.0"
+#define CK_VERSION "1.3.0"
 
 /* ── body indices (order identical to the JS grahas() object) ─────────── */
 enum {
@@ -121,6 +121,7 @@ void        ck_panchanga_calc(double d, double y, ck_panchanga *out);
 const char *ck_karana_name(int karana_i);
 
 /* ── solvers ──────────────────────────────────────────────────────────── */
+double ck_sunset_ut(long jdn,double lat,double lonE);   /* geometric sunset, UT */
 double ck_elong_of(double t);
 double ck_solve_elong(double t0, double target);            /* 12 Newton  */
 double ck_solve_asc(double t0, double target, double lat, double lonE);

@@ -107,6 +107,9 @@
       </div>
     </div>
 
+    <canvas id="warp" width="1100" height="280" style="width:100%;display:block;border:1px solid var(--panelb);border-radius:12px;margin-top:16px;background:#02040a" aria-label="Warp-field view: star streaks scale with your chosen fraction of light-speed"></canvas>
+    <div style="font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:6px;letter-spacing:.06em">the view from the bridge — streak length, speed and blue-shift follow your β live · past 0.92 c it goes properly Star-Trek</div>
+
     <div class="board">
       <div class="bigrow">
         <div class="big"><div class="k">distance</div><div class="v" id="oDist">—</div><div class="s" id="oDistS"></div></div>
@@ -154,7 +157,9 @@
 (function(){
 "use strict";
 var C=window.Chakra,V=window.ChakraVoyage;
-function el(id){return document.getElementById(id);}
+function el(id){return document.getElementById(id);}function el(id){return document.getElementById(id);}
+function AIW(x){return "Project: CHAKRA \u2014 Temporal Cycle Observatory. Repo: https://github.com/project-ilm/chakra (GPL-3.0-or-later). Read CONTEXT.md + CONTRACTS.md in the repo before proposing changes. Live site: https://project-ilm.github.io/chakra/\n\n"+x;}
+var TOUR_PROMPT="Explain special-relativistic interstellar travel kinematics: the Lorentz factor \u03b3=1/\u221a(1\u2212\u03b2\u00b2), why Earth-frame time is distance/speed while ship proper time is that divided by \u03b3, the twin 'paradox' and its resolution, and compute a worked example: 4.367 light-years to \u03b1 Centauri at \u03b2=0.5 (Earth time, ship time, aging difference). Then explain how a constant 1 g acceleration profile would change the numbers.";
 function fmtY(y){
   if(y<1e-3)return (y*365.25*24).toFixed(1)+" hours";
   if(y<0.5)return (y*365.25).toFixed(1)+" days";
@@ -223,6 +228,7 @@ function update(){
   el("starnote").textContent=(custom>0)?"free-range mode: "+fmtLy(ly)+" of vacuum, your responsibility":star.note;
   var beta=sliderToBeta(+el("beta").value);
   if(beta<=0)beta=0.0001;
+  warpBeta=beta;
   var rt=el("rt").checked?2:1;
   var depart=parseInt(el("depart").value)||new Date().getFullYear();
   var g=V.gamma(beta);
@@ -262,11 +268,65 @@ function update(){
   el("rt").addEventListener(evt,update);
 });
 el("aiPrompt").onclick=function(){
-  var t="Explain special-relativistic interstellar travel kinematics: the Lorentz factor γ=1/√(1−β²), why Earth-frame time is distance/speed while ship proper time is that divided by γ, the twin 'paradox' and its resolution, and compute a worked example: 4.367 light-years to α Centauri at β=0.5 (Earth time, ship time, aging difference). Then explain how a constant 1 g acceleration profile would change the numbers.";
+  var t=AIW(TOUR_PROMPT);
   var b=this,o=b.textContent;
   (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent="Copied ✓";setTimeout(function(){b.textContent=o;},1300);},function(){
     var ta=document.createElement("textarea");ta.value=t;ta.style.cssText="position:fixed;opacity:0";document.body.appendChild(ta);ta.select();try{document.execCommand("copy");b.textContent="Copied ✓";setTimeout(function(){b.textContent=o;},1300);}catch(e){}document.body.removeChild(ta);});
 };
+/* \u2500\u2500 warp field: the view from the bridge \u2500\u2500 */
+var warpBeta=0.2;
+(function(){
+  var cv=el("warp");if(!cv)return;
+  var ctx=cv.getContext("2d");
+  var W=cv.width,H=cv.height,cx=W/2,cy=H/2,Rm=Math.hypot(cx,cy);
+  var N=340,st=[];
+  function reset(s){s.a=Math.random()*6.2832;s.r=0.02+Math.random()*0.08;}
+  for(var i=0;i<N;i++){st.push({a:Math.random()*6.2832,r:Math.random()});}
+  var red=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function frame(){
+    var b=Math.min(0.9999,Math.max(0.0001,warpBeta));
+    var g=1/Math.sqrt(1-b*b);
+    var speed=(0.2+3*b)*(1+0.8*Math.min(g-1,60));
+    var len=Math.min(0.92,b*b);
+    var blue=Math.max(0,Math.min(1,(b-0.9)*10));
+    ctx.fillStyle="rgba(2,4,10,"+(0.5-0.22*blue)+")";
+    ctx.fillRect(0,0,W,H);
+    for(var i=0;i<N;i++){var s=st[i];
+      var r0=s.r;
+      s.r+=(0.0016+0.02*s.r)*speed*0.16;
+      if(s.r>1.08){reset(s);continue;}
+      var x0=cx+Math.cos(s.a)*r0*Rm, y0=cy+Math.sin(s.a)*r0*Rm;
+      var rT=Math.max(r0-len*(0.15+0.85*r0),0.01);
+      var xT=cx+Math.cos(s.a)*rT*Rm, yT=cy+Math.sin(s.a)*rT*Rm;
+      var al=0.25+0.75*s.r;
+      var cR=Math.round(210-90*blue), cG=Math.round(225-30*blue);
+      ctx.strokeStyle="rgba("+cR+","+cG+",255,"+al.toFixed(2)+")";
+      ctx.lineWidth=0.6+1.8*s.r;
+      ctx.beginPath();ctx.moveTo(xT,yT);ctx.lineTo(x0,y0);ctx.stroke();
+    }
+    if(blue>0){
+      var gr=ctx.createRadialGradient(cx,cy,0,cx,cy,Rm);
+      gr.addColorStop(0,"rgba(140,180,255,"+(0.22*blue)+")");
+      gr.addColorStop(0.5,"rgba(0,0,0,0)");
+      gr.addColorStop(1,"rgba(255,120,90,"+(0.10*blue)+")");
+      ctx.fillStyle=gr;ctx.fillRect(0,0,W,H);
+    }
+    if(!red)requestAnimationFrame(frame);
+  }
+  ctx.fillStyle="#02040a";ctx.fillRect(0,0,W,H);
+  if(red){warpBeta=0.6;for(var k=0;k<50;k++)frame();}
+  else requestAnimationFrame(frame);
+})();
+/* \u2500\u2500 open this prompt directly in an AI \u2500\u2500 */
+(function(){
+  var host=el("aiPrompt");if(!host||!host.parentNode)return;
+  var q=encodeURIComponent(AIW(TOUR_PROMPT));
+  [["Claude \u2197","https://claude.ai/new?q="+q],["ChatGPT \u2197","https://chatgpt.com/?q="+q]].forEach(function(Lk){
+    var a=document.createElement("a");a.textContent=Lk[0];a.href=Lk[1];a.target="_blank";a.rel="noopener";
+    a.style.cssText="font-family:var(--mono);font-size:10.5px;color:var(--cy2);border:1px solid var(--panelb);border-radius:999px;padding:3px 10px;text-decoration:none";
+    host.parentNode.appendChild(a);
+  });
+})();
 update();
 })();
 </script>
