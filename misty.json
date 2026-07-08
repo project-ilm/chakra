@@ -1,7 +1,9 @@
 {
   "title": "CHAKRA — Temporal Cycle Observatory",
+  "description": "An offline-first, dependency-free astronomical and calendrical observatory. CHAKRA computes ten calendar traditions, planetary positions, the Hindu pañcāṅga, eclipses and classical jyotiṣa structures from live geometry and orbital mechanics — never from lookup tables — as a set of static web pages plus a byte-parity C99 core (6,590-check JS↔C parity). Includes an interactive mathematics tutor with eight derivations, a relativistic interstellar-tour planner, and a browser-executable public test plan. Sole author, thirty-year independent research corpus.",
+  "license": "gpl-3.0",
   "upload_type": "software",
-  "description": "An offline-first, dependency-free astronomical and calendrical observatory. CHAKRA computes ten calendar traditions, planetary positions, the Hindu pañcāṅga, eclipses and classical jyotiṣa structures from live geometry and orbital mechanics — never from lookup tables — as a set of static web pages plus a byte-parity C99 core (6,590-check JS↔C parity). Includes an interactive mathematics tutor, a relativistic interstellar-tour planner, and a browser-executable public test plan.",
+  "version": "1.3.0",
   "creators": [
     { "name": "Choudhary, Abhishek" }
   ],
@@ -10,9 +12,7 @@
     "hijri calendar", "hebrew calendar", "nanakshahi", "eclipses",
     "keplerian orbits", "offline-first", "C99", "relativity", "heritage computing"
   ],
-  "license": "GPL-3.0-or-later",
-  "access_right": "open",
-  "version": "1.3.0",
+  "repository": "https://github.com/project-ilm/chakra",
   "related_identifiers": [
     { "identifier": "https://github.com/project-ilm/chakra", "relation": "isSupplementTo", "scheme": "url" },
     { "identifier": "https://project-ilm.github.io/chakra/", "relation": "isDocumentedBy", "scheme": "url" }

@@ -885,11 +885,12 @@ function renderGlobe(){
     for(const q of pts){const p=q&&orthoXY(q[0],q[1],cx,cy,R);
       if(!p){pen=false;continue;}pp+=(pen?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)+" ";pen=true;}
     if(pp)svg.appendChild(E("path",Object.assign({d:pp,fill:"none"},st)));};
-  for(let la=-60;la<=60;la+=30){const g=[];for(let lo=0;lo<=360;lo+=6)g.push([la,lo]);path(g,{stroke:"rgba(90,110,150,.16)"});}
-  for(let lo=0;lo<360;lo+=30){const g=[];for(let la=-88;la<=88;la+=4)g.push([la,lo]);path(g,{stroke:"rgba(90,110,150,.12)"});}
-  /* continent coastlines (COAST: flattened [lon×10,lat×10] pairs) */
+  /* faint navigation graticule only — NOT political borders (CHAKRA carries no border/country data, only shorelines) */
+  for(let la=-60;la<=60;la+=30){const g=[];for(let lo=0;lo<=360;lo+=6)g.push([la,lo]);path(g,{stroke:"rgba(90,110,150,.07)","stroke-dasharray":"1 6"});}
+  for(let lo=0;lo<360;lo+=60){const g=[];for(let la=-88;la<=88;la+=4)g.push([la,lo]);path(g,{stroke:"rgba(90,110,150,.06)","stroke-dasharray":"1 6"});}
+  /* natural shorelines only (COAST: flattened [lon×10,lat×10] pairs) */
   for(const ring of COAST){const g=[];for(let i=0;i<ring.length;i+=2)g.push([ring[i+1]/10,ring[i]/10]);
-    path(g,{stroke:"rgba(120,200,180,.35)","stroke-width":0.7});}
+    path(g,{stroke:"rgba(120,200,180,.4)","stroke-width":0.7});}
   /* reference circles: equator, tropics, polar circles */
   [[0,"rgba(70,199,214,.55)",1.4,""],[23.44,"rgba(230,180,80,.42)",1,"3 4"],[-23.44,"rgba(230,180,80,.42)",1,"3 4"],[66.56,"rgba(90,110,150,.3)",1,"2 5"],[-66.56,"rgba(90,110,150,.3)",1,"2 5"]]
     .forEach(([la,st,w,da])=>{const g=[];for(let lo=0;lo<=360;lo+=4)g.push([la,lo]);

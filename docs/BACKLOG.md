@@ -54,10 +54,11 @@ Implement rigorous frame rotation between mean equinoxes: IAU precession matrix 
 `bindings/python/`: pyproject (module `chakra_obs`), ctypes bindings to `libchakra.so` (add a `-fPIC -shared` target to `lib/Makefile`) with graceful fallback to spawning the `lib/chakra` CLI. Console script `chakra-cli` subcommands: `panchang`, `calendars`, `events --year`, `kundali --date --time --lat --lon` (ASCII North-diamond render + planet table). Descriptive docstrings sized for AI packet work.
 **Done when:** `pipx install .` works and `chakra-cli calendars --date 2026-06-16` byte-matches the HTML test console's engine output for the same query.
 
-### B-24: GWBASIC port — `bindings/gwbasic/CHAKRA.BAS`
+### B-24: BASIC ports — GW-BASIC + QB64 graphical UI  *(partially shipped v1.3.0)*
 **Category:** Bindings / heritage · **Priority:** Medium
-A line-numbered, single-precision-safe GW-BASIC program computing: JDN, day-number, Sun & Moon longitude (main perturbation terms), tithi + nakṣatra + vāra, Lahiri ayanāṁśa, tabular Hijrī date. Comment every block; target PC-BASIC and DOSBox GW-BASIC 3.23. Include a README mapping each GOSUB to its `chakra-core.js` twin and noting expected precision loss.
-**Done when:** for 2026-08-12 it prints the same tithi/nakṣatra/vāra names as the site.
+**Shipped:** `bindings/gwbasic/CHAKRA.BAS` (line-numbered GW-BASIC 3.23 / PC-BASIC: JDN, Sun & Moon longitude with the 10 main perturbation terms, tithi/nakṣatra/vāra, Lahiri ayanāṁśa, tabular Hijrī, GOSUB-based atan2) and `bindings/gwbasic/CHAKRA_QB64.BAS` (QB64/QB64-PE graphical astrolabe: Moon-with-terminator + planet ring + panchāṅga panel via `SCREEN`/`_RGB32`), with a README mapping every routine to its `chakra-core.js` twin. Verified: 2026-08-12 06:30 UT → Amāvāsyā · Āśleṣā · Budhavāra, Sun ≈ 139.6°, Moon ≈ 133.3°.
+**Remaining:** the QB64 planet ring uses crude mean longitudes (not chart-grade); port the full `grahas()` planetary theory, the other nine calendars, eclipses and the pradoṣa Dīpāvalī rule to BASIC; add an automated emulator smoke-test.
+**Done when:** BASIC planet longitudes match the C/JS cores within a degree and an emulator run is checked in CI.
 
 ### B-25: Node.js binding
 **Category:** Bindings · **Priority:** Low

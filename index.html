@@ -327,11 +327,13 @@ function drawGlobe(d){
     for(var i=0;i<pts.length;i++){var p=pts[i]&&orthoXY(pts[i][0],pts[i][1],cx,cy,R);
       if(!p){pen=false;continue;}pp+=(pen?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)+" ";pen=true;}
     if(pp){var attrs={d:pp,fill:"none"};for(var kk in st)attrs[kk]=st[kk];svg.appendChild(E("path",attrs));}}
-  for(var la=-60;la<=60;la+=30){var gA=[];for(var lo=0;lo<=360;lo+=8)gA.push([la,lo]);path(gA,{stroke:"rgba(90,110,150,.14)"});}
-  for(var lo2=0;lo2<360;lo2+=30){var gB=[];for(var la2=-88;la2<=88;la2+=6)gB.push([la2,lo2]);path(gB,{stroke:"rgba(90,110,150,.10)"});}
+  /* faint navigation graticule only (NOT political borders — CHAKRA carries no border data) */
+  for(var la=-60;la<=60;la+=30){var gA=[];for(var lo=0;lo<=360;lo+=8)gA.push([la,lo]);path(gA,{stroke:"rgba(90,110,150,.07)","stroke-dasharray":"1 6"});}
+  for(var lo2=0;lo2<360;lo2+=60){var gB=[];for(var la2=-88;la2<=88;la2+=6)gB.push([la2,lo2]);path(gB,{stroke:"rgba(90,110,150,.06)","stroke-dasharray":"1 6"});}
+  /* natural shorelines only */
   for(var r0=0;r0<C.COAST.length;r0++){var ring=C.COAST[r0],gC=[];
     for(var i2=0;i2<ring.length;i2+=2)gC.push([ring[i2+1]/10,ring[i2]/10]);
-    path(gC,{stroke:"rgba(120,200,180,.38)","stroke-width":0.8});}
+    path(gC,{stroke:"rgba(120,200,180,.42)","stroke-width":0.8});}
   var ls=C.sunLon(d).lon,ee=C.obliq(d);
   var Sd=function(x){return Math.sin(x*Math.PI/180);},Cd=function(x){return Math.cos(x*Math.PI/180);};
   var aS=C.atan2d(Sd(ls)*Cd(ee),Cd(ls)), latS=Math.asin(Sd(ls)*Sd(ee))*180/Math.PI;
