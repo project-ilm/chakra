@@ -36,7 +36,7 @@
 extern "C" {
 #endif
 
-#define CK_VERSION "1.4.0"
+#define CK_VERSION "1.4.1"
 
 /* ── body indices (order identical to the JS grahas() object) ─────────── */
 enum {

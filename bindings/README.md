@@ -12,6 +12,7 @@ matches the website to the byte.
 | **Go** | `go/` | cgo includes `chakra.c` directly | `go test ./...` |
 | **C#** | `csharp/` | P/Invoke over `libchakra.so`/`chakra.dll` | `make -C ../../lib libchakra.so && cp ../../lib/libchakra.so . && dotnet run` |
 | **Node** (`@project-ilm/chakra`) | `node/` | spawns the `chakra` CLI, parses JSON | `node test.js` |
+| **CUDA** | `cuda/` | `__host__ __device__` port of the ephemeris core; batch N epochs × 11 bodies | `nvcc -O3 -o chakra_ephem chakra_ephem.cu && ./chakra_ephem` |
 | **GW-BASIC / QB64** | `gwbasic/` | independent port (text + graphical) | see `gwbasic/README.md` |
 
 ## The shared signature

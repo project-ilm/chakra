@@ -47,7 +47,12 @@ fi
 say "artifact: $ART ($(du -h "$ART" | cut -f1))"
 
 if [ "$LIVE" = 1 ]; then
-  say "LIVE mint → Zenodo PRODUCTION. This creates a permanent public DOI."
+  say "LIVE mint → Zenodo PRODUCTION."
+  say "This mints v$VER as a NEW VERSION under the CHAKRA concept DOI"
+  say "(10.5281/zenodo.21253628). Zenodo assigns a fresh version DOI; the concept"
+  say "DOI always resolves to the latest. misty.json records isVersionOf accordingly."
+  say "For a version update you may prefer Zenodo UI 'New version' on the concept"
+  say "record, then upload dist/chakra-v$VER.tar.gz — misty --no-publish leaves a draft."
   printf '   type EXACTLY "mint %s" to proceed: ' "$CORE_VER"
   read -r reply
   [ "$reply" = "mint $CORE_VER" ] || die "confirmation mismatch — aborting (nothing published)"

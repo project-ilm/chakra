@@ -29,6 +29,20 @@ tables. Ships as a set of static web pages plus a byte-parity C99 core.
   `malloc` in hot paths). The JS core is ordinary JS.
 - There is **no SDR, no SGP4, no DE440, no atlas** in the tree yet — all are
   seeded backlog items (B-20, B-45, B-47, B-52…). Don't reference them as if present.
+- **The globe carries ONLY physical coastlines, never political borders.** The
+  `COAST` array in `chakra-core.js` is the Natural Earth *physical* coastline
+  (their "physical" vs "cultural" split — cultural/political layers are excluded
+  by construction). This is a hard, politically-sensitive requirement: never
+  introduce a border/country/admin dataset, and if asked to "add a map," add only
+  shorelines. `COAST` is UI-only and does not touch the C parity harness.
+- **Versions are single-sourced from `src/chakra-core.js`.** `seed-chakra.sh`
+  derives `VER` from the core's `version:` field; never hardcode a version in the
+  seed script or any binding will drift. Bump the core first, then mirror to the
+  C header (`CK_VERSION`), `misty.json`, and the binding manifests.
+- **Six bindings all call the ONE C core.** They must reproduce the reference
+  anchor exactly: 2026-08-12 06:30 UT → Budhavāra · Amāvāsyā · Āśleṣā ·
+  JDN 2461265; the CUDA binding adds all-body longitude parity (max |Δ| < 0.0023°).
+  A binding that computes anything itself, rather than deferring to the core, is a bug.
 
 ## Layout
 
@@ -48,9 +62,14 @@ src/chakra-ui.js      all Observatory-Pro rendering & interaction
 src/chakra-voyage.js  relativistic star-travel arithmetic (pure, tested)
 src/chakra-site.js    shared chrome: themes, share bar, AI-prompt popups
 
-lib/         C99 twin + generated vectors.h + parity harness + JSON CLI
+lib/         C99 twin + generated vectors.h + parity harness + JSON CLI + libchakra.so
+bindings/    six language faces of the SAME C core (all verified to the anchor):
+             python/ (chakra-observatory + chakra-cli), rust/ (chakra-sys),
+             go/ (cgo), csharp/ (P/Invoke), node/ (CLI-spawn),
+             cuda/ (batch ephemeris), gwbasic/ (GW-BASIC + QB64 graphical)
 test/        node suite (auto-discovered test-*.js) — run: node test/run.js
 docs/        ARCHITECTURE, ASSUMPTIONS, FURTHER-WORK (FW-series), BACKLOG (B-series)
+scripts/     mint-doi.sh (Zenodo via misty-doi), close-completed-issues.sh
 ```
 
 ## The one rule that matters most

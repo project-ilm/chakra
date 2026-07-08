@@ -1,5 +1,30 @@
 # Changelog
 
+## v1.4.1 — 2026-07-08
+- **Physical-map globe (regression fix, political-sensitivity).** The location
+  globe's `COAST` dataset has been replaced wholesale with the canonical
+  **Natural Earth "physical" coastline** (133 rings, coastline-only by definition
+  — Natural Earth strictly separates physical from cultural/political layers).
+  The previous dataset could render lines readable as political boundaries; the
+  new one carries **only shorelines**. `COAST` is UI-only, so the 6,590-check
+  C-parity harness is unaffected (still 0 failed).
+- **CUDA binding (B-30).** New `bindings/cuda/chakra_ephem.cu`: a
+  `__host__ __device__` port of the ephemeris core that batches N epochs × 11
+  bodies on the GPU, with a built-in CPU/GPU parity self-check and throughput
+  benchmark. Verified faithful to the JS/C cores at the 2026-08-12 06:30 UT
+  anchor — max deviation < 0.0023° across all eleven bodies (Sun and Moon exact
+  to 3 decimals). The device math also compiles as ordinary host C++ for
+  GPU-free validation.
+- **Version now self-deriving in `seed-chakra.sh`.** The release script
+  previously hardcoded `VER="1.2.0"`, so its final "published" line reported the
+  wrong version through three releases (the git history and artifacts were always
+  correct; only the echo drifted). `VER` is now derived directly from
+  `src/chakra-core.js`, and the stale commit message was de-versioned to point at
+  this CHANGELOG. This is the substantive reason for the 1.4.0 → 1.4.1 bump.
+- **Version bumped to 1.4.1** across the JS core, C header (`CK_VERSION`),
+  `misty.json`, and all binding manifests.
+
+
 ## v1.4.0 — 2026-07-08
 - **Five language bindings, all calling the same C core** (`bindings/`):
   - **Python** `chakra-observatory` — ctypes against `libchakra.so` with an automatic CLI fallback, and a real **`chakra-cli`** (`panchang`, `calendars`, `events`, `kundali` with an ASCII North-Indian diamond chart; `--json` on any command). `pip install`-ready.

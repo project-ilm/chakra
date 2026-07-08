@@ -90,7 +90,8 @@ Phase 1 (now): `bindings/node/` wrapper that spawns the `lib/chakra` CLI and par
 Emscripten target for `lib/chakra.c` exporting the `ck_*` surface; a triple-parity harness (JS core vs native C vs WASM) over the generated vectors. This creates the WASM layer some drafts wrongly assumed already exists.
 **Done when:** triple parity is byte-exact on the events strings.
 
-### B-30: CUDA kernel — batch ephemerides
+### B-30: CUDA kernel — batch ephemerides  *(shipped v1.4.1)*
+**Shipped:** `bindings/cuda/chakra_ephem.cu` — `__host__ __device__` port of the ephemeris core batching N epochs × 11 bodies, with a CPU/GPU parity self-check and benchmark. Verified against the JS/C cores at the 2026-08-12 anchor (max |Δ| < 0.0023° across all bodies). Remaining: execute on a real GPU runner in CI (B-31).
 **Category:** Compute · **Priority:** Medium
 `cuda/chakra_ephem.cu`: `__device__` ports of kepler/helio/sunLon/moonLon/planetLon (branch-light, no globals), kernel mapping N epochs × 11 bodies → longitude array. Host program compares 32 samples against CPU (`lib/chakra.o` linked as reference) and reports throughput (epochs/s) vs single-thread C.
 **Done when:** max |Δ| < 1e-9° on samples and a benchmark table prints on any CUDA GPU. CI execution is B-31.

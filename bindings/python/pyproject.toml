@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chakra-observatory"
-version = "1.4.0"
+version = "1.4.1"
 description = "Offline, dependency-free astronomical & calendrical observatory — panchāṅga, ten calendars, planetary positions, eclipses, jyotiṣa — from live geometry, never lookup tables."
 readme = "README.md"
 requires-python = ">=3.8"

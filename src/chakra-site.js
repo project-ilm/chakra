@@ -279,5 +279,5 @@
     else init();
   }
 
-  return { THEMES: THEMES, PROMPTS: PROMPTS, applyTheme: typeof document !== "undefined" ? applyTheme : null, version: "1.4.0" };
+  return { THEMES: THEMES, PROMPTS: PROMPTS, applyTheme: typeof document !== "undefined" ? applyTheme : null, version: "1.4.1" };
 });

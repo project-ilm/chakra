@@ -35,6 +35,18 @@ grep -rvil 'x' /dev/null                # (see CI for the exact per-file loop)
    co-author/credit lines. The forbidden-name sweep in CI must stay at zero.
 8. **No scope-creep imports.** Don't reference WASM/SDR/SGP4/DE440/atlas as if they
    exist; build them under their backlog IDs if that's your task.
+9. **Physical map only.** The globe renders coastlines (`COAST`, Natural Earth
+   physical) and never political borders/countries/admin lines. Introducing any
+   cultural/political geographic dataset is a hard rejection — this is a
+   sensitivity requirement, not a preference.
+10. **Single-source the version.** Bump `src/chakra-core.js` first; mirror to
+    `CK_VERSION`, `misty.json`, and every binding manifest. `seed-chakra.sh`
+    derives its version from the core — never hardcode it.
+11. **Bindings defer to the core.** Every language binding calls the C core (or
+    spawns the CLI) and must reproduce the anchor (2026-08-12 06:30 UT →
+    Budhavāra · Amāvāsyā · Āśleṣā · JDN 2461265). No binding recomputes astronomy
+    itself. The CUDA device port additionally holds all-body |Δ| < 0.0023° vs the
+    reference and self-checks host-vs-device to < 1e-9°.
 
 ## Multi-language binding signature (for B-23…B-31)
 
@@ -46,6 +58,21 @@ core returns:
 - Flags: 32-bit int bitmask (ayanāṁśa school, divisional-chart target, theory)
 - Outputs mirror the C struct / JSON envelope; language-idiomatic wrappers may
   present it, but must not alter the numbers.
+
+## Release & DOI workflow (learned, load-bearing)
+
+- **The human owns the push and the mint.** The AI prepares the tree; it does not
+  push to GitHub or mint DOIs from its own environment. `seed-chakra.sh` publishes;
+  `scripts/mint-doi.sh` mints.
+- **DOI minting is guarded (P3).** `mint-doi.sh` defaults to a Zenodo *sandbox
+  dry-run* (validates metadata + builds the artifact, zero network) and requires an
+  explicit `--live` flag plus a typed confirmation to mint for real. `misty.json`
+  MUST carry `access_right: "open"` — misty's shipped JSON Schema otherwise
+  misfires its embargo conditional and demands `embargo_date`. For a **version
+  update** of an existing record, mint under the same Zenodo concept DOI (new
+  version), do not create a fresh concept.
+- **Closing shipped issues.** When a backlog item ships, `scripts/close-completed-
+  issues.sh` closes it by title prefix (`B-NN:`), artifact-guarded, idempotent.
 
 ## PR shape
 

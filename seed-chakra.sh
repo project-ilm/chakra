@@ -8,7 +8,10 @@
 #
 # Copyright (C) 1993-2026 Abhishek Choudhary. GPL-3.0-or-later.
 set -euo pipefail
-ORG="project-ilm"; REPO="chakra"; VER="1.2.0"
+ORG="project-ilm"; REPO="chakra"
+# VER is derived from the engine so it can never drift from the code (fixed v1.4.1)
+VER="$(sed -nE 's/.*version: *"([0-9]+\.[0-9]+\.[0-9]+)".*/\1/p' src/chakra-core.js | head -1)"
+[ -n "$VER" ] || VER="1.4.1"
 say(){ printf '\n\033[1;36m── %s\033[0m\n' "$*"; }
 url(){ printf '\033[1;33m>>> %s\033[0m\n' "$*"; }
 die(){ printf '\n\033[1;31mXX %s\033[0m\n' "$*"; exit 1; }
@@ -73,7 +76,7 @@ git status --short | head -30
 CH=$(git status --short | wc -l | tr -d ' ')
 say "$CH path(s) changed"
 if git -c user.name="Abhishek Choudhary" -c user.email="obonac@users.noreply.github.com" \
-   commit -m "CHAKRA v$VER — landing/pro split, learn+tour+tests pages, site themes & share, sky time-drag, true-orbit orrery, terminator globe, api=events, C99 core with 6590-check parity, 98-assertion suite, seed v2 guards" >/dev/null; then
+   commit -m "CHAKRA v$VER — see CHANGELOG.md for this release's changes" >/dev/null; then
   say "committed"
 else
   say "nothing new to commit"

@@ -4,18 +4,45 @@
   "license": "gpl-3.0",
   "upload_type": "software",
   "access_right": "open",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "creators": [
-    { "name": "Choudhary, Abhishek" }
+    {
+      "name": "Choudhary, Abhishek"
+    }
   ],
   "keywords": [
-    "astronomy", "panchang", "calendar", "jyotisha", "ayanamsa", "ephemeris",
-    "hijri calendar", "hebrew calendar", "nanakshahi", "eclipses",
-    "keplerian orbits", "offline-first", "C99", "relativity", "heritage computing"
+    "astronomy",
+    "panchang",
+    "calendar",
+    "jyotisha",
+    "ayanamsa",
+    "ephemeris",
+    "hijri calendar",
+    "hebrew calendar",
+    "nanakshahi",
+    "eclipses",
+    "keplerian orbits",
+    "offline-first",
+    "C99",
+    "relativity",
+    "heritage computing"
   ],
   "repository": "https://github.com/project-ilm/chakra",
   "related_identifiers": [
-    { "identifier": "https://github.com/project-ilm/chakra", "relation": "isSupplementTo", "scheme": "url" },
-    { "identifier": "https://project-ilm.github.io/chakra/", "relation": "isDocumentedBy", "scheme": "url" }
+    {
+      "identifier": "10.5281/zenodo.21253628",
+      "relation": "isVersionOf",
+      "scheme": "doi"
+    },
+    {
+      "identifier": "https://github.com/project-ilm/chakra",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "https://project-ilm.github.io/chakra/",
+      "relation": "isDocumentedBy",
+      "scheme": "url"
+    }
   ]
 }
