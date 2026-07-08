@@ -3,6 +3,7 @@
   "description": "An offline-first, dependency-free astronomical and calendrical observatory. CHAKRA computes ten calendar traditions, planetary positions, the Hindu pañcāṅga, eclipses and classical jyotiṣa structures from live geometry and orbital mechanics — never from lookup tables — as a set of static web pages plus a byte-parity C99 core (6,590-check JS↔C parity). Includes an interactive mathematics tutor with eight derivations, a relativistic interstellar-tour planner, and a browser-executable public test plan. Sole author, thirty-year independent research corpus.",
   "license": "gpl-3.0",
   "upload_type": "software",
+  "access_right": "open",
   "version": "1.3.0",
   "creators": [
     { "name": "Choudhary, Abhishek" }
