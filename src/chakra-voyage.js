@@ -101,5 +101,5 @@
 
   return { STARS: STARS, DRIVES: DRIVES, gamma: gamma, earthYears: earthYears,
            shipYears: shipYears, plan: plan, tour: tour, findStar: findStar,
-           version: "1.3.0" };
+           version: "1.4.0" };
 });

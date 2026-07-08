@@ -49,7 +49,8 @@ Use the real misty-doi interface — binary `misty`, `misty publish -m misty.jso
 Implement rigorous frame rotation between mean equinoxes: IAU precession matrix P(t₁,t₂) (Capitaine/IAU-2006 angles or Lieske for classical spans), optional nutation. API/engine accept `epoch=J2000|B1950|JD…`; internal computation stays J2000-of-date, outputs rotate on request. Round-trip J2000→B1950→J2000 must close < 0.01″; spot-check Aldebaran's catalogued B1950 vs J2000 places.
 **Done when:** `?api=telescope&epoch=B1950` returns frame-correct RA/Dec with tests pinning the rotation.
 
-### B-23: PyPI package `chakra-observatory` + `chakra-cli`
+### B-23: PyPI package `chakra-observatory` + `chakra-cli`  *(shipped v1.4.0)*
+**Shipped:** `bindings/python/` — ctypes→`libchakra.so` with CLI fallback, `chakra-observatory` on `pip install`, and a `chakra-cli` with panchang/calendars/events/kundali (ASCII North-diamond). Verified byte-match to the JS core (2026-08-12 → Budhavāra·Amāvāsyā·Āśleṣā, JDN 2461265). Remaining: publish to PyPI; add the `_find_so` Windows `.dll` path test in CI.
 **Category:** Bindings · **Priority:** High
 `bindings/python/`: pyproject (module `chakra_obs`), ctypes bindings to `libchakra.so` (add a `-fPIC -shared` target to `lib/Makefile`) with graceful fallback to spawning the `lib/chakra` CLI. Console script `chakra-cli` subcommands: `panchang`, `calendars`, `events --year`, `kundali --date --time --lat --lon` (ASCII North-diamond render + planet table). Descriptive docstrings sized for AI packet work.
 **Done when:** `pipx install .` works and `chakra-cli calendars --date 2026-06-16` byte-matches the HTML test console's engine output for the same query.
@@ -60,22 +61,26 @@ Implement rigorous frame rotation between mean equinoxes: IAU precession matrix 
 **Remaining:** the QB64 planet ring uses crude mean longitudes (not chart-grade); port the full `grahas()` planetary theory, the other nine calendars, eclipses and the pradoṣa Dīpāvalī rule to BASIC; add an automated emulator smoke-test.
 **Done when:** BASIC planet longitudes match the C/JS cores within a degree and an emulator run is checked in CI.
 
-### B-25: Node.js binding
+### B-25: Node.js binding  *(shipped v1.4.0)*
+**Shipped:** `bindings/node/` — CLI-spawn wrapper + `test.js` (3 checks against the C core, passing). Remaining: the N-API native addon (phase 2).
 **Category:** Bindings · **Priority:** Low
 Phase 1 (now): `bindings/node/` wrapper that spawns the `lib/chakra` CLI and parses JSON — zero build steps, works everywhere. Phase 2: N-API addon compiling `lib/chakra.c` directly, same surface. Note honestly in the README that pure-JS users should just `require("src/chakra-core.js")`.
 **Done when:** `npm test` in the folder cross-checks three endpoints against the JS core.
 
-### B-26: Rust crate `chakra-sys` (+ safe wrapper)
+### B-26: Rust crate `chakra-sys` (+ safe wrapper)  *(shipped v1.4.0)*
+**Shipped:** `bindings/rust/` — `chakra-sys` with `build.rs` compiling `chakra.c`, raw FFI + safe `panchanga()`, two `cargo test` cases (Āśleṣā anchor + Hijrī-split JDN). Remaining: run `cargo test` in CI (B-31).
 **Category:** Bindings · **Priority:** Medium
 `build.rs` compiles `../../lib/chakra.c` via the `cc` crate; raw FFI decls for the `ck_*` surface; a safe `panchanga(y,m,d,ut,lat,lon)` returning an owned struct. No unsafe leaks past the boundary.
 **Done when:** `cargo test` reproduces the 2026-06-16 Hijrī divergence from Rust.
 
-### B-27: Go binding (cgo)
+### B-27: Go binding (cgo)  *(shipped v1.4.0)*
+**Shipped:** `bindings/go/` — cgo package including `chakra.c`, `Compute()`, a test and an example. Remaining: `go test` in CI (B-31).
 **Category:** Bindings · **Priority:** Low
 `bindings/go/`: cgo package including `lib/chakra.c` directly, exposing Panchanga/Calendars/Events; example server streaming today's pañcāṅga as JSON.
 **Done when:** `go test ./...` passes with vector spot-checks.
 
-### B-28: C# binding (P/Invoke)
+### B-28: C# binding (P/Invoke)  *(shipped v1.4.0)*
+**Shipped:** `bindings/csharp/` — P/Invoke `Chakra.cs` + `.csproj`, sole-creator struct mirror, demo `Main`. Remaining: xUnit test + `dotnet test` in CI (B-31).
 **Category:** Bindings · **Priority:** Low
 `Chakra.cs` DllImport surface over `libchakra` + build notes for Linux/Windows; one xUnit test pinning Dīpāvalī 2026 = 2026-11-08.
 **Done when:** `dotnet test` green on Linux CI.

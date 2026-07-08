@@ -1,0 +1,15 @@
+[package]
+name = "chakra-sys"
+version = "1.4.0"
+edition = "2021"
+description = "Rust FFI bindings to the CHAKRA C core — offline panchāṅga, ten calendars, jyotiṣa from live geometry."
+license = "GPL-3.0-or-later"
+authors = ["Abhishek Choudhary"]
+repository = "https://github.com/project-ilm/chakra"
+links = "chakra"
+build = "build.rs"
+
+[dependencies]
+
+[build-dependencies]
+cc = "1"

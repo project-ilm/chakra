@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.4.0 — 2026-07-08
+- **Five language bindings, all calling the same C core** (`bindings/`):
+  - **Python** `chakra-observatory` — ctypes against `libchakra.so` with an automatic CLI fallback, and a real **`chakra-cli`** (`panchang`, `calendars`, `events`, `kundali` with an ASCII North-Indian diamond chart; `--json` on any command). `pip install`-ready.
+  - **Rust** `chakra-sys` — `build.rs` compiles `chakra.c` into the crate; raw FFI plus a safe `panchanga()`; two `cargo test` anchors.
+  - **Go** — cgo package including `chakra.c` directly, with a test and example.
+  - **C#** — P/Invoke `Chakra.cs` + `.csproj`.
+  - **Node** `@project-ilm/chakra` — spawns the `chakra` CLI; `test.js` passes 3 cross-checks against the core.
+  Every binding was verified to reproduce the reference anchors exactly (2026-08-12 06:30 UT → **Budhavāra · Amāvāsyā · Āśleṣā · JDN 2461265**, and the Sunni/Shia Hijrī split on 2026-06-16). The BASIC ports (GW-BASIC + QB64) from v1.3.0 remain.
+- **New shared-library target** `make -C lib libchakra.so` (`-fPIC -shared`, 45 exported `ck_` symbols) so ctypes/P-Invoke consumers can load the core without a rebuild.
+- **Node binding smoke test added to the suite** (`test/test-bindings.js`, skips gracefully if the CLI isn't built): node suite **115 → 120 assertions**.
+- **Unified UT convention across bindings:** all bindings treat their time argument as UT (the CLI-backed paths pass `tz=0`), so Python/Rust/Go/C#/Node agree to the byte.
+- **Backlog:** B-23, B-25, B-26, B-27, B-28 marked *shipped*; the cross-language CI matrix (running `cargo test`/`go test`/`dotnet test` and the Python byte-match) remains B-31.
+- **DOI metadata fix (carried from the interrupted 1.3.0 mint):** `misty.json` now sets `access_right: "open"` explicitly — misty's shipped JSON Schema (active when the `jsonschema` extra is installed) otherwise misfires its embargo conditional and demands `embargo_date`. Verified: `misty validate` and a sandbox dry-run both pass.
+- **C parity preserved:** 6,590-check JS↔C harness still `0 failed`; version bumped to 1.4.0 across the JS core, C header (`CK_VERSION`), `misty.json`, and all binding manifests.
+
+
 ## v1.3.0 — 2026-07-06
 - **Dīpāvalī fixed to the classical rule.** `annualEvents()` now dates Dīpāvalī by the **pradoṣa-vyāpinī** criterion computed at Ujjain (23.18°N, 75.78°E): the day whose geometric sunset falls inside the Āśvina amāvāsyā tithi. 2026 → **8 Nov** (matching civil practice; the bare tithi-instant would mislead to 9 Nov). New engine primitive `sunsetUT(jdn,lat,lonE)`; ported to C (`ck_sunset_ut`) with parity preserved (6,590 checks). A generalized udaya/pradoṣa/niśītha engine for all festivals is seeded as B-42.
 - **Landing is now a live instrument.** Drag the moon-in-astrolabe sideways to **scrub time** — ten calendars, the lagna diamond, the Moon's terminator and the coming-up board all follow; double-tap returns to now. Added a **location globe** (real coastlines back in, only the political map was ever meant to go; drag to spin, tap to relocate) with day/night terminator + subsolar point, a **live North-Indian lagna card**, a **daily-rotating calendar ribbon** (no tradition owns the top slot), and sci-fi polish (aurora sweep, shooting stars, title shimmer). `index.html?api=…` still serves JSON.

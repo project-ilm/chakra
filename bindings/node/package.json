@@ -1,0 +1,11 @@
+{
+  "name": "@project-ilm/chakra",
+  "version": "1.4.0",
+  "description": "Node binding for the CHAKRA observatory — spawns the chakra CLI (or use src/chakra-core.js directly in pure JS).",
+  "license": "GPL-3.0-or-later",
+  "author": "Abhishek Choudhary",
+  "repository": "github:project-ilm/chakra",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": { "test": "node test.js" }
+}

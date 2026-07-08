@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chakra-observatory"
+version = "1.4.0"
+description = "Offline, dependency-free astronomical & calendrical observatory — panchāṅga, ten calendars, planetary positions, eclipses, jyotiṣa — from live geometry, never lookup tables."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "GPL-3.0-or-later"
+authors = [{ name = "Abhishek Choudhary" }]
+keywords = ["astronomy", "panchang", "calendar", "jyotisha", "ayanamsa",
+            "ephemeris", "hijri", "hebrew-calendar", "eclipses", "offline"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+  "Programming Language :: Python :: 3",
+  "Topic :: Scientific/Engineering :: Astronomy",
+  "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://project-ilm.github.io/chakra/"
+Source = "https://github.com/project-ilm/chakra"
+
+[project.scripts]
+chakra-cli = "chakra_obs.cli:main"
+
+[tool.setuptools]
+packages = ["chakra_obs"]

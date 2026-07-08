@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <AssemblyName>chakra-demo</AssemblyName>
+  </PropertyGroup>
+  <!-- Copy the native library next to the binary at build time:
+       make -C ../../lib libchakra.so && cp ../../lib/libchakra.so . -->
+</Project>

@@ -5,6 +5,9 @@ LDLIBS   = -lm
 
 all: libchakra.a chakra
 
+libchakra.so: chakra.c chakra.h
+	$(CC) $(CFLAGS) -fPIC -shared -o libchakra.so chakra.c $(LDLIBS)
+
 chakra.o: chakra.c chakra.h
 	$(CC) $(CFLAGS) -c chakra.c
 
@@ -22,7 +25,7 @@ test: vectors.h test_chakra.c chakra.o
 	./test_chakra
 
 clean:
-	rm -f *.o libchakra.a chakra test_chakra vectors.h
+	rm -f *.o libchakra.a libchakra.so chakra test_chakra vectors.h
 
 vectors: vectors.h
 
