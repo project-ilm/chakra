@@ -1,0 +1,14 @@
+{
+  "_copyright": "© 1993–2026 Abhishek Choudhary. All rights reserved.",
+  "title": "CHAKRA — Temporal Cycle Observatory",
+  "short": "CHAKRA",
+  "text": "One sky, many calendars. Drag the astrolabe to scrub time: ten calendar traditions, the live lagna, the Moon",
+  "bg": "#05070e",
+  "fg": "#d8a94e",
+  "hashKey": "s",
+  "sw": "sw.js",
+  "whatsapp": true,
+  "card": true,
+  "stamp": true,
+  "installHint": true
+}
