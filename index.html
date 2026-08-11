@@ -254,6 +254,7 @@
   document.close();
 })();
 </script>
+<script src="src/chakra-ext.js"></script>
 <script src="src/chakra-site.js"></script>
 <script>
 (function(){
@@ -477,6 +478,8 @@ function drawRibbon(d){
   card("Maya · Long Count",my.lc,my.tz+" · "+my.haab);
   var pc=C.panchanga(d,y);
   card("Pañcāṅga · this instant",pc.tithi.split(" (")[0]+" · "+pc.nak,pc.yoga+" yoga · "+pc.karana+" karaṇa");
+  if(window.ChakraExt){try{var _m=window.ChakraExt.masa(d);
+    card("Māsa · Hindu month",_m.amanta+" "+_m.paksha,"Amānta "+_m.amantaDev+" · Pūrnimānta "+_m.purnimanta+(_m.adhika?" · adhika māsa":""));}catch(e){}}
   var rot=((jdn%cards.length)+cards.length)%cards.length;
   cards=cards.slice(rot).concat(cards.slice(0,rot));
   cards.forEach(function(cv){

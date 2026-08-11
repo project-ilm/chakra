@@ -777,6 +777,7 @@ function renderSky(){
     const lbl=s.yg&&showYg? s.nm+" · "+s.yg : (s.mag<1.7? s.nm : null);
     if(lbl)svg.appendChild(T(p[0]+r+2,p[1]+3,lbl,{fill:s.yg?"var(--mag)":"var(--dim)","font-size":8.5,"font-family":"var(--mono)","fill-opacity":.85}));}
     window.__skyB=[];
+  for(const s of _stars){const p=_sp[s.nm];if(!p)continue;window.__skyB.push({nm:s.nm,x:p[0],y:p[1],star:true,lam:s.lam,bet:s.bet});}
   for(const b of skyBodies(d)){const h=altAz(b.lonT,b.beta,d,lat,lon);const p=proj(h.az,h.alt);if(!p)continue;
     window.__skyB.push({nm:b.nm,x:p[0],y:p[1]});
     if(b.nm==="Moon"){const ph=phaseInfo(d);moonIcon(svg,p[0],p[1],9,ph.illum,ph.waxing);}
@@ -812,19 +813,29 @@ function solveWhenLon(nm,lam,d0){
   if(flo*fhi>0)return bk;
   for(let i=0;i<46;i++){const m=(lo+hi)/2,fm=f(m);if(flo*fm<=0){hi=m;fhi=fm;}else{lo=m;flo=fm;}}
   return (lo+hi)/2;}
+function solveWhenStar(nm,azT,altT,d0,lam,bet){
+  if(lam==null||bet==null){const st=((window.__skyB||[]).filter(b=>b.nm===nm)[0])||null;
+    if(!st||st.lam==null)return d0; lam=st.lam; bet=st.bet;}
+  const sep=t=>{const h=altAz(lam,bet,t,state.lat,state.lon);
+    const dz=Math.abs(((h.az-azT+540)%360)-180),da=h.alt-altT;return dz*dz+da*da;};
+  const W=0.51,N=360;let bk=d0,bv=Infinity;
+  for(let k=0;k<=N;k++){const t=d0-W+2*W*k/N,v=sep(t);if(v<bv){bv=v;bk=t;}}
+  let lo=bk-2*W/N,hi=bk+2*W/N;
+  for(let i=0;i<40;i++){const m1=lo+(hi-lo)/3,m2=hi-(hi-lo)/3;if(sep(m1)<sep(m2))hi=m2;else lo=m1;}
+  return (lo+hi)/2;}
 function setupSky(){
   const svg=document.getElementById("skyview");if(!svg)return;
   let dr=null;
   svg.addEventListener("pointerdown",ev=>{
     {const rc=svg.getBoundingClientRect(),px=(ev.clientX-rc.left)*700/rc.width,py=(ev.clientY-rc.top)*700/rc.height;
      const hit=(window.__skyB||[]).map(bb=>({bb,d2:(bb.x-px)**2+(bb.y-py)**2})).sort((a,c)=>a.d2-c.d2)[0];
-     if(hit&&hit.d2<19*19){dr={body:hit.bb.nm,raf:0,pend:null};try{svg.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();return;}}
+     if(hit&&hit.d2<19*19){dr={body:hit.bb.nm,star:!!hit.bb.star,lam:hit.bb.lam,bet:hit.bb.bet,raf:0,pend:null};try{svg.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();return;}}
     dr={x:ev.clientX,y:ev.clientY,az:skyS.az,alt:skyS.alt,off:skyS.azOff,raf:0};try{svg.setPointerCapture(ev.pointerId);}catch(e){}ev.preventDefault();});
   svg.addEventListener("pointermove",ev=>{if(!dr)return;
     if(dr.body){const rc=svg.getBoundingClientRect(),px=(ev.clientX-rc.left)*700/rc.width,py=(ev.clientY-rc.top)*700/rc.height;
       const q=skyInv(px,py);
-      if(q&&q.alt>-25){dr.pend=lonFromAzAlt(q.az,q.alt,refDayNo(),state.lat,state.lon);
-        if(!dr.raf)dr.raf=requestAnimationFrame(()=>{if(dr&&dr.pend!=null)setMomentFromDayNo(solveWhenLon(dr.body,dr.pend,refDayNo()));if(dr)dr.raf=0;});}
+      if(q&&q.alt>-25){dr.pend=lonFromAzAlt(q.az,q.alt,refDayNo(),state.lat,state.lon);dr.qaz=q.az;dr.qalt=q.alt;
+        if(!dr.raf)dr.raf=requestAnimationFrame(()=>{if(dr&&dr.pend!=null)setMomentFromDayNo(dr.star?solveWhenStar(dr.body,dr.qaz,dr.qalt,refDayNo(),dr.lam,dr.bet):solveWhenLon(dr.body,dr.pend,refDayNo()));if(dr)dr.raf=0;});}
       ev.preventDefault();return;}
     const r=svg.getBoundingClientRect();const sc=skyS.fov/r.width;
     if(skyS.sensor){skyS.azOff=dr.off+(dr.x-ev.clientX)*sc;}
