@@ -235,6 +235,9 @@
 </footer>
 
 <script src="src/chakra-core.js"></script>
+<div id="chakra-showcase"></div>
+<div id="chakra-work"></div>
+<div id="chakra-support"></div>
 <script src="src/chakra-kernel.js"></script>
 <script src="src/chakra-api.js"></script>
 <script>
@@ -255,6 +258,7 @@
 })();
 </script>
 <<<<<<< HEAD
+<<<<<<< HEAD
 <script src="src/chakra-ext.js"></script>
 =======
 <!-- best-of strip + support/cycler layer: added by seed_chakra_plus.sh -->
@@ -264,6 +268,15 @@
 <!-- kundali.html · mahabharata.html : added by seed_chakra_plus.sh -->
 <script src="js/chakra-plus.js"></script>
 >>>>>>> 8db9b0a (plus: kundali + mahabharata pages, 16 vargas, observances, muhurta, matching, BASIC)
+=======
+<!-- showcase + support/cycler/learning layer: added by seed_chakra_plus.sh -->
+<script src="js/chakra-civic.js"></script>
+<script src="js/chakra-cycler.js"></script>
+<script src="js/chakra-music.js"></script>
+<script src="js/chakra-shell.js" defer></script>
+<!-- kundali.html · mahabharata.html : added by seed_chakra_plus.sh -->
+<script src="js/chakra-plus.js"></script>
+>>>>>>> b9cd843 (plus: kundali + mahabharata pages, 16 vargas, observances, muhurta, matching, BASIC)
 <script src="src/chakra-site.js"></script>
 <script>
 (function(){
@@ -488,6 +501,7 @@ function drawRibbon(d){
   var pc=C.panchanga(d,y);
   card("Pañcāṅga · this instant",pc.tithi.split(" (")[0]+" · "+pc.nak,pc.yoga+" yoga · "+pc.karana+" karaṇa");
 <<<<<<< HEAD
+<<<<<<< HEAD
   if(window.ChakraExt){try{var _m=window.ChakraExt.masa(d);
     card("Māsa · Hindu month",_m.amanta+" "+_m.paksha,"Amānta "+_m.amantaDev+" · Pūrnimānta "+_m.purnimanta+(_m.adhika?" · adhika māsa":""));}catch(e){}}
 =======
@@ -495,6 +509,11 @@ function drawRibbon(d){
     card("Māsa · Hindu month",_m.masaFull+" "+_m.paksha,
          _m.system+" · new moon "+_m.newMoon+(_m.adhika?" · adhika māsa":""));}catch(e){}}
 >>>>>>> 8db9b0a (plus: kundali + mahabharata pages, 16 vargas, observances, muhurta, matching, BASIC)
+=======
+  if(window.ChakraPlus){try{var _m=window.ChakraPlus.hinduMonth(d);
+    card("Māsa · Hindu month",_m.masaFull+" "+_m.paksha,
+         _m.system+" · new moon "+_m.newMoon+(_m.adhika?" · adhika māsa":""));}catch(e){}}
+>>>>>>> b9cd843 (plus: kundali + mahabharata pages, 16 vargas, observances, muhurta, matching, BASIC)
   var rot=((jdn%cards.length)+cards.length)%cards.length;
   cards=cards.slice(rot).concat(cards.slice(0,rot));
   cards.forEach(function(cv){
