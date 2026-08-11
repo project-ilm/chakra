@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kurukṣetra sky anchors — CHAKRA</title>
+<meta name="description" content="Vyāsa's astronomical verses, mapped onto computed sky states. Score any candidate year, search a range, and see which anchors can actually discriminate a date — and where the instrument itself stops being trustworthy.">
+<meta name="theme-color" content="#05070e">
+<style>
+:root{--bg:#05070e;--panel:#0f1526;--line:#1e2740;--line2:#161d31;--ink:#e8ecf7;--soft:#9dabc9;--faint:#6b7a9c;
+--gold:#e0b350;--gold2:#f2cd77;--rose:#d1704a;--grn:#5bb89a;--maxw:1000px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-serif,Georgia,serif;font-size:16px;line-height:1.58}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 18px 4rem}
+header{max-width:var(--maxw);margin:0 auto;padding:1.6rem 18px .4rem;display:flex;align-items:baseline;gap:.9rem;flex-wrap:wrap}
+h1{font-size:1.5rem;margin:0}h1 .g{color:var(--gold)}
+.tag{font:500 .64rem/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+nav{margin-left:auto;display:flex;gap:.8rem;font:.75rem ui-monospace,monospace}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(224,179,80,.28)}a:hover{color:var(--gold2)}
+h2{font-size:1.02rem;margin:1.7rem 0 .5rem;border-top:1px solid var(--line);padding-top:.9rem;display:flex;gap:.5rem;align-items:center}
+h2 .k{font:500 .6rem/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:rgba(224,179,80,.1);border:1px solid var(--line);border-radius:3px;padding:.2rem .45rem}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem;margin:.7rem 0}
+.lead{color:var(--soft);font-size:.92rem}
+label{display:block;font:.68rem ui-monospace,monospace;color:var(--soft);margin:.5rem 0 .18rem;letter-spacing:.04em}
+input,select,textarea{width:100%;background:#070b16;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.42rem .55rem;font:.8rem ui-monospace,monospace}
+input:focus{outline:none;border-color:var(--gold)}
+.row{display:flex;gap:.5rem;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+button{font:.74rem ui-monospace,monospace;cursor:pointer;border-radius:6px;padding:.5rem .8rem;border:1px solid var(--line);background:#111829;color:var(--ink)}
+button:hover{border-color:var(--gold);color:#fff}
+button.go{background:var(--gold);color:#0a0f1c;border-color:var(--gold);font-weight:700}
+.btns{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.6rem}
+.anchor{border-left:3px solid var(--line);padding:.5rem .8rem;margin:.5rem 0;background:#0b1120;border-radius:0 8px 8px 0}
+.anchor.hit{border-left-color:var(--grn)}
+.anchor.miss{border-left-color:var(--rose)}
+.anchor h4{margin:0 0 .15rem;font-size:.88rem}
+.anchor .cite{font:.62rem ui-monospace,monospace;color:var(--gold);letter-spacing:.04em}
+.anchor .says{font-style:italic;color:var(--soft);font-size:.82rem;margin:.25rem 0}
+.anchor .res{font:.7rem ui-monospace,monospace;margin-top:.25rem}
+.anchor.hit .res{color:var(--grn)}.anchor.miss .res{color:var(--rose)}
+.anchor .why{font-size:.74rem;color:var(--faint);margin-top:.2rem}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th,td{text-align:left;padding:.32rem .45rem;border-bottom:1px solid var(--line2)}
+th{font:500 .62rem ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+.warn{border-left:3px solid var(--rose);background:rgba(209,112,74,.08);padding:.7rem .9rem;border-radius:0 8px 8px 0;font-size:.82rem;color:#f0cdbc;margin:.8rem 0}
+.warn b{color:#ffd9c6}
+.ok{border-left:3px solid var(--grn);background:rgba(91,184,154,.07);padding:.6rem .9rem;border-radius:0 8px 8px 0;font-size:.8rem;color:#bfe6d8}
+.bar{height:7px;background:#0b1120;border:1px solid var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--gold2))}
+.power-high{color:var(--grn)}.power-moderate{color:var(--gold2)}.power-low{color:var(--rose)}.power-negligible{color:var(--rose);font-weight:700}
+footer{border-top:1px solid var(--line);margin-top:2rem;padding:1.2rem 0 0;font-size:.74rem;color:var(--soft)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(18px);background:#0a0f1c;border:1px solid var(--gold);color:var(--gold2);font:.72rem ui-monospace,monospace;padding:.5rem .9rem;border-radius:6px;opacity:0;transition:.22s;z-index:99;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="g">◉</span> Kurukṣetra sky anchors</h1>
+  <span class="tag">CHAKRA · archaeo-astronomy workbench</span>
+  <nav><a href="./">home</a><a href="kundali.html">kuṇḍalī</a><a href="pro.html">observatory</a></nav>
+</header>
+
+<div class="wrap">
+
+  <p class="lead">Vyāsa records specific celestial states around the war. Researchers turn those verses into
+  data points and search for a year whose sky matches. This page does exactly that on CHAKRA's own
+  ephemeris — and, just as importantly, shows you <b>which anchors can actually discriminate a date</b>
+  and <b>where the instrument stops being trustworthy</b>. It does not settle the question, and says so.</p>
+
+  <div class="warn" id="topWarn">
+    <b>Read this first.</b> CHAKRA is a heritage-computation instrument, not a deep-time ephemeris.
+    Its elements are fitted near the present era; five millennia back, positional error grows from
+    arc-minutes to degrees, and ΔT itself is uncertain by hours. Competing published dates
+    (3067 BCE, 5561 BCE and others) differ mainly on <i>how the Sanskrit is read</i>, not on arithmetic.
+    Nothing here is evidence for or against any date.
+  </div>
+
+  <h2><span class="k">score</span> Score a candidate year</h2>
+  <div class="card">
+    <div class="row">
+      <div><label>year (negative = BCE, astronomical numbering)</label><input type="number" id="year" value="-3066"></div>
+      <div><label>quick pick</label><select id="ref"></select></div>
+    </div>
+    <div class="btns"><button class="go" id="scoreBtn">Compute the sky for this year</button></div>
+    <div id="health"></div>
+    <div id="scoreOut"></div>
+  </div>
+
+  <h2><span class="k">anchors</span> The seven textual anchors</h2>
+  <div id="anchors"></div>
+
+  <h2><span class="k">search</span> Search a range of years</h2>
+  <div class="card">
+    <div class="row">
+      <div><label>from</label><input type="number" id="from" value="-3200"></div>
+      <div><label>to</label><input type="number" id="to" value="-3000"></div>
+      <div><label>step</label><input type="number" id="step" value="1"></div>
+    </div>
+    <div class="btns"><button class="go" id="searchBtn">Search</button><span id="searchNote" class="lead"></span></div>
+    <div id="searchOut"></div>
+  </div>
+
+  <h2><span class="k">honesty</span> Which anchors can actually date anything?</h2>
+  <div class="card">
+    <p class="lead">A constraint satisfied by most years cannot discriminate a year. This measures each
+    anchor's hit rate across a sample so you can see, rather than assume, how much any single omen is worth.
+    It is the reason serious chronology work uses ~140 observations rather than seven.</p>
+    <div class="row">
+      <div><label>sample from</label><input type="number" id="dpFrom" value="-1000"></div>
+      <div><label>to</label><input type="number" id="dpTo" value="-500"></div>
+      <div><label>step</label><input type="number" id="dpStep" value="25"></div>
+    </div>
+    <div class="btns"><button class="go" id="dpBtn">Measure discriminating power</button></div>
+    <div id="dpOut"></div>
+  </div>
+
+  <h2><span class="k">context</span> Published candidate dates</h2>
+  <div class="card"><table id="refs"></table>
+    <p class="lead" style="margin-top:.5rem">Shown for comparison and attributed to their proponents.
+    CHAKRA makes no claim of its own about the date.</p></div>
+
+  <h2><span class="k">discuss</span> Take this to an AI</h2>
+  <div class="card">
+    <label>reply language</label><select id="lang"></select>
+    <div class="btns">
+      <span id="aiSlots"></span>
+      <button data-ai="copy">⧉ Copy prompt</button>
+    </div>
+    <p class="lead">The prompt carries the computed anchor results, the instrument-health verdict and the
+    caveats, and instructs the assistant to treat the question as textual and contested rather than settled.</p>
+  </div>
+
+  <h2><span class="k">caveats</span> Everything working against a confident answer</h2>
+  <div class="card"><ol id="caveats" class="lead"></ol></div>
+
+  <div class="btns"><button id="bug">🐞 Report a bug / dispute an anchor reading</button></div>
+
+  <footer>© 1993–2026 Abhishek Choudhary · AyeAI · GPL-3.0-or-later · Verse citations are to the
+  critical-edition parva/chapter divisions as commonly cited; translations paraphrased.
+  CHAKRA computes; it does not adjudicate. <a href="DISCLAIMER.md">disclaimer</a></footer>
+</div>
+<div id="toast"></div>
+
+<script src="src/chakra-core.js"></script>
+<script src="js/chakra-plus.js"></script>
+<script src="js/chakra-mahabharata.js"></script>
+<script>
+(function(){
+"use strict";
+var MB=window.ChakraMB, $=function(s){return document.querySelector(s);};
+var toastEl=$("#toast");
+function toast(m){toastEl.textContent=m;toastEl.className="show";clearTimeout(toastEl._t);toastEl._t=setTimeout(function(){toastEl.className="";},2200);}
+var last=null;
+
+(function(){
+  $("#ref").innerHTML='<option value="">—</option>'+MB.REFERENCE_YEARS.map(function(r){
+    return '<option value="'+r.year+'">'+r.label+' · '+r.who+'</option>';}).join("");
+  $("#ref").addEventListener("change",function(){if(this.value){$("#year").value=this.value;score();}});
+  $("#refs").innerHTML="<tr><th>date</th><th>proposed by</th><th>basis</th></tr>"+
+    MB.REFERENCE_YEARS.map(function(r){return "<tr><td><b>"+r.label+"</b></td><td>"+r.who+"</td><td>"+r.note+"</td></tr>";}).join("");
+  $("#caveats").innerHTML=MB.caveats(3067).map(function(c){return "<li>"+c+"</li>";}).join("");
+  var L=["English","हिन्दी","বাংলা","తెలుగు","தமிழ்","मराठी","संस्कृतम्","ગુજરાતી","ಕನ್ನಡ","Français","Español","Deutsch"];
+  $("#lang").innerHTML=L.map(function(x){return '<option>'+x+'</option>';}).join("");
+})();
+
+function renderAnchors(res){
+  $("#anchors").innerHTML=MB.ANCHORS.map(function(a){
+    var r=res?res.anchors[a.id]:null;
+    var cls=r?(r.hit?"hit":"miss"):"";
+    return '<div class="anchor '+cls+'"><h4>'+a.name+' <span class="cite">'+a.cite+'</span></h4>'+
+      '<div class="says">“'+a.says+'”</div>'+
+      (r?'<div class="res">'+(r.hit?"✓ MATCHES":"✗ does not match")+' — '+(r.note||"")+'</div>':'')+
+      '<div class="why">'+a.why+' · weight '+a.weight+'</div></div>';
+  }).join("");
+}
+renderAnchors(null);
+
+function score(){
+  var Y=parseInt($("#year").value,10);
+  if(isNaN(Y)){toast("enter a year");return;}
+  toast("computing…");
+  setTimeout(function(){
+    var r=MB.scoreYear(Y); last=r;
+    $("#health").innerHTML = r.health.degraded
+      ? '<div class="warn"><b>Instrument degraded for '+r.era+'.</b> '+r.health.verdict+
+        ' <br><span style="opacity:.85">eclipses found this year: '+r.health.eclipsesFound+' (expected '+r.health.expected+')</span></div>'
+      : '<div class="ok"><b>Instrument nominal for '+r.era+'.</b> '+r.health.verdict+'</div>';
+    $("#scoreOut").innerHTML='<div style="margin-top:.6rem"><b style="font-size:1.15rem;color:var(--gold2)">'+r.era+
+      '</b> — matched '+r.matched+' of '+r.possible+' weighted anchors ('+r.score+'%)'+
+      (r.admissible?"":' <span style="color:var(--rose)">· NOT ADMISSIBLE</span>')+
+      '</div><div class="bar" style="margin:.4rem 0"><i style="width:'+r.score+'%"></i></div>'+
+      '<p class="lead">'+r.note+'</p>';
+    renderAnchors(r);
+  },20);
+}
+$("#scoreBtn").addEventListener("click",score);
+
+$("#searchBtn").addEventListener("click",function(){
+  var a=parseInt($("#from").value,10),b=parseInt($("#to").value,10),st=parseInt($("#step").value,10)||1;
+  if(isNaN(a)||isNaN(b)||b<a){toast("check the range");return;}
+  var n=Math.floor((b-a)/st)+1;
+  if(n>400){toast("range too wide — narrow it or increase the step");return;}
+  $("#searchNote").textContent="examining "+n+" years…";
+  setTimeout(function(){
+    var r=MB.searchYears(a,b,{step:st,top:12});
+    $("#searchNote").textContent="";
+    $("#searchOut").innerHTML='<p class="lead" style="margin-top:.6rem">'+r.examined+' years examined · '+
+      r.inadmissible+' flagged inadmissible (instrument degraded). Ranking below is by weighted anchor match — '+
+      '<b>it is not a probability and not a dating claim.</b></p>'+
+      '<table><tr><th>year</th><th>score</th><th>matched</th><th>admissible</th></tr>'+
+      r.best.map(function(x){return '<tr><td><b>'+x.era+'</b></td><td>'+x.score+'%</td><td>'+x.matched+'/'+x.possible+'</td><td>'+
+        (x.admissible?'<span style="color:var(--grn)">yes</span>':'<span style="color:var(--rose)">no</span>')+'</td></tr>';}).join("")+'</table>';
+  },20);
+});
+
+$("#dpBtn").addEventListener("click",function(){
+  var a=parseInt($("#dpFrom").value,10),b=parseInt($("#dpTo").value,10),st=parseInt($("#dpStep").value,10)||25;
+  toast("sampling…");
+  setTimeout(function(){
+    var dp=MB.discriminatingPower(a,b,st);
+    $("#dpOut").innerHTML='<table style="margin-top:.6rem"><tr><th>anchor</th><th>hit rate</th><th>power</th><th>verdict</th></tr>'+
+      dp.anchors.map(function(x){return '<tr><td>'+x.name+'<br><span class="cite" style="font:.6rem ui-monospace,monospace;color:var(--faint)">'+x.cite+'</span></td>'+
+        '<td>'+x.hitRate+'%</td><td class="power-'+x.power+'">'+x.power+'</td><td class="lead">'+x.verdict+'</td></tr>';}).join("")+
+      '</table><div class="warn" style="margin-top:.7rem"><b>The lesson.</b> '+dp.lesson+'</div>';
+  },20);
+});
+
+function prompt_(){
+  var lang=$("#lang").value, r=last||MB.scoreYear(parseInt($("#year").value,10)||-3066);
+  var L=["== CONTEXT CONTRACT (read before answering) ==",
+"These figures were COMPUTED by CHAKRA (project-ilm.github.io/chakra), an open-source astronomical",
+"engine, by mapping Vyāsa's astronomical verses onto sky states. Ground rules:",
+"1. Reply ENTIRELY in: "+lang,
+"2. This question is TEXTUAL and CONTESTED, not settled. Do not assert a date as fact.",
+"3. Distinguish (a) what the verses say, (b) how different scholars READ them, (c) what any",
+"   ephemeris can actually resolve at this epoch.",
+"4. Note that competing dates (3067 BCE, 5561 BCE, ~1793 BCE and traditional reckonings) come from",
+"   different readings of the same verses, and that mainstream historiography treats the omens as",
+"   possibly literary. Represent all sides fairly; do not flatter any position, including mine.",
+"5. Do not invent verse references. The citations below are parva/chapter as commonly cited.",
+"",
+"== COMPUTED RESULT =="," year: "+r.era+"  ·  weighted anchor match: "+r.score+"% ("+r.matched+"/"+r.possible+")",
+" admissible: "+r.admissible+"  ·  "+r.health.verdict,""," ANCHOR BY ANCHOR:"];
+  MB.ANCHORS.forEach(function(a){var x=r.anchors[a.id];
+    L.push("  ["+(x.hit?"MATCH":"no   ")+"] "+a.name+"  ("+a.cite+")");
+    L.push("           says: "+a.says);
+    L.push("           computed: "+(x.note||""));});
+  L.push(""); L.push("== CAVEATS CARRIED BY THE TOOL ==");
+  MB.caveats(3067).forEach(function(c,i){L.push(" "+(i+1)+". "+c);});
+  L.push(""); L.push("== MY QUESTION ==");
+  L.push("Explain what this computation does and does not show, and what would actually be needed to date the war.");
+  return L.join("\n");
+}
+/* Assistants are CONFIGURATION (config/chakra.config.json -> ai.byok.providers,
+   each {id,label,url} with a {q} placeholder). No vendor is named in this page.
+   With none configured, Copy prompt is the path and it works with anything. */
+var AI_PROVIDERS=[], AI={};
+function renderAISlots(){
+  var host=document.getElementById("aiSlots"); if(!host)return;
+  if(!AI_PROVIDERS.length){
+    host.innerHTML='<span style="font-size:.78rem;opacity:.7">'+
+      "No assistant configured \u2014 use Copy prompt.</span>"; return;
+  }
+  host.innerHTML=AI_PROVIDERS.map(function(pv,i){
+    return '<button class="go" data-aip="'+i+'">'+String(pv.label||("Assistant "+(i+1)))+" \u2197</button>";}).join("");
+  host.querySelectorAll("[data-aip]").forEach(function(b){
+    b.addEventListener("click",function(){
+      var pv=AI_PROVIDERS[+b.getAttribute("data-aip")]; if(!pv)return;
+      window.open(String(pv.url).replace("{q}",encodeURIComponent(prompt_())),"_blank","noopener");});});
+}
+(function(){
+  if(typeof fetch!=="function"){renderAISlots();return;}
+  fetch("config/chakra.config.json").then(function(r){return r.ok?r.json():null;}).then(function(c){
+    var l=(c&&c.ai&&c.ai.byok&&c.ai.byok.providers)||[];
+    AI_PROVIDERS=l.filter(function(x){return x&&typeof x==="object"&&x.url&&!/^__[A-Z0-9_]+__$/.test(x.url);});
+    renderAISlots();
+  }).catch(function(){renderAISlots();});
+})();
+document.querySelectorAll("[data-ai]").forEach(function(b){
+  b.addEventListener("click",function(){
+    var w=b.getAttribute("data-ai"), p=prompt_();
+    if(w==="copy"){navigator.clipboard.writeText(p).then(function(){toast("prompt copied");},function(){toast("copy failed");});}
+    else {window.open(AI[w](p),"_blank","noopener");toast("opening "+w+"…");}
+  });
+});
+$("#bug").addEventListener("click",function(){
+  window.open("https://github.com/project-ilm/chakra/issues/new?title="+encodeURIComponent("[mahabharata] ")+
+    "&body="+encodeURIComponent("**Anchor / reading in question**\n\n**What the text actually says (with parva & chapter)**\n\n**Why the current implementation is wrong**\n\n---\ncore "+window.Chakra.version),"_blank","noopener");
+});
+score();
+})();
+</script>
+</body>
+</html>

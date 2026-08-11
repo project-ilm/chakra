@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Kuṇḍalī — CHAKRA</title>
+<meta name="description" content="A simplified lagna page: the birth chart, all sixteen vargas, the Vimśottarī daśā, yogas and doṣas — computed offline, printable, and ready to discuss with an AI in your own language.">
+<meta name="theme-color" content="#05070e">
+<meta property="og:title" content="Kuṇḍalī — CHAKRA">
+<meta property="og:description" content="Birth chart, sixteen vargas, daśā and yogas — computed, never looked up.">
+<meta property="og:type" content="website">
+<style>
+:root{
+  --bg:#05070e; --bg2:#0a0f1c; --panel:#0f1526; --line:#1e2740; --line2:#161d31;
+  --ink:#e8ecf7; --soft:#9dabc9; --faint:#6b7a9c;
+  --gold:#e0b350; --gold2:#f2cd77; --rose:#d1704a; --grn:#5bb89a; --blue:#6fa8dc;
+  --maxw:1120px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:ui-serif,Georgia,"Times New Roman",serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 18px 4rem}
+header{max-width:var(--maxw);margin:0 auto;padding:1.6rem 18px .6rem;display:flex;align-items:baseline;gap:1rem;flex-wrap:wrap}
+h1{font-size:1.5rem;margin:0;letter-spacing:.02em}
+h1 .g{color:var(--gold)}
+header .tag{font:500 .66rem/1 ui-monospace,monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+header nav{margin-left:auto;display:flex;gap:.8rem;font:.75rem/1 ui-monospace,monospace}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(224,179,80,.28)}
+a:hover{color:var(--gold2)}
+h2{font-size:1.02rem;margin:1.6rem 0 .5rem;color:#f2f5fc;border-top:1px solid var(--line);padding-top:.9rem;display:flex;align-items:center;gap:.5rem}
+h2 .k{font:500 .6rem/1 ui-monospace,monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:rgba(224,179,80,.1);border:1px solid var(--line);border-radius:3px;padding:.2rem .45rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.9rem 1rem}
+label{display:block;font:.7rem/1.4 ui-monospace,monospace;color:var(--soft);margin:.55rem 0 .2rem;letter-spacing:.04em}
+input,select,textarea{width:100%;background:#070b16;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.45rem .55rem;font:.82rem/1.4 ui-monospace,monospace}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
+.row{display:flex;gap:.5rem;flex-wrap:wrap}
+.row>*{flex:1;min-width:110px}
+button{font:.74rem/1 ui-monospace,monospace;cursor:pointer;border-radius:6px;padding:.5rem .8rem;border:1px solid var(--line);background:#111829;color:var(--ink);letter-spacing:.03em}
+button:hover{border-color:var(--gold);color:#fff}
+button.go{background:var(--gold);color:#0a0f1c;border-color:var(--gold);font-weight:700}
+button.go:hover{background:var(--gold2)}
+.btns{display:flex;gap:.45rem;flex-wrap:wrap;margin-top:.7rem}
+.pill{display:inline-block;font:.62rem/1 ui-monospace,monospace;padding:.24rem .5rem;border-radius:20px;border:1px solid var(--line);color:var(--soft);margin:.15rem .15rem 0 0;cursor:pointer;user-select:none}
+.pill.on{background:var(--gold);color:#0a0f1c;border-color:var(--gold);font-weight:700}
+/* chart */
+.chart{width:100%;max-width:340px;aspect-ratio:1;margin:0 auto;display:block}
+.chart .fr{fill:none;stroke:var(--line);stroke-width:1.4}
+.chart .hn{fill:var(--faint);font:9px ui-monospace,monospace}
+.chart .gl{fill:var(--gold2);font:11px ui-monospace,monospace}
+.chart .asc{fill:var(--rose);font:10px ui-monospace,monospace}
+.vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:.6rem}
+.vg{background:#0b1120;border:1px solid var(--line);border-radius:8px;padding:.5rem}
+.vg h4{margin:0 0 .2rem;font-size:.8rem;color:var(--gold2)}
+.vg .sig{font:.58rem/1.3 ui-monospace,monospace;color:var(--faint);min-height:2.4em}
+.vg .rule{font:.55rem/1.3 ui-monospace,monospace;color:var(--soft);margin-top:.25rem;border-top:1px solid var(--line2);padding-top:.25rem}
+table{width:100%;border-collapse:collapse;font-size:.78rem}
+th,td{text-align:left;padding:.32rem .45rem;border-bottom:1px solid var(--line2)}
+th{font:500 .62rem/1 ui-monospace,monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--gold)}
+tr.now td{background:rgba(224,179,80,.09)}
+.muted{color:var(--soft);font-size:.78rem}
+.warn{border-left:3px solid var(--rose);background:rgba(209,112,74,.08);padding:.6rem .8rem;border-radius:0 8px 8px 0;font-size:.78rem;color:#f0cdbc;margin:.7rem 0}
+.ok{border-left:3px solid var(--grn);background:rgba(91,184,154,.07);padding:.6rem .8rem;border-radius:0 8px 8px 0;font-size:.78rem;color:#bfe6d8}
+#adslot{border:1px dashed var(--line);border-radius:8px;padding:.7rem;text-align:center;color:var(--faint);font:.66rem/1.5 ui-monospace,monospace;margin:1.2rem 0}
+footer{border-top:1px solid var(--line);margin-top:2rem;padding:1.2rem 0 0;font-size:.74rem;color:var(--soft)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(18px);background:#0a0f1c;border:1px solid var(--gold);color:var(--gold2);font:.72rem ui-monospace,monospace;padding:.5rem .9rem;border-radius:6px;opacity:0;transition:.22s;z-index:99;pointer-events:none}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media print{
+  body{background:#fff;color:#000}
+  header nav,.noprint,#adslot,#toast{display:none!important}
+  .card,.vg{background:#fff;border-color:#bbb;break-inside:avoid}
+  h2{color:#000;border-color:#999}
+  .chart .fr{stroke:#333}.chart .gl{fill:#000}.chart .hn{fill:#666}.chart .asc{fill:#a33}
+  a{color:#000}th{color:#333}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1><span class="g">◉</span> Kuṇḍalī</h1>
+  <span class="tag">CHAKRA · simplified lagna</span>
+  <nav class="noprint">
+    <a href="./">home</a><a href="pro.html">observatory</a><a href="mahabharata.html">mahābhārata</a><a href="learn.html">learn</a>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <!-- ============ INPUT ============ -->
+  <div class="card noprint">
+    <div class="grid" style="gap:.8rem">
+      <div>
+        <label>date of birth</label><input type="date" id="dob" value="1990-05-15">
+        <label>time of birth (local)</label><input type="time" id="tob" value="06:30">
+        <label>timezone offset from UTC (hours)</label><input type="number" id="tz" value="5.5" step="0.25">
+      </div>
+      <div>
+        <label>place — type a city, or enter coordinates</label>
+        <input id="place" list="cities" placeholder="Hyderabad" autocomplete="off">
+        <datalist id="cities"></datalist>
+        <div class="row" style="margin-top:.4rem">
+          <div><label>latitude</label><input type="number" id="lat" value="17.385" step="0.001"></div>
+          <div><label>longitude</label><input type="number" id="lon" value="78.486" step="0.001"></div>
+        </div>
+        <label>name (for the printed chart)</label><input id="who" placeholder="optional">
+      </div>
+    </div>
+    <div class="btns">
+      <button class="go" id="calc">Compute kuṇḍalī</button>
+      <button id="printBtn">🖨 Print / save PDF</button>
+      <button id="saveBtn">💾 Save locally</button>
+      <button id="loadBtn">📂 Load</button>
+    </div>
+  </div>
+
+  <div id="epochWarn"></div>
+
+  <!-- ============ SUMMARY ============ -->
+  <h2><span class="k">D1</span> Rāśi chart &amp; the moment</h2>
+  <div class="grid">
+    <div class="card"><svg class="chart" id="d1chart" viewBox="0 0 300 300"></svg></div>
+    <div class="card"><table id="summary"></table></div>
+  </div>
+
+  <!-- ============ VARGAS ============ -->
+  <h2><span class="k">D1–D60</span> Ṣoḍaśavarga — all sixteen divisional charts</h2>
+  <p class="muted noprint">The core computes D1, D2, D3, D7, D9, D10 and D12 with its verified classical rules; the remaining divisions are supplied by the add-on layer and each names the rule it used. Click a card to draw it.</p>
+  <div class="vgrid" id="vargas"></div>
+  <div class="card" style="margin-top:.8rem"><svg class="chart" id="vchart" viewBox="0 0 300 300"></svg><p class="muted" id="vlabel" style="text-align:center"></p></div>
+
+  <!-- ============ DASHA ============ -->
+  <h2><span class="k">daśā</span> Vimśottarī — mahādaśā &amp; antardaśā</h2>
+  <div class="grid">
+    <div class="card"><table id="dasha"></table></div>
+    <div class="card"><table id="antar"></table><p class="muted" id="antarNote"></p></div>
+  </div>
+
+  <!-- ============ YOGAS ============ -->
+  <h2><span class="k">yoga</span> Yogas &amp; doṣas</h2>
+  <div class="card"><div id="yogas"></div></div>
+
+  <!-- ============ NAMES ============ -->
+  <h2><span class="k">nāma</span> Nāmākṣara — name syllable</h2>
+  <div class="card"><div id="names"></div></div>
+
+  <!-- ============ ADS ============ -->
+  <div id="adslot" class="noprint">
+    ad slot — disabled by default.<br>
+    Enable by setting <code>window.CHAKRA_ADS = {provider:"google", client:"ca-pub-XXXX", slot:"YYYY"}</code> before this script,
+    or see <a href="MONETIZATION.md">MONETIZATION.md</a>.
+  </div>
+
+  <!-- ============ AI + SHARE ============ -->
+  <h2 class="noprint"><span class="k">discuss</span> Ask an AI about this horoscope</h2>
+  <div class="card noprint">
+    <p class="muted">The prompt carries the full computed horoscope — lagna, all nine grahas with house and sign, the sixteen vargas, the running daśā, yogas and the pañcāṅga — so the assistant reasons from your actual chart rather than guessing. Nothing is uploaded by this page; you choose where it goes.</p>
+    <label>reply language</label>
+    <div id="langs"></div>
+    <label>what would you like to discuss?</label>
+    <div id="topics"></div>
+    <label>your question (optional)</label>
+    <textarea id="q" rows="2" placeholder="e.g. explain the 10th-house situation for career"></textarea>
+    <div class="btns">
+      <span id="aiSlots"></span>
+      <button data-ai="copy">⧉ Copy prompt</button>
+      <button data-ai="show">👁 Preview</button>
+    </div>
+    <textarea id="promptPreview" rows="8" style="display:none;margin-top:.6rem"></textarea>
+  </div>
+
+  <h2 class="noprint"><span class="k">share</span> Share &amp; report</h2>
+  <div class="card noprint">
+    <div class="btns" id="share"></div>
+    <p class="muted" style="margin-top:.6rem">Sharing sends a link to wherever this page is hosted, plus the chart image if your browser supports it. Your birth details are never put in the shared link.</p>
+    <div class="btns"><button id="bug">🐞 Report a bug / request a feature</button></div>
+  </div>
+
+  <div class="warn">
+    <b>What this is.</b> CHAKRA computes; it does not predict. Every number here is astronomy plus a
+    named classical convention. Jyotiṣa outputs are cultural computations, not statements about
+    your life, health, finances or relationships. Nothing here is advice.
+  </div>
+
+  <footer>
+    © 1993–2026 Abhishek Choudhary · AyeAI · GPL-3.0-or-later (code), CC BY-SA 4.0 (text) ·
+    computed offline, no trackers, no dependencies · <a href="DISCLAIMER.md">disclaimer</a>
+  </footer>
+</div>
+<div id="toast"></div>
+
+<script src="src/chakra-core.js"></script>
+<script src="js/chakra-plus.js"></script>
+<script>
+(function(){
+"use strict";
+var Ck=window.Chakra, P=window.ChakraPlus;
+var $=function(s){return document.querySelector(s);};
+var toastEl=$("#toast");
+function toast(m){toastEl.textContent=m;toastEl.className="show";clearTimeout(toastEl._t);toastEl._t=setTimeout(function(){toastEl.className="";},2000);}
+function rname(i){var r=Ck.RASHI[i];return (typeof r==="string")?r:r[0];}
+function nname(n){return (typeof n==="string")?n:n[0];}
+
+/* ---------- bundled city list (offline-first; extend freely) ---------- */
+var CITIES=[["Hyderabad",17.385,78.486],["Delhi",28.6139,77.2090],["Mumbai",19.076,72.8777],["Bengaluru",12.9716,77.5946],
+["Chennai",13.0827,80.2707],["Kolkata",22.5726,88.3639],["Pune",18.5204,73.8567],["Ahmedabad",23.0225,72.5714],
+["Jaipur",26.9124,75.7873],["Lucknow",26.8467,80.9462],["Kanpur",26.4499,80.3319],["Nagpur",21.1458,79.0882],
+["Patna",25.5941,85.1376],["Bhopal",23.2599,77.4126],["Indore",22.7196,75.8577],["Visakhapatnam",17.6868,83.2185],
+["Vijayawada",16.5062,80.6480],["Surat",21.1702,72.8311],["Kochi",9.9312,76.2673],["Thiruvananthapuram",8.5241,76.9366],
+["Coimbatore",11.0168,76.9558],["Madurai",9.9252,78.1198],["Varanasi",25.3176,82.9739],["Amritsar",31.6340,74.8723],
+["Chandigarh",30.7333,76.7794],["Ludhiana",30.9010,75.8573],["Guwahati",26.1445,91.7362],["Bhubaneswar",20.2961,85.8245],
+["Ranchi",23.3441,85.3096],["Raipur",21.2514,81.6296],["Dehradun",30.3165,78.0322],["Srinagar",34.0837,74.7973],
+["Katihar",25.5541,87.5586],["Mysuru",12.2958,76.6394],["Nashik",19.9975,73.7898],["Rajkot",22.3039,70.8022],
+["Jodhpur",26.2389,73.0243],["Gwalior",26.2183,78.1828],["Tirupati",13.6288,79.4192],["Puri",19.8135,85.8312],
+["Ujjain",23.1765,75.7885],["Haridwar",29.9457,78.1642],["Shirdi",19.7645,74.4776],["Ayodhya",26.7922,82.1998],
+["Kurukshetra",29.9695,76.8783],["Dwarka",22.2394,68.9678],["Mathura",27.4924,77.6737],["Gaya",24.7955,85.0002],
+["Kathmandu",27.7172,85.3240],["Colombo",6.9271,79.8612],["Dhaka",23.8103,90.4125],["Karachi",24.8607,67.0011],
+["Lahore",31.5204,74.3587],["Kabul",34.5553,69.2075],["Dubai",25.2048,55.2708],["Doha",25.2854,51.5310],
+["Singapore",1.3521,103.8198],["Kuala Lumpur",3.1390,101.6869],["Bangkok",13.7563,100.5018],["Jakarta",-6.2088,106.8456],
+["Hong Kong",22.3193,114.1694],["Tokyo",35.6762,139.6503],["Beijing",39.9042,116.4074],["Seoul",37.5665,126.9780],
+["Sydney",-33.8688,151.2093],["Melbourne",-37.8136,144.9631],["Auckland",-36.8485,174.7633],
+["London",51.5074,-0.1278],["Manchester",53.4808,-2.2426],["Birmingham",52.4862,-1.8904],["Dublin",53.3498,-6.2603],
+["Paris",48.8566,2.3522],["Berlin",52.5200,13.4050],["Frankfurt",50.1109,8.6821],["Amsterdam",52.3676,4.9041],
+["Zurich",47.3769,8.5417],["Rome",41.9028,12.4964],["Madrid",40.4168,-3.7038],["Lisbon",38.7223,-9.1393],
+["Moscow",55.7558,37.6173],["Istanbul",41.0082,28.9784],["Tehran",35.6892,51.3890],["Cairo",30.0444,31.2357],
+["Nairobi",-1.2864,36.8172],["Johannesburg",-26.2041,28.0473],["Lagos",6.5244,3.3792],
+["New York",40.7128,-74.0060],["Chicago",41.8781,-87.6298],["Houston",29.7604,-95.3698],["San Francisco",37.7749,-122.4194],
+["Los Angeles",34.0522,-118.2437],["Seattle",47.6062,-122.3321],["Boston",42.3601,-71.0589],["Atlanta",33.7490,-84.3880],
+["Toronto",43.6532,-79.3832],["Vancouver",49.2827,-123.1207],["Mexico City",19.4326,-99.1332],
+["São Paulo",-23.5505,-46.6333],["Buenos Aires",-34.6037,-58.3816],["Lima",-12.0464,-77.0428],["Santiago",-33.4489,-70.6693]];
+(function(){var dl=$("#cities");dl.innerHTML=CITIES.map(function(c){return '<option value="'+c[0]+'">';}).join("");})();
+$("#place").addEventListener("input",function(){
+  var v=this.value.trim().toLowerCase();
+  for(var i=0;i<CITIES.length;i++) if(CITIES[i][0].toLowerCase()===v){$("#lat").value=CITIES[i][1];$("#lon").value=CITIES[i][2];toast(CITIES[i][0]+" → "+CITIES[i][1]+", "+CITIES[i][2]);return;}
+});
+
+/* ---------- chart drawing (North-Indian diamond) ---------- */
+var CELL=[[150,55],[75,30],[30,75],[55,150],[30,225],[75,270],[150,245],[225,270],[270,225],[245,150],[270,75],[225,30]];
+var GLYPH={Sun:"Su",Moon:"Mo",Mars:"Ma",Mercury:"Me",Jupiter:"Ju",Venus:"Ve",Saturn:"Sa",Rahu:"Ra",Ketu:"Ke"};
+function drawChart(svg,ch){
+  var o='<rect class="fr" x="10" y="10" width="280" height="280"/>'+
+    '<path class="fr" d="M10,10 L290,290 M290,10 L10,290 M150,10 L10,150 L150,290 L290,150 Z"/>';
+  for(var h=1;h<=12;h++){
+    var sign=(ch.ascSign+h-1)%12, c=CELL[h-1];
+    o+='<text class="hn" x="'+c[0]+'" y="'+(c[1]-10)+'" text-anchor="middle">'+(sign+1)+'</text>';
+    var occ=[];
+    for(var g in GLYPH) if(ch.house(g)===h) occ.push(GLYPH[g]+(Math.floor(ch.pos[g]%30)));
+    if(h===1) o+='<text class="asc" x="'+c[0]+'" y="'+(c[1]+3)+'" text-anchor="middle">Asc</text>';
+    occ.forEach(function(t,i){o+='<text class="gl" x="'+c[0]+'" y="'+(c[1]+16+i*12)+'" text-anchor="middle">'+t+'</text>';});
+  }
+  svg.innerHTML=o;
+}
+
+/* ---------- state ---------- */
+var S={};
+function readInputs(){
+  var dob=$("#dob").value||"1990-05-15", tob=$("#tob").value||"06:30", tz=parseFloat($("#tz").value)||0;
+  var p=dob.split("-").map(Number), t=tob.split(":").map(Number);
+  var ut=t[0]+t[1]/60-tz;
+  return {Y:p[0],M:p[1],D:p[2],ut:ut,lat:parseFloat($("#lat").value),lon:parseFloat($("#lon").value),
+          tz:tz,who:$("#who").value.trim(),place:$("#place").value.trim(),dob:dob,tob:tob};
+}
+function compute(){
+  var i=readInputs();
+  var d=Ck.dayNo(i.Y,i.M,i.D,i.ut), y=P.yearOf(d);
+  var ch=Ck.buildChart(d,y,i.lat,i.lon);
+  var pc=Ck.panchanga(d,y);
+  var hm=P.hinduMonth(d,y,"amanta"), hmP=P.hinduMonth(d,y,"purnimanta");
+  var vim=Ck.vimshottari(ch.pos.Moon,y);
+  var yog=Ck.computeYogas(ch);
+  var vgo=P.vargottama(ch);
+  var nm=P.nameSuggestions(ch.pos.Moon);
+  S={i:i,d:d,y:y,ch:ch,pc:pc,hm:hm,hmP:hmP,vim:vim,yog:yog,vgo:vgo,nm:nm};
+  render();
+}
+function render(){
+  var i=S.i,ch=S.ch,pc=S.pc;
+  /* epoch honesty */
+  var w=P.epochWarning(i.Y);
+  $("#epochWarn").innerHTML = w? '<div class="warn"><b>Epoch notice ('+w.level+').</b> '+w.text+'</div>' : "";
+  drawChart($("#d1chart"),ch);
+  /* summary */
+  var rows=[
+    ["Name",i.who||"—"],["Born",i.dob+" "+i.tob+" (UTC"+(i.tz>=0?"+":"")+i.tz+")"],
+    ["Place",(i.place||"—")+" · "+i.lat.toFixed(3)+"°, "+i.lon.toFixed(3)+"°"],
+    ["Lagna",rname(ch.ascSign)+" "+(ch.pos.Asc%30).toFixed(2)+"°"],
+    ["Rāśi (Moon)",rname(ch.sign(ch.pos.Moon))],
+    ["Nakṣatra",nname(pc.nak)],
+    ["Māsa (amānta)",S.hm.masaFull+" "+S.hm.paksha],
+    ["Māsa (pūrṇimānta)",S.hmP.masaFull+" "+S.hmP.paksha],
+    ["Tithi",pc.tithi],["Vāra",pc.vara],["Yoga",pc.yoga],["Karaṇa",pc.karana],
+    ["Vargottama",S.vgo.length?S.vgo.join(", "):"none"]
+  ];
+  $("#summary").innerHTML="<tr><th>field</th><th>value</th></tr>"+rows.map(function(r){return "<tr><td>"+r[0]+"</td><td><b>"+r[1]+"</b></td></tr>";}).join("");
+  /* vargas */
+  $("#vargas").innerHTML=P.SHODASHAVARGA.map(function(n){
+    var v=P.vargaChart(ch,n);
+    return '<div class="vg" data-n="'+n+'"><h4>D'+n+' · '+v.name+'</h4>'+
+      '<div class="sig">'+v.signifies+'</div>'+
+      '<div style="font:.68rem ui-monospace,monospace;color:var(--gold2)">Lagna: '+rname(v.ascSign)+'</div>'+
+      '<div class="rule">rule: '+v.rule+'</div></div>';
+  }).join("");
+  document.querySelectorAll(".vg").forEach(function(el){
+    el.addEventListener("click",function(){
+      var n=+el.getAttribute("data-n"), v=P.vargaChart(ch,n);
+      drawChart($("#vchart"),v);
+      $("#vlabel").textContent="D"+n+" · "+v.name+" — "+v.signifies+" · rule: "+v.rule;
+    });
+  });
+  var v9=P.vargaChart(ch,9); drawChart($("#vchart"),v9);
+  $("#vlabel").textContent="D9 · "+v9.name+" — "+v9.signifies+" · rule: "+v9.rule;
+  /* dasha */
+  var nowY=(new Date()).getUTCFullYear()+(new Date()).getUTCMonth()/12;
+  var cur=null;
+  $("#dasha").innerHTML="<tr><th>mahādaśā</th><th>from</th><th>to</th><th>yrs</th></tr>"+
+    S.vim.seq.map(function(s){
+      var on=(nowY>=s.start&&nowY<s.end); if(on)cur=s;
+      return '<tr class="'+(on?"now":"")+'"><td>'+s.lord+'</td><td>'+s.start.toFixed(2)+'</td><td>'+s.end.toFixed(2)+'</td><td>'+s.years+'</td></tr>';
+    }).join("");
+  if(cur){
+    var VY={Ketu:7,Venus:20,Sun:6,Moon:10,Mars:7,Rahu:18,Jupiter:16,Saturn:19,Mercury:17};
+    var order=["Ketu","Venus","Sun","Moon","Mars","Rahu","Jupiter","Saturn","Mercury"];
+    var st=order.indexOf(cur.lord), t=cur.start, out="";
+    for(var k=0;k<9;k++){
+      var L=order[(st+k)%9], dur=cur.years*VY[L]/120;
+      var on=(nowY>=t&&nowY<t+dur);
+      out+='<tr class="'+(on?"now":"")+'"><td>'+cur.lord+"–"+L+'</td><td>'+t.toFixed(2)+'</td><td>'+(t+dur).toFixed(2)+'</td></tr>';
+      t+=dur;
+    }
+    $("#antar").innerHTML="<tr><th>antardaśā</th><th>from</th><th>to</th></tr>"+out;
+    $("#antarNote").textContent="Highlighted row = currently running (decimal years). Balance at birth: "+S.vim.balance.toFixed(2)+" yr of "+S.vim.startLord+".";
+  } else { $("#antar").innerHTML=""; $("#antarNote").textContent="Current date is outside the 120-year Vimśottarī cycle from this birth."; }
+  /* yogas */
+  $("#yogas").innerHTML = S.yog.length
+    ? S.yog.map(function(y){return '<div style="margin:.35rem 0"><b style="color:var(--gold2)">'+y.name+'</b> <span class="pill">'+y.kind+'</span><br><span class="muted">'+y.note+'</span></div>';}).join("")
+    : '<span class="muted">No yoga from the core\'s implemented set is present in this chart. The set is deliberately small and named — absence here does not mean absence in your tradition.</span>';
+  /* names */
+  $("#names").innerHTML='<b>'+S.nm.nakshatra+' pāda '+S.nm.pada+'</b> → first syllable <b style="color:var(--gold2)">'+S.nm.syllable+'</b>'+
+    (S.nm.names.length?'<div style="margin-top:.3rem">'+S.nm.names.map(function(n){return '<span class="pill">'+n+'</span>';}).join("")+'</div>':'')+
+    '<p class="muted">'+S.nm.note+'</p>'+
+    '<div class="btns noprint"><button data-ai="names">Ask an AI for more names in my language ↗</button></div>';
+  document.querySelectorAll('[data-ai="names"]').forEach(function(b){b.addEventListener("click",function(){
+  if(AI_PROVIDERS.length)openAssistant(0,namePrompt());
+  else if(navigator.clipboard)navigator.clipboard.writeText(namePrompt()).then(function(){toast("name prompt copied");});
+});});
+}
+
+/* ---------- AI seeding ---------- */
+var LANGS=["English","हिन्दी","বাংলা","తెలుగు","தமிழ்","मराठी","ગુજરાતી","ಕನ್ನಡ","മലയാളം","ਪੰਜਾਬੀ","ଓଡ଼ିଆ","اردو","संस्कृतम्","Français","Español","Deutsch"];
+var TOPICS=["Lagna & personality","Yogas present","Doṣas & remedies discussed culturally","Current daśā period","Career (10th house)","Marriage (7th house)","Health (6th house)","Education (5th house)","Wealth (2nd/11th)","Vargas — what D9/D10 add","Nakṣatra & pāda meaning","Explain the whole chart simply"];
+var lang="English", topic="Explain the whole chart simply";
+function chips(host,arr,cur,cb){
+  var h=$(host); h.innerHTML=arr.map(function(v){return '<span class="pill'+(v===cur?" on":"")+'">'+v+'</span>';}).join("");
+  h.addEventListener("click",function(e){var p=e.target.closest(".pill");if(!p)return;
+    h.querySelectorAll(".pill").forEach(function(x){x.classList.remove("on");});p.classList.add("on");cb(p.textContent);});
+}
+chips("#langs",LANGS,lang,function(v){lang=v;});
+chips("#topics",TOPICS,topic,function(v){topic=v;});
+
+function horoscopeBlock(){
+  var ch=S.ch,pc=S.pc,i=S.i,L=[];
+  L.push("BIRTH: "+i.dob+" "+i.tob+" (UTC"+(i.tz>=0?"+":"")+i.tz+") · "+(i.place||"")+" "+i.lat.toFixed(3)+"°, "+i.lon.toFixed(3)+"°");
+  L.push("AYANĀṀŚA: Lahiri-form, sidereal. Ascendant "+rname(ch.ascSign)+" "+(ch.pos.Asc%30).toFixed(2)+"°");
+  L.push("PAÑCĀṄGA: "+pc.tithi+" · "+nname(pc.nak)+" · "+pc.vara+" · yoga "+pc.yoga+" · karaṇa "+pc.karana);
+  L.push("MĀSA: "+S.hm.masaFull+" "+S.hm.paksha+" (amānta) / "+S.hmP.masaFull+" (pūrṇimānta)");
+  L.push("");
+  L.push("GRAHAS (sidereal longitude · sign · house):");
+  ["Sun","Moon","Mars","Mercury","Jupiter","Venus","Saturn","Rahu","Ketu"].forEach(function(g){
+    L.push("  "+g.padEnd(8)+" "+ch.pos[g].toFixed(2).padStart(7)+"°  "+rname(ch.sign(ch.pos[g])).padEnd(10)+" house "+ch.house(g));
+  });
+  L.push("");
+  L.push("VARGAS (ascendant sign in each division):");
+  P.SHODASHAVARGA.forEach(function(n){var v=P.vargaChart(ch,n);
+    L.push("  D"+String(n).padEnd(3)+" "+(v.name+"            ").slice(0,14)+" lagna "+rname(v.ascSign)+"  ["+v.signifies+"]");});
+  L.push("  Vargottama: "+(S.vgo.length?S.vgo.join(", "):"none"));
+  L.push("");
+  L.push("VIMŚOTTARĪ DAŚĀ (decimal years): balance at birth "+S.vim.balance.toFixed(2)+" yr of "+S.vim.startLord);
+  S.vim.seq.forEach(function(s){L.push("  "+s.lord.padEnd(8)+s.start.toFixed(2)+" → "+s.end.toFixed(2));});
+  L.push("");
+  L.push("YOGAS FOUND BY THE ENGINE: "+(S.yog.length?S.yog.map(function(y){return y.name+" ("+y.kind+")";}).join("; "):"none in its implemented set"));
+  var w=P.epochWarning(i.Y);
+  if(w) L.push("\nEPOCH NOTICE ("+w.level+"): "+w.text);
+  return L.join("\n");
+}
+function basePrompt(){
+  return [
+"== CONTEXT CONTRACT (read before answering) ==",
+"This horoscope was COMPUTED offline by CHAKRA (project-ilm.github.io/chakra) — an open-source",
+"astronomical/calendrical engine (JS core with a byte-parity C99 twin, 6,590 verification checks).",
+"The positions are astronomy; the jyotiṣa layer is a named classical convention, not a prediction.",
+"",
+"HOW TO ANSWER:",
+"1. Reply ENTIRELY in: "+lang,
+"2. Work ONLY from the chart data below. Do not invent positions, daśā dates or yogas.",
+"3. Name the tradition/school behind any interpretive claim you make, and say where schools differ.",
+"4. Be honest that astrological interpretation is cultural, not empirical. Do NOT give medical,",
+"   legal, financial or relationship ADVICE, and do not make predictions about specific outcomes.",
+"5. If something cannot be determined from the data given, say so instead of filling the gap.",
+"",
+"== COMPUTED HOROSCOPE ==",
+horoscopeBlock(),
+"",
+"== WHAT I WANT TO DISCUSS ==",
+topic + (($("#q").value||"").trim()? ("\n"+$("#q").value.trim()) : "")
+  ].join("\n");
+}
+function namePrompt(){
+  return basePrompt()+"\n\nSPECIFIC TASK: suggest given names beginning with the syllable \""+S.nm.syllable+
+    "\" (from "+S.nm.nakshatra+" pāda "+S.nm.pada+"). Offer names from several Indian language traditions, "+
+    "give each name's meaning and language of origin, and note that the nāmākṣara convention is one custom among many.";
+}
+/* Where a prompt may be sent is CONFIGURATION, never a literal in this page.
+   config/chakra.config.json -> ai.byok.providers = [{id,label,url}] with a {q}
+   placeholder. Until it is filled in, the only path offered is Copy prompt,
+   which works with any assistant and sends nothing anywhere. */
+var AI_PROVIDERS=[];
+function loadAIConfig(){
+  /* No fetch (file://, older engines, or a test harness) is a normal state, not
+     an error: fall back to Copy prompt, which needs nothing. */
+  if(typeof fetch!=="function"){renderAISlots();return Promise.resolve();}
+  return fetch("config/chakra.config.json").then(function(r){return r.ok?r.json():null;})
+    .then(function(c){
+      var list=(c&&c.ai&&c.ai.byok&&c.ai.byok.providers)||[];
+      AI_PROVIDERS=list.filter(function(x){
+        return x&&typeof x==="object"&&x.url&&!/^__[A-Z0-9_]+__$/.test(x.url);});
+      renderAISlots();
+    }).catch(function(){renderAISlots();});
+}
+function renderAISlots(){
+  var host=$("#aiSlots"); if(!host)return;
+  if(!AI_PROVIDERS.length){
+    host.innerHTML='<span class="pending" style="font-size:.78rem;opacity:.75">'+
+      "No assistant is configured — use Copy prompt with any assistant you like.</span>";
+    return;
+  }
+  host.innerHTML=AI_PROVIDERS.map(function(pv,i){
+    return '<button class="go" data-aip="'+i+'">'+String(pv.label||("Assistant "+(i+1)))+" \u2197</button>";}).join("");
+  host.querySelectorAll("[data-aip]").forEach(function(b){
+    b.addEventListener("click",function(){openAssistant(+b.getAttribute("data-aip"),basePrompt());});});
+}
+function openAssistant(idx,p){
+  var pv=AI_PROVIDERS[idx]; if(!pv)return;
+  window.open(String(pv.url).replace("{q}",encodeURIComponent(p)),"_blank","noopener");
+  toast("opening the assistant you configured, with the full chart\u2026");
+}
+loadAIConfig();
+document.querySelectorAll("[data-ai]").forEach(function(b){
+  var w=b.getAttribute("data-ai"); if(w==="names")return;
+  b.addEventListener("click",function(){
+    var p=basePrompt();
+    if(w==="copy"){navigator.clipboard.writeText(p).then(function(){toast("prompt copied");},function(){toast("copy failed");});}
+    else if(w==="show"){var t=$("#promptPreview");t.style.display=t.style.display==="none"?"block":"none";t.value=p;}
+    else openAssistant(w,p);
+  });
+});
+
+/* ---------- share ---------- */
+var SHARE=[["𝕏","https://twitter.com/intent/tweet?text={t}&url={u}"],["LinkedIn","https://www.linkedin.com/sharing/share-offsite/?url={u}"],
+["WhatsApp","https://wa.me/?text={t}%20{u}"],["Facebook","https://www.facebook.com/sharer/sharer.php?u={u}"],
+["Telegram","https://t.me/share/url?url={u}&text={t}"],["Email","mailto:?subject={t}&body={u}"]];
+(function(){
+  var u=encodeURIComponent(location.href.split("#")[0]), t=encodeURIComponent("Kuṇḍalī computed with CHAKRA — one sky, many calendars");
+  $("#share").innerHTML=SHARE.map(function(s){return '<button data-href="'+s[1].replace("{u}",u).replace("{t}",t).replace("{u}",u)+'">'+s[0]+'</button>';}).join("")
+    +'<button id="shareImg">🖼 Share with chart image</button><button id="copyLink">🔗 Copy link</button>';
+  $("#share").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;
+    if(b.dataset.href)window.open(b.dataset.href,"_blank","noopener");});
+  $("#copyLink").addEventListener("click",function(){navigator.clipboard.writeText(location.href.split("#")[0]).then(function(){toast("link copied");});});
+  $("#shareImg").addEventListener("click",function(){
+    var svg=$("#d1chart"), xml=new XMLSerializer().serializeToString(svg);
+    var img=new Image(), cv=document.createElement("canvas"); cv.width=cv.height=600;
+    img.onload=function(){
+      var c=cv.getContext("2d"); c.fillStyle="#0a0f1c"; c.fillRect(0,0,600,600); c.drawImage(img,0,0,600,600);
+      cv.toBlob(function(bl){
+        var f=new File([bl],"kundali.png",{type:"image/png"});
+        if(navigator.canShare&&navigator.canShare({files:[f]})){
+          navigator.share({files:[f],title:"Kuṇḍalī — CHAKRA",text:"Computed with CHAKRA",url:location.href.split("#")[0]});
+        } else { var a=document.createElement("a");a.href=cv.toDataURL();a.download="kundali.png";a.click();toast("image downloaded — attach it manually"); }
+      });
+    };
+    img.src="data:image/svg+xml;base64,"+btoa(unescape(encodeURIComponent(xml)));
+  });
+})();
+
+/* ---------- bug reporting ---------- */
+$("#bug").addEventListener("click",function(){
+  var body=["**What happened**\n\n","**What I expected**\n\n","---","_auto-attached context (no birth details):_",
+    "- page: kundali.html","- core: "+Ck.version+" · plus: "+P.version,
+    "- UA: "+navigator.userAgent,"- computed at: "+new Date().toISOString()].join("\n");
+  window.open("https://github.com/project-ilm/chakra/issues/new?title="+encodeURIComponent("[kundali] ")+"&body="+encodeURIComponent(body),"_blank","noopener");
+});
+
+/* ---------- save / load / print ---------- */
+$("#saveBtn").addEventListener("click",function(){
+  try{ localStorage.setItem("chakra.kundali",JSON.stringify(readInputs())); toast("saved on this device only"); }
+  catch(e){ toast("could not save (storage blocked)"); }});
+$("#loadBtn").addEventListener("click",function(){
+  try{ var v=JSON.parse(localStorage.getItem("chakra.kundali")||"null"); if(!v){toast("nothing saved");return;}
+    $("#dob").value=v.dob;$("#tob").value=v.tob;$("#tz").value=v.tz;$("#lat").value=v.lat;$("#lon").value=v.lon;
+    $("#place").value=v.place||"";$("#who").value=v.who||""; compute(); toast("loaded"); }
+  catch(e){ toast("could not load"); }});
+$("#printBtn").addEventListener("click",function(){window.print();});
+$("#calc").addEventListener("click",compute);
+
+/* ---------- ads (config-driven, off by default) ---------- */
+(function(){
+  var cfg=window.CHAKRA_ADS;
+  if(!cfg||!cfg.client){return;}
+  var s=document.createElement("script");
+  s.async=true; s.crossOrigin="anonymous";
+  s.src="https://pagead2.googlesyndication.com/pagead/js/__AD_SLOT_CLASS__.js?client="+encodeURIComponent(cfg.client);
+  document.head.appendChild(s);
+  $("#adslot").innerHTML='<ins class="__AD_SLOT_CLASS__" style="display:block" data-ad-client="'+cfg.client+'" data-ad-slot="'+(cfg.slot||"")+'" data-ad-format="auto" data-full-width-responsive="true"></ins>';
+  (window.__AD_SLOT_CLASS__=window.__AD_SLOT_CLASS__||[]).push({});
+})();
+
+compute();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "_": "CHAKRA runtime config. Replace every __PLACEHOLDER__ before going live.",
+  "_rule": "Nothing here is baked into code. No provider or vendor name appears in any built page — they are values in this file, and only this file.",
+  "support": {
+    "enabled": true,
+    "heading": "Support this work",
+    "note": "CHAKRA is free and offline-first. Support is voluntary and buys nothing extra.",
+    "channels": [
+      { "id": "payment_primary", "label": "Support (card / netbanking)", "url": "__PAYMENT_LINK_PRIMARY__" },
+      { "id": "payment_upi",     "label": "UPI",                          "url": "__UPI_LINK__" },
+      { "id": "sponsor_forge",   "label": "Sponsor on the forge",         "url": "__FORGE_SPONSOR_URL__" },
+      { "id": "payment_alt",     "label": "Alternate",                    "url": "__ALT_PAYMENT_LINK__" }
+    ]
+  },
+  "ads": {
+    "enabled": false,
+    "note": "Off by default. No slot renders and no request is made until enabled AND a client id is set AND consent is given.",
+    "client": "__AD_CLIENT_ID__",
+    "consent_required": true,
+    "slots": [
+      { "id": "slot_footer", "label": "footer", "unit": "__AD_UNIT_FOOTER__" },
+      { "id": "slot_side",   "label": "side",   "unit": "__AD_UNIT_SIDE__" }
+    ]
+  },
+  "learning": {
+    "enabled": true,
+    "courses_repo": "zistgah/varzish",
+    "book_repo": "zistgah/kitab",
+    "book_url": "__KITAB_BOOK_URL__",
+    "select_to_learn": true,
+    "min_chars": 8
+  },
+  "tasks": { "enabled": true, "repo": "project-ilm/chakra", "max_lines": 100 },
+  "ai": {
+    "note": "Providers are configuration. The visitor chooses; the key never leaves their browser; no vendor is named in any built page.",
+    "byok": { "enabled": true, "storage_key": "chakra.byok", "providers": ["__AI_PROVIDER_A__", "__AI_PROVIDER_B__"] },
+    "handoff": { "enabled": true, "mode": "cycler" }
+  },
+  "social": { "handles": ["__SOCIAL_HANDLE_PRIMARY__", "__SOCIAL_HANDLE_SECONDARY__"] },
+  "bug": { "repo": "project-ilm/chakra", "label": "defect" }
+}

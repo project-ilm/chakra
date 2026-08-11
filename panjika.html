@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>পঞ্জিকা · Panjika — CHAKRA</title>
+<meta name="description" content="A printable Bengali-style panjika: Bengali era and months from the solar sankranti, daily tithi, nakshatra, yoga, karana and vara, sunrise and sunset, festivals, ceremony windows and eclipses — computed, never looked up.">
+<style>
+:root{--bg:#05070e;--panel:#0f1526;--line:#1e2740;--ink:#e8ecf7;--soft:#9dabc9;--faint:#6b7a9c;
+--gold:#e0b350;--gold2:#f2cd77;--rose:#d1704a;--grn:#5bb89a;--maxw:1180px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,"Noto Serif Bengali",serif;font-size:16px;line-height:1.55}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:1.6rem 18px 4rem}
+h1{font-size:1.7rem;margin:.2rem 0 .1rem;color:#f4f6fc}
+h1 .bn{color:var(--gold)}
+.sub{color:var(--soft);font-style:italic;margin:.2rem 0 1rem;font-size:.94rem}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(224,179,80,.3)}
+.bar{display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-end;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:.8rem .9rem;margin:.8rem 0}
+.fld{display:flex;flex-direction:column;gap:.2rem}
+.fld label{font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-family:ui-monospace,monospace}
+input,select{background:#070a14;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.4rem .5rem;font:inherit;font-size:.86rem}
+button{background:var(--gold);color:#12161f;border:1px solid var(--gold);border-radius:6px;padding:.45rem .8rem;font:inherit;font-size:.82rem;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--gold)}
+.note{background:#131a2c;border:1px solid var(--line);border-left:3px solid var(--rose);border-radius:8px;padding:.7rem .9rem;margin:.9rem 0;font-size:.84rem;color:var(--soft)}
+.note b{color:var(--ink)}
+table{width:100%;border-collapse:collapse;font-size:.8rem;margin:.6rem 0}
+th,td{border:1px solid var(--line);padding:.3rem .42rem;text-align:left;vertical-align:top}
+th{background:#131a2c;color:var(--gold);font-size:.66rem;letter-spacing:.05em;text-transform:uppercase;font-family:ui-monospace,monospace}
+td.d{white-space:nowrap;color:var(--gold2);font-family:ui-monospace,monospace;font-size:.74rem}
+tr.sun td{background:#141a2e}
+tr.fest td{background:#16201c}
+.fest .f{color:var(--grn)}
+h2{font-size:1.05rem;color:#eef1fb;border-top:1px solid var(--line);padding-top:.8rem;margin:1.6rem 0 .3rem}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+@media(max-width:800px){.grid{grid-template-columns:1fr}}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:.7rem .85rem}
+.card h3{margin:0 0 .3rem;font-size:.84rem;color:var(--gold);font-family:ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase}
+.card p,.card li{font-size:.8rem;color:var(--soft);margin:.2rem 0}
+.hd{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.4rem}
+.masahead{font-size:1.1rem;color:var(--gold2);margin:1.2rem 0 .2rem;font-weight:700}
+#status{font-size:.8rem;color:var(--faint);font-family:ui-monospace,monospace}
+@media print{
+  body{background:#fff;color:#000}
+  .bar,#status,.noprint{display:none!important}
+  .card,table,th,td{border-color:#999}
+  th{background:#eee;color:#000}
+  tr.sun td,tr.fest td{background:#f4f4f4}
+  a{color:#000;border:none}
+  h1,h2,h3,.masahead{color:#000}
+  .note{border-color:#999;color:#333;background:#fafafa}
+  .sub,.card p,.card li,td{color:#000}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hd">
+    <div>
+      <h1><span class="bn">পঞ্জিকা</span> · Panjika</h1>
+      <p class="sub">Bengali era and months from the solar saṅkrānti · daily pañcāṅga · festivals · ceremony windows · eclipses. Computed here, from the ephemeris — not copied from any almanac.</p>
+    </div>
+    <span id="status">idle</span>
+  </div>
+
+  <div class="bar noprint">
+    <div class="fld"><label>Bengali year (BS)</label><input id="bs" type="number" value="1433" min="1000" max="1600"></div>
+    <div class="fld"><label>or Gregorian year</label><input id="gy" type="number" value="2026" min="1600" max="2200"></div>
+    <div class="fld"><label>Month</label><select id="mon"></select></div>
+    <div class="fld"><label>Latitude</label><input id="lat" type="number" step="0.01" value="22.57"></div>
+    <div class="fld"><label>Longitude</label><input id="lon" type="number" step="0.01" value="88.36"></div>
+    <div class="fld"><label>Place</label><input id="place" list="cities" placeholder="Kolkata" value="Kolkata"></div>
+    <datalist id="cities"></datalist>
+    <button id="go">Compute</button>
+    <button id="prt" class="ghost">Print</button>
+    <button id="csv" class="ghost">CSV</button>
+  </div>
+
+  <div class="note">
+    <b>Which siddhānta.</b> CHAKRA computes <b>true (dṛk) positions</b> from the ephemeris. That places
+    it with the <b>Bishuddha / Dṛk Siddhānta</b> school. The <b>Gupta Press</b> and other
+    <i>odṛk</i> panjikas follow Sūrya Siddhānta parameters and <b>will differ on some festival
+    dates</b> — this is a real, long-standing divergence between the two schools, not an error in
+    either. Where your community follows Gupta Press, use its dates. Nothing here is a ruling.
+  </div>
+
+  <div id="out"></div>
+
+  <h2 class="noprint">What a panjika carries</h2>
+  <div class="grid noprint">
+    <div class="card"><h3>Present here</h3>
+      <ul><li>Bengali year and month, from the solar saṅkrānti</li>
+      <li>Daily vāra, tithi, nakṣatra, yoga, karaṇa</li>
+      <li>Sunrise, sunset, day length</li>
+      <li>Festivals and fasts, each with the rule that produced it</li>
+      <li>Ceremony windows (bibāha, annaprāśana, gṛha-praveśa)</li>
+      <li>Eclipses in the year</li></ul></div>
+    <div class="card"><h3>Not here — and why</h3>
+      <ul><li><b>Rulings on disputed dates.</b> Two schools differ; we show ours and name the other.</li>
+      <li><b>Predictions.</b> This is a calendar, not a forecast.</li>
+      <li><b>Directory matter</b> — pilgrim listings, dialling codes, tide tables. Printed panjikas carry these; they are not astronomy.</li></ul></div>
+  </div>
+</div>
+
+<script src="src/chakra-core.js"></script>
+<script src="js/chakra-plus.js"></script>
+<script>
+(function(){
+  "use strict";
+  var C=window.Chakra, P=window.ChakraPlus;
+  var $=function(s){return document.querySelector(s);};
+  /* Bengali months begin at the solar sankranti; names in order from Baishakh. */
+  var BN=[["Baiśākh","বৈশাখ"],["Jyaiṣṭha","জ্যৈষ্ঠ"],["Āṣāṛh","আষাঢ়"],["Śrāvaṇ","শ্রাবণ"],
+          ["Bhādra","ভাদ্র"],["Āśvin","আশ্বিন"],["Kārtik","কার্তিক"],["Agrahāyaṇ","অগ্রহায়ণ"],
+          ["Pauṣ","পৌষ"],["Māgh","মাঘ"],["Phālgun","ফাল্গুন"],["Caitra","চৈত্র"]];
+  var VARA=["Ravi","Soma","Maṅgal","Budh","Bṛhaspati","Śukra","Śani"];
+  var CITIES=[["Kolkata",22.57,88.36],["Dhaka",23.81,90.41],["Siliguri",26.73,88.40],
+    ["Agartala",23.83,91.28],["Bhubaneswar",20.30,85.82],["Guwahati",26.14,91.74],
+    ["Delhi",28.61,77.21],["Mumbai",19.08,72.88],["Chennai",13.08,80.27],["London",51.51,-0.13]];
+
+  (function(){
+    var s=$("#mon"); BN.forEach(function(m,i){var o=document.createElement("option");
+      o.value=i;o.textContent=m[0]+" · "+m[1];s.appendChild(o);});
+    s.value="0";
+    var dl=$("#cities"); CITIES.forEach(function(c){var o=document.createElement("option");o.value=c[0];dl.appendChild(o);});
+    $("#place").addEventListener("change",function(){
+      var f=CITIES.filter(function(c){return c[0].toLowerCase()===this.value.trim().toLowerCase();},this)[0];
+      if(f){$("#lat").value=f[1];$("#lon").value=f[2];}
+    });
+    $("#bs").addEventListener("input",function(){ $("#gy").value=+this.value+593; });
+    $("#gy").addEventListener("input",function(){ $("#bs").value=+this.value-593; });
+  })();
+
+  /* Bengali month m (0=Baishakh) of BS year y starts when the Sun enters
+     sidereal Aries + m signs. Solve for the sankranti by bisection on sidereal
+     solar longitude — the same instrument, no lookup table. */
+  function sidSunLon(d){ var g=C.jdn2greg(Math.floor(C.jdOf(d)+0.5));
+    return C.rev(C.sunLon(d).lon - C.ayan(g.Y+(g.M-0.5)/12)); }
+  function sankranti(gYear,m){
+    /* The Sun's entry into sidereal sign m. Take the FIRST crossing after the
+       window opens — a global minimum over 13 months can lock onto next year's
+       crossing, which is exactly the defect this replaces. */
+    var target=m*30;
+    var diff=function(d){ var x=C.rev(sidSunLon(d)-target); return x>180?x-360:x; };
+    var lo=C.dayNo(gYear,3,20,0), hi=lo+400, step=0.25;
+    var prev=diff(lo), a=null,b=null;
+    for(var t=lo+step;t<hi;t+=step){
+      var cur=diff(t);
+      if(prev<0 && cur>=0 && Math.abs(cur-prev)<30){ a=t-step; b=t; break; }
+      prev=cur;
+    }
+    if(a==null) return lo;                     /* declared miss, not a guess */
+    for(var i=0;i<60;i++){                     /* bisect the bracketed crossing */
+      var mid=(a+b)/2;
+      if(diff(mid)<0) a=mid; else b=mid;
+      if(b-a<1e-6) break;
+    }
+    return (a+b)/2;
+  }
+
+  function fmt(dn){ var g=C.jdn2greg(Math.floor(C.jdOf(dn)+0.5)); return g.Y+"-"+String(g.M).padStart(2,"0")+"-"+String(g.D).padStart(2,"0"); }
+  var lastRows=[];
+
+  function build(){
+    var gy=+$("#gy").value, bs=+$("#bs").value, m=+$("#mon").value,
+        lat=+$("#lat").value, lon=+$("#lon").value;
+    $("#status").textContent="computing…";
+    var start=sankranti(gy,m), next=sankranti(gy,(m+1)%12);
+    if(next<=start) next=start+30.44;
+    var days=Math.max(28,Math.min(33,Math.round(next-start)));
+    var obs={};
+    try{ (P.observances(gy,{lat:lat,lonE:lon})||[]).forEach(function(o){ (obs[o.date]=obs[o.date]||[]).push(o); }); }catch(e){}
+    try{ (P.observances(gy+1,{lat:lat,lonE:lon})||[]).forEach(function(o){ (obs[o.date]=obs[o.date]||[]).push(o); }); }catch(e){}
+
+    var rows=[],html="";
+    html+='<div class="masahead">'+BN[m][0]+" · "+BN[m][1]+" — "+bs+" বঙ্গাব্দ / BS "+bs+
+          ' <span style="color:var(--faint);font-size:.8rem;font-weight:400">('+fmt(start)+" → "+fmt(start+days-1)+")</span></div>";
+    html+='<table><thead><tr><th>Date</th><th>Bn</th><th>Vāra</th><th>Tithi</th><th>Nakṣatra</th>'+
+          "<th>Yoga</th><th>Karaṇa</th><th>Sunrise</th><th>Sunset</th><th>Observance</th></tr></thead><tbody>";
+    for(var i=0;i<days;i++){
+      var dn=Math.floor(start)+i, jdn=Math.floor(C.jdOf(dn)+0.5);
+      var g0=C.jdn2greg(jdn);
+      var pm=P.panchangaMode(dn,{lat:lat,lonE:lon,mode:"sunrise"});
+      var pc=pm&&pm.panchanga?pm.panchanga:C.panchanga(dn+0.25,C.jdn2greg(jdn).Y);
+      var dt=P.dayTimes(g0.Y,g0.M,g0.D,lat,lon);
+      var g=C.jdn2greg(jdn), key=fmt(dn);
+      var vara=VARA[((jdn+1)%7+7)%7];
+      var f=(obs[key]||[]).map(function(o){return o.name;}).join("; ");
+      var hh=function(x){ if(x==null||!isFinite(x))return "—";
+        /* dayNo -> UT hours -> local mean time for the entered longitude */
+        var h=(((x%1)+1)%1)*24 + lon/15; h=(h%24+24)%24;
+        var mi=Math.round((h%1)*60), hr=Math.floor(h); if(mi===60){mi=0;hr=(hr+1)%24;}
+        return String(hr).padStart(2,"0")+":"+String(mi).padStart(2,"0"); };
+      var cls=(vara==="Ravi"?"sun":"")+(f?" fest":"");
+      html+='<tr class="'+cls+'"><td class="d">'+key+"</td><td>"+(i+1)+"</td><td>"+vara+"</td><td>"+
+        (pc.tithi||"—")+"</td><td>"+(pc.nak||"—")+"</td><td>"+(pc.yoga||"—")+"</td><td>"+(pc.karana||"—")+
+        "</td><td>"+hh(dt&&dt.sunrise)+"</td><td>"+hh(dt&&dt.sunset)+'</td><td class="f">'+(f||"")+"</td></tr>";
+      rows.push({date:key,bn:i+1,vara:vara,tithi:pc.tithi,nakshatra:pc.nak,yoga:pc.yoga,karana:pc.karana,
+                 sunrise:hh(dt&&dt.sunrise),sunset:hh(dt&&dt.sunset),observance:f});
+    }
+    html+="</tbody></table>";
+
+    /* ceremony windows — the electional engine, run for the classical purposes */
+    html+='<h2>Ceremony windows in this month</h2><div class="grid">';
+    [["Bibāha · marriage","marriage"],["Annaprāśana · first rice","general"],
+     ["Gṛha-praveśa · housewarming","housewarming"],["Ārambha · new work","business"]].forEach(function(p){
+      var best=[];
+      try{ var r=P.findMuhurta(Math.floor(start),Math.floor(start)+days-1,lat,lon,{tradition:"vedic",purpose:p[1],limit:4});
+           best=(r&&r.best)||[]; }catch(e){}
+      html+='<div class="card"><h3>'+p[0]+"</h3>";
+      html+= best.length? "<ul>"+best.map(function(b){
+               return "<li><b>"+(b.date||fmt(b.dayNo||start))+"</b> — score "+(b.score!=null?b.score:"—")+
+                      (b.why?'<br><span style="color:var(--faint)">'+b.why+"</span>":"")+"</li>";}).join("")+"</ul>"
+             : "<p>No window scored in this month for this purpose.</p>";
+      html+="</div>";
+    });
+    html+="</div>";
+
+    /* eclipses */
+    var ecl=[];
+    try{ ecl=(C.eclipses?C.eclipses(gy):[])||[]; }catch(e){}
+    if(ecl.length){
+      html+="<h2>Eclipses — "+gy+"</h2><table><thead><tr><th>Date</th><th>Kind</th><th>Detail</th></tr></thead><tbody>";
+      ecl.slice(0,12).forEach(function(e){
+        html+="<tr><td class='d'>"+(e.date||e.when||"—")+"</td><td>"+(e.kind||e.type||"—")+"</td><td>"+
+              (e.note||e.detail||"")+"</td></tr>"; });
+      html+="</tbody></table>";
+    }
+
+    html+='<div class="note" style="border-left-color:var(--gold)"><b>Every row above was computed.</b> '+
+          "Tithi is judged at sunrise for the place you entered — change the latitude and longitude and the "+
+          "festival rows move, as they should. A printed panjika is computed for one meridian; this one is "+
+          "computed for yours.</div>";
+
+    $("#out").innerHTML=html;
+    lastRows=rows;
+    $("#status").textContent=days+" days · "+rows.filter(function(r){return r.observance;}).length+" observances";
+  }
+
+  $("#go").addEventListener("click",build);
+  $("#prt").addEventListener("click",function(){window.print();});
+  $("#csv").addEventListener("click",function(){
+    if(!lastRows.length)return;
+    var keys=Object.keys(lastRows[0]);
+    var csv=keys.join(",")+"\n"+lastRows.map(function(r){
+      return keys.map(function(k){return '"'+String(r[k]==null?"":r[k]).replace(/"/g,'""')+'"';}).join(",");}).join("\n");
+    var a=document.createElement("a");
+    a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(csv);
+    a.download="panjika.csv"; document.body.appendChild(a); a.click(); a.remove();
+  });
+  build();
+})();
+</script>
+</body>
+</html>

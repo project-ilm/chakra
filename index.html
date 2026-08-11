@@ -254,7 +254,16 @@
   document.close();
 })();
 </script>
+<<<<<<< HEAD
 <script src="src/chakra-ext.js"></script>
+=======
+<!-- best-of strip + support/cycler layer: added by seed_chakra_plus.sh -->
+<script src="js/chakra-civic.js"></script>
+<script src="js/chakra-cycler.js"></script>
+<script src="js/chakra-music.js"></script>
+<!-- kundali.html · mahabharata.html : added by seed_chakra_plus.sh -->
+<script src="js/chakra-plus.js"></script>
+>>>>>>> 8db9b0a (plus: kundali + mahabharata pages, 16 vargas, observances, muhurta, matching, BASIC)
 <script src="src/chakra-site.js"></script>
 <script>
 (function(){
@@ -478,8 +487,14 @@ function drawRibbon(d){
   card("Maya · Long Count",my.lc,my.tz+" · "+my.haab);
   var pc=C.panchanga(d,y);
   card("Pañcāṅga · this instant",pc.tithi.split(" (")[0]+" · "+pc.nak,pc.yoga+" yoga · "+pc.karana+" karaṇa");
+<<<<<<< HEAD
   if(window.ChakraExt){try{var _m=window.ChakraExt.masa(d);
     card("Māsa · Hindu month",_m.amanta+" "+_m.paksha,"Amānta "+_m.amantaDev+" · Pūrnimānta "+_m.purnimanta+(_m.adhika?" · adhika māsa":""));}catch(e){}}
+=======
+  if(window.ChakraPlus){try{var _m=window.ChakraPlus.hinduMonth(d);
+    card("Māsa · Hindu month",_m.masaFull+" "+_m.paksha,
+         _m.system+" · new moon "+_m.newMoon+(_m.adhika?" · adhika māsa":""));}catch(e){}}
+>>>>>>> 8db9b0a (plus: kundali + mahabharata pages, 16 vargas, observances, muhurta, matching, BASIC)
   var rot=((jdn%cards.length)+cards.length)%cards.length;
   cards=cards.slice(rot).concat(cards.slice(0,rot));
   cards.forEach(function(cv){

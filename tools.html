@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tools — CHAKRA</title>
+<meta name="description" content="Music of the stars, the task cycler, batch panchanga, matching, electional search, calendars by tradition, save and load, place search and a small scripting console — all offline.">
+<style>
+:root{--bg:#05070e;--panel:#0f1526;--line:#1e2740;--ink:#e8ecf7;--soft:#9dabc9;--faint:#6b7a9c;
+--gold:#e0b350;--gold2:#f2cd77;--rose:#d1704a;--grn:#5bb89a;--blue:#6fa8dc;--maxw:1080px}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,serif;font-size:16px;line-height:1.55}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:1.5rem 18px 4rem}
+h1{font-size:1.6rem;margin:.1rem 0 .1rem;color:#f4f6fc}
+h1 .g{color:var(--gold)}
+.sub{color:var(--soft);font-style:italic;font-size:.92rem;margin:.2rem 0 1rem}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(224,179,80,.3)}
+.tabs{display:flex;flex-wrap:wrap;gap:.35rem;margin:.8rem 0}
+.tab{font-family:ui-monospace,monospace;font-size:.72rem;background:var(--panel);border:1px solid var(--line);
+  color:#dbe1f2;border-radius:18px;padding:.32rem .7rem;cursor:pointer;user-select:none}
+.tab:hover{border-color:var(--gold)}
+.tab.on{background:var(--gold);color:#12161f;border-color:var(--gold);font-weight:700}
+.panel{display:none;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:1rem 1.1rem;margin:.6rem 0}
+.panel.on{display:block}
+.panel h2{margin:0 0 .3rem;font-size:1.05rem;color:#eef1fb}
+.panel p.hint{font-size:.82rem;color:var(--soft);margin:.2rem 0 .7rem}
+.row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-end;margin:.4rem 0}
+.fld{display:flex;flex-direction:column;gap:.15rem}
+.fld label{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);font-family:ui-monospace,monospace}
+input,select,textarea{background:#070a14;color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:.35rem .5rem;font:inherit;font-size:.82rem}
+textarea{width:100%;min-height:110px;font-family:ui-monospace,monospace;font-size:.75rem}
+button{background:var(--gold);color:#12161f;border:1px solid var(--gold);border-radius:6px;padding:.4rem .75rem;font:inherit;font-size:.78rem;font-weight:600;cursor:pointer}
+button.ghost{background:transparent;color:var(--gold)}
+button.sm{padding:.28rem .55rem;font-size:.72rem}
+table{width:100%;border-collapse:collapse;font-size:.78rem;margin:.5rem 0}
+th,td{border:1px solid var(--line);padding:.3rem .45rem;text-align:left}
+th{background:#131a2c;color:var(--gold);font-size:.64rem;letter-spacing:.05em;text-transform:uppercase;font-family:ui-monospace,monospace}
+.out{font-family:ui-monospace,monospace;font-size:.74rem;color:var(--soft);white-space:pre-wrap;
+  background:#070a14;border:1px solid var(--line);border-radius:6px;padding:.6rem .7rem;margin:.5rem 0;max-height:280px;overflow:auto}
+.warn{border-left:3px solid var(--rose);background:#1a1420;border-radius:6px;padding:.55rem .8rem;font-size:.8rem;color:var(--soft);margin:.5rem 0}
+.warn b{color:var(--ink)}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem;margin:.3rem 0}
+.chip{font-family:ui-monospace,monospace;font-size:.68rem;background:#070a14;border:1px solid var(--line);
+  color:#dbe1f2;border-radius:14px;padding:.22rem .55rem;cursor:pointer;user-select:none}
+.chip.on{background:var(--blue);color:#06111c;border-color:var(--blue);font-weight:700}
+.pending{color:var(--faint);font-style:italic}
+.ok{color:var(--grn)}
+@media print{.tabs,button,.noprint{display:none!important} .panel{display:block!important;border:none} body{background:#fff;color:#000} th{background:#eee;color:#000} td,th{border-color:#999}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span class="g">Tools</span> — CHAKRA</h1>
+  <p class="sub">Everything here runs in your browser, from the same verified ephemeris. Nothing is sent anywhere.</p>
+
+  <div class="tabs" id="tabs"></div>
+
+  <!-- ============ MUSIC ============ -->
+  <div class="panel" data-p="music">
+    <h2>Music of the Stars</h2>
+    <p class="hint">Every pitch below is a real longitude. <b>Raw</b> is the sky as it is — continuous and microtonal. <b>Modulated</b> is the same motion snapped to a scale. Play any graha, the Σ composite, or both.</p>
+    <div class="row">
+      <div class="fld"><label>From</label><input id="mzDate" type="date" value="2026-08-09"></div>
+      <div class="fld"><label>Span (days)</label><input id="mzSpan" type="number" value="30" min="1" max="3650"></div>
+      <div class="fld"><label>Steps</label><input id="mzSteps" type="number" value="48" min="4" max="400"></div>
+      <div class="fld"><label>Mode</label><select id="mzMode"><option value="raw">raw · continuous</option><option value="modulated">modulated · scale</option></select></div>
+      <div class="fld"><label>Scale</label><select id="mzScale"></select></div>
+      <div class="fld"><label>Note (s)</label><input id="mzNote" type="number" step="0.02" value="0.22" min="0.05" max="2"></div>
+    </div>
+    <div class="chips" id="mzBodies"></div>
+    <div class="row">
+      <button id="mzPlay">▶ Play selected</button>
+      <button id="mzSigma" class="ghost">▶ Play Σ only</button>
+      <button id="mzBoth" class="ghost">▶ Parts + Σ</button>
+      <button id="mzStop" class="ghost">■ Stop</button>
+      <button id="mzCsv" class="ghost sm">CSV</button>
+    </div>
+    <div class="out" id="mzOut">Pick bodies and press play.</div>
+    <div class="warn"><b>A chosen convention, not a discovered harmony.</b> One zodiac cycle maps to one octave; slower grahas take lower registers; loudness follows apparent speed and a retrograde is voiced quieter because that is what it is doing. It predicts nothing.</div>
+  </div>
+
+  <!-- ============ CYCLER ============ -->
+  <div class="panel" data-p="cycler">
+    <h2>Cycler — small work, with any AI</h2>
+    <p class="hint">Pulls the open tasks, sizes them small, and walks you through the handoff: copy a prompt, paste it into your own AI, bring the reply back, press Next. No key, no server, no vendor.</p>
+    <div class="row">
+      <div class="fld"><label>Repo</label><input id="cyRepo" value="project-ilm/chakra" size="24"></div>
+      <div class="fld"><label>Max lines</label><input id="cyMax" type="number" value="100" min="10" max="500"></div>
+      <button id="cyPull">Pull open tasks</button>
+    </div>
+    <div id="cyList" class="out">Not pulled yet.</div>
+    <div id="cyRun" style="display:none">
+      <div class="row"><b id="cyTitle" style="color:var(--gold2)"></b><span id="cyStep" class="pending"></span></div>
+      <textarea id="cyPrompt" readonly></textarea>
+      <div class="row">
+        <button id="cyCopy">⧉ Copy prompt</button>
+        <button id="cyBack" class="ghost sm">← Back</button>
+        <button id="cyNext" class="ghost">Paste reply &amp; copy next →</button>
+        <button id="cyTx" class="ghost sm">Transcript</button>
+      </div>
+      <textarea id="cyReply" placeholder="Paste your AI's reply here, then press Next."></textarea>
+    </div>
+  </div>
+
+  <!-- ============ PANCHANGA BATCH ============ -->
+  <div class="panel" data-p="batch">
+    <h2>Batch pañcāṅga</h2>
+    <p class="hint">A date range, one row a day, downloadable.</p>
+    <div class="row">
+      <div class="fld"><label>From</label><input id="bFrom" type="date" value="2026-08-01"></div>
+      <div class="fld"><label>To</label><input id="bTo" type="date" value="2026-08-31"></div>
+      <div class="fld"><label>Lat</label><input id="bLat" type="number" step="0.01" value="28.61"></div>
+      <div class="fld"><label>Lon</label><input id="bLon" type="number" step="0.01" value="77.21"></div>
+      <button id="bGo">Compute</button><button id="bCsv" class="ghost">CSV</button>
+    </div>
+    <div id="bOut"></div>
+  </div>
+
+  <!-- ============ MUHURTA + EVENTS ============ -->
+  <div class="panel" data-p="muhurta">
+    <h2>Electional search</h2>
+    <p class="hint">Rank moments in a window against a purpose. Generate a list of <b>synthetic</b> events to exercise it — no real person's dates are in CHAKRA.</p>
+    <div class="row">
+      <div class="fld"><label>From</label><input id="uFrom" type="date" value="2026-08-09"></div>
+      <div class="fld"><label>Days</label><input id="uDays" type="number" value="30" min="1" max="365"></div>
+      <div class="fld"><label>Purpose</label><select id="uPurpose"></select></div>
+      <div class="fld"><label>Tradition</label><select id="uTrad"></select></div>
+      <div class="fld"><label>Lat</label><input id="uLat" type="number" step="0.01" value="28.61"></div>
+      <div class="fld"><label>Lon</label><input id="uLon" type="number" step="0.01" value="77.21"></div>
+      <button id="uGo">Search</button>
+    </div>
+    <div class="row">
+      <div class="fld"><label>Random events</label><input id="uCount" type="number" value="5" min="1" max="30"></div>
+      <div class="fld"><label>Seed</label><input id="uSeed" type="number" value="7"></div>
+      <button id="uGen" class="ghost">Generate synthetic events</button>
+    </div>
+    <div id="uOut"></div>
+  </div>
+
+  <!-- ============ MATCHING ============ -->
+  <div class="panel" data-p="match">
+    <h2>Aṣṭakūṭa matching</h2>
+    <div class="warn"><b>Read this first.</b> These are cultural conventions with a long history, computed exactly as the classical rules state. They are <b>not</b> a measure of a person, a relationship, or compatibility, and they must not be used to coerce anyone or to override consent, health advice or the law.</div>
+    <div class="row">
+      <div class="fld"><label>Party A nakṣatras (1–27, comma)</label><input id="mA" value="5,12,19" size="18"></div>
+      <div class="fld"><label>Party B nakṣatras</label><input id="mB" value="9,20,3" size="18"></div>
+      <div class="fld"><label>Trials</label><input id="mT" type="number" value="500" min="50" max="20000"></div>
+      <div class="fld"><label>Seed</label><input id="mS" type="number" value="42"></div>
+      <button id="mGo">Optimise pairing</button>
+    </div>
+    <div id="mOut"></div>
+  </div>
+
+  <!-- ============ CALENDARS ============ -->
+  <div class="panel" data-p="cal">
+    <h2>Calendars by tradition</h2>
+    <p class="hint">The same instant, read in every reckoning the core carries. Printable.</p>
+    <div class="row">
+      <div class="fld"><label>Date</label><input id="kDate" type="date" value="2026-08-09"></div>
+      <button id="kGo">Read</button><button id="kPrint" class="ghost">Print</button>
+    </div>
+    <div id="kOut"></div>
+  </div>
+
+  <!-- ============ SAVE / LOAD ============ -->
+  <div class="panel" data-p="store">
+    <h2>Save &amp; load</h2>
+    <p class="hint">Your working sets stay in this browser. Export to a file to keep or move them.</p>
+    <div class="row">
+      <div class="fld"><label>Name</label><input id="sName" value="my-set"></div>
+      <button id="sSave">Save current tools state</button>
+      <button id="sExport" class="ghost">Export JSON</button>
+      <button id="sImport" class="ghost">Import</button>
+      <input id="sFile" type="file" accept="application/json" style="display:none">
+    </div>
+    <div id="sOut" class="out">No saved sets yet.</div>
+  </div>
+
+  <!-- ============ PLACE ============ -->
+  <div class="panel" data-p="place">
+    <h2>Place search</h2>
+    <p class="hint">Offline first: a built-in list, searched in your browser. Online lookup is opt-in and never automatic.</p>
+    <div class="row">
+      <div class="fld"><label>Search</label><input id="pQ" placeholder="type a city" size="22"></div>
+      <button id="pGo">Find</button>
+    </div>
+    <div id="pOut" class="out">—</div>
+  </div>
+
+  <!-- ============ BASIC ============ -->
+  <div class="panel" data-p="basic">
+    <h2>CHAKRA BASIC</h2>
+    <p class="hint">A small, sandboxed language for asking the sky your own questions. No host access, and a step limit so a runaway loop stops instead of hanging.</p>
+    <textarea id="zCode">10 REM tithi over ten days
+20 FOR I = 0 TO 9
+30 LET T = TITHI(I)
+40 PRINT T
+50 NEXT I</textarea>
+    <div class="row"><button id="zRun">Run</button><button id="zEx" class="ghost sm">Examples</button></div>
+    <div class="out" id="zOut">—</div>
+    <div class="out" id="zDoc" style="display:none"></div>
+  </div>
+
+  <!-- ============ SUPPORT ============ -->
+  <div class="panel" data-p="support">
+    <h2>Support &amp; placement</h2>
+    <p class="hint">Support links are <b>placeholders</b> until replaced in config. Ad slots render nothing and fetch nothing until enabled with a client id and consent.</p>
+    <div id="supOut"></div>
+    <div id="adOut" class="out"></div>
+  </div>
+</div>
+
+<script src="src/chakra-core.js"></script>
+<script src="js/chakra-plus.js"></script>
+<script src="js/chakra-music.js"></script>
+<script src="js/chakra-civic.js"></script>
+<script src="js/chakra-cycler.js"></script>
+<script>
+(function(){
+"use strict";
+var C=window.Chakra,P=window.ChakraPlus,M=window.ChakraMusic,V=window.ChakraCivic,Y=window.ChakraCycler;
+var $=function(s){return document.querySelector(s);};
+var PANELS=[["music","Music of the Stars"],["cycler","Cycler"],["batch","Batch pañcāṅga"],
+  ["muhurta","Electional"],["match","Matching"],["cal","Calendars"],["store","Save/Load"],
+  ["place","Place"],["basic","BASIC"],["support","Support"]];
+var CITIES=[["Delhi",28.61,77.21],["Mumbai",19.08,72.88],["Kolkata",22.57,88.36],["Chennai",13.08,80.27],
+ ["Bengaluru",12.97,77.59],["Hyderabad",17.39,78.49],["Dhaka",23.81,90.41],["Kathmandu",27.72,85.32],
+ ["Colombo",6.93,79.86],["London",51.51,-0.13],["New York",40.71,-74.01],["Singapore",1.35,103.82],
+ ["Dubai",25.20,55.27],["Sydney",-33.87,151.21],["Tokyo",35.68,139.69],["Longyearbyen",78.22,15.63]];
+var cfg=null, curDate=function(id){var v=$(id).value.split("-");return {Y:+v[0],M:+v[1],D:+v[2]};};
+function dnOf(id,h){var g=curDate(id);return C.dayNo(g.Y,g.M,g.D,h==null?12:h);}
+function jdnOf(id){var g=curDate(id);return C.greg2jdn(g.Y,g.M,g.D);}
+function fmtJ(j){var g=C.jdn2greg(j);return g.Y+"-"+String(g.M).padStart(2,"0")+"-"+String(g.D).padStart(2,"0");}
+
+/* tabs */
+(function(){var t=$("#tabs");
+ PANELS.forEach(function(p,i){var b=document.createElement("span");b.className="tab"+(i===0?" on":"");
+  b.textContent=p[1];b.dataset.p=p[0];t.appendChild(b);});
+ document.querySelectorAll(".panel").forEach(function(pn,i){if(i===0)pn.classList.add("on");});
+ t.addEventListener("click",function(e){var b=e.target.closest(".tab");if(!b)return;
+  document.querySelectorAll(".tab").forEach(function(x){x.classList.toggle("on",x===b);});
+  document.querySelectorAll(".panel").forEach(function(x){x.classList.toggle("on",x.dataset.p===b.dataset.p);});});
+})();
+
+/* ---------------- music ---------------- */
+var mzSel={Sun:true,Moon:true}, mzCtx=null;
+(function(){
+ var sc=$("#mzScale");Object.keys(M.SCALES).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;sc.appendChild(o);});
+ sc.value="bhupali";
+ var c=$("#mzBodies");
+ M.BODIES.forEach(function(b){var s=document.createElement("span");
+  s.className="chip"+(mzSel[b]?" on":"");s.textContent=b;s.dataset.b=b;c.appendChild(s);});
+ c.addEventListener("click",function(e){var s=e.target.closest(".chip");if(!s)return;
+  var b=s.dataset.b; mzSel[b]=!mzSel[b]; s.classList.toggle("on",!!mzSel[b]);});
+})();
+function mzBuild(){
+ var bods=Object.keys(mzSel).filter(function(b){return mzSel[b];});
+ if(!bods.length){$("#mzOut").textContent="Select at least one graha.";return null;}
+ var mel=M.melody({fromDayNo:dnOf("#mzDate"),spanDays:+$("#mzSpan").value,steps:+$("#mzSteps").value,
+   bodies:bods,mode:$("#mzMode").value,scale:$("#mzScale").value,noteSeconds:+$("#mzNote").value,sigma:true});
+ return mel;
+}
+function mzShow(mel,extra){
+ var t=mel.bodies.map(function(b){return b+": "+mel.tracks[b].length+" notes";}).join(" · ");
+ $("#mzOut").textContent=(extra?extra+"\n":"")+"mode "+mel.mode+" · scale "+mel.scale+" · "+mel.durationSeconds+"s\n"+t+
+   (mel.sigma?"\n\u03a3 "+mel.sigma.notes.length+" notes over "+mel.sigma.bodies.join(" + "):"")+
+   "\n\n"+mel.convention.pitch;
+}
+function mzGo(opts){
+ var mel=mzBuild(); if(!mel)return;
+ if(mzCtx&&mzCtx.close){try{mzCtx.close();}catch(e){} mzCtx=null;}
+ var r=M.play(mel,opts||{});
+ mzCtx=r.ok?r.context:null;
+ mzShow(mel, r.ok?("playing "+r.voices+" voices"):("cannot play: "+r.reason));
+}
+$("#mzPlay").addEventListener("click",function(){mzGo({});});
+$("#mzSigma").addEventListener("click",function(){mzGo({only:"sigma"});});
+$("#mzBoth").addEventListener("click",function(){mzGo({withSigma:true});});
+$("#mzStop").addEventListener("click",function(){if(mzCtx&&mzCtx.close){try{mzCtx.close();}catch(e){}}mzCtx=null;$("#mzOut").textContent="stopped.";});
+$("#mzCsv").addEventListener("click",function(){var mel=mzBuild();if(!mel)return;dl("stars.csv",M.toCSV(mel),"text/csv");});
+
+/* ---------------- cycler ---------------- */
+var cyCycle=null;
+$("#cyPull").addEventListener("click",function(){
+ var repo=$("#cyRepo").value.trim(), max=+$("#cyMax").value;
+ $("#cyList").textContent="pulling…";
+ Y.pull({repo:repo,maxLines:max}).then(function(r){
+  if(!r.ok){$("#cyList").innerHTML="Could not fetch the task list: "+r.reason+
+    "<br>"+r.note+' <a href="'+r.link+'" target="_blank" rel="noopener">Open the issues</a>';return;}
+  if(!r.chunks.length){$("#cyList").textContent="No open tasks.";return;}
+  $("#cyList").innerHTML=r.chunks.map(function(ch,i){
+   return '<div style="margin:.25rem 0"><button class="sm ghost" data-i="'+i+'">start</button> #'+ch.number+
+    " · <b>"+esc(ch.title)+"</b> <span class='pending'>["+ch.kind+" · "+ch.size+"]</span></div>";}).join("");
+  $("#cyList").querySelectorAll("button").forEach(function(b){
+   b.addEventListener("click",function(){cyStart(r.chunks[+b.dataset.i],max);});});
+ });
+});
+function cyStart(chunk,max){
+ cyCycle=Y.makeCycle(chunk,{maxLines:max});
+ $("#cyRun").style.display="block"; $("#cyTitle").textContent="#"+chunk.number+" "+chunk.title;
+ cyRender();
+}
+function cyRender(){
+ var s=cyCycle.current();
+ $("#cyStep").textContent=" step "+(cyCycle.index()+1)+" of "+cyCycle.total+" · "+s.name;
+ $("#cyPrompt").value=s.prompt; $("#cyReply").value="";
+}
+$("#cyCopy").addEventListener("click",function(){copy($("#cyPrompt").value,"prompt copied");});
+$("#cyNext").addEventListener("click",function(){
+ if(!cyCycle)return;
+ var r=cyCycle.accept($("#cyReply").value);
+ if(r.done){$("#cyStep").textContent=" cycle complete";$("#cyPrompt").value=cyCycle.transcript();}
+ else {cyRender(); copy($("#cyPrompt").value,"reply kept · next prompt copied");}
+});
+$("#cyBack").addEventListener("click",function(){if(cyCycle){cyCycle.back();cyRender();}});
+$("#cyTx").addEventListener("click",function(){if(cyCycle)$("#cyPrompt").value=cyCycle.transcript();});
+
+/* ---------------- batch ---------------- */
+var bRows=[];
+$("#bGo").addEventListener("click",function(){
+ var a=jdnOf("#bFrom"),b=jdnOf("#bTo");
+ if(b<a){$("#bOut").innerHTML="<p class='pending'>The end date is before the start.</p>";return;}
+ if(b-a>400){$("#bOut").innerHTML="<p class='pending'>Range capped at 400 days.</p>";b=a+400;}
+ bRows=P.batchPanchanga(a,b,+$("#bLat").value,+$("#bLon").value);
+ var keys=Object.keys(bRows[0]||{});
+ $("#bOut").innerHTML="<p class='hint'>"+bRows.length+" rows</p><table><thead><tr>"+
+  keys.map(function(k){return "<th>"+k+"</th>";}).join("")+"</tr></thead><tbody>"+
+  bRows.slice(0,60).map(function(r){return "<tr>"+keys.map(function(k){return "<td>"+esc(r[k])+"</td>";}).join("")+"</tr>";}).join("")+
+  "</tbody></table>"+(bRows.length>60?"<p class='pending'>showing first 60 — CSV has all "+bRows.length+"</p>":"");
+});
+$("#bCsv").addEventListener("click",function(){if(bRows.length)dl("panchanga.csv",P.toCSV(bRows),"text/csv");});
+
+/* ---------------- muhurta + synthetic events ---------------- */
+(function(){
+ var p=$("#uPurpose");Object.keys(P.PURPOSE_NAK).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;p.appendChild(o);});
+ var t=$("#uTrad");Object.keys(P.MUHURTA_TRADITIONS).forEach(function(k){var o=document.createElement("option");o.value=k;o.textContent=k;t.appendChild(o);});
+})();
+function uSearch(from,days,purpose){
+ var r=P.findMuhurta(from,from+days,+$("#uLat").value,+$("#uLon").value,
+   {tradition:$("#uTrad").value,purpose:purpose||$("#uPurpose").value,limit:6});
+ return r;
+}
+$("#uGo").addEventListener("click",function(){
+ var r=uSearch(jdnOf("#uFrom"),+$("#uDays").value);
+ var best=(r&&r.best)||[];
+ $("#uOut").innerHTML=best.length?("<table><thead><tr><th>Date</th><th>Score</th><th>Why</th></tr></thead><tbody>"+
+  best.map(function(b){return "<tr><td>"+esc(b.date||fmtJ(b.jdn||0))+"</td><td>"+esc(b.score)+"</td><td>"+esc(b.why||b.reason||"")+"</td></tr>";}).join("")+
+  "</tbody></table><p class='pending'>"+esc(r.disclaimer||"")+"</p>"):"<p class='pending'>No window scored.</p>";
+});
+$("#uGen").addEventListener("click",function(){
+ var g=V.randomEvents({startJdn:jdnOf("#uFrom"),count:+$("#uCount").value,seed:+$("#uSeed").value,horizonDays:365});
+ var html="<p class='hint ok'>"+g.note+"</p><table><thead><tr><th>Event</th><th>Purpose</th><th>Window</th><th>Best moment found</th></tr></thead><tbody>";
+ g.events.forEach(function(e){
+  var r=uSearch(e.fromJdn,e.windowDays,e.purpose), b=(r&&r.best&&r.best[0])||null;
+  html+="<tr><td>"+esc(e.kind)+"</td><td>"+esc(e.purpose)+"</td><td>"+fmtJ(e.fromJdn)+" → "+fmtJ(e.toJdn)+
+   "</td><td>"+(b?esc(b.date||"")+" (score "+esc(b.score)+")":"<span class='pending'>none scored</span>")+"</td></tr>";});
+ $("#uOut").innerHTML=html+"</tbody></table>";
+});
+
+/* ---------------- matching ---------------- */
+$("#mGo").addEventListener("click",function(){
+ var parse=function(v){return v.split(",").map(function(x){return parseInt(x.trim(),10);}).filter(function(n){return n>=1&&n<=27;});};
+ var A=parse($("#mA").value).map(function(n,i){return {name:"A"+(i+1),nak:n};});
+ var B=parse($("#mB").value).map(function(n,i){return {name:"B"+(i+1),nak:n};});
+ if(!A.length||!B.length){$("#mOut").innerHTML="<p class='pending'>Enter nakṣatra numbers 1–27 on both sides.</p>";return;}
+ var r=P.matchOptimize(A,B,{trials:+$("#mT").value,seed:+$("#mS").value});
+ var pairs=r.pairs||r.assignment||[];
+ $("#mOut").innerHTML="<table><thead><tr><th>A</th><th>B</th><th>Total /36</th><th>Kūṭas</th></tr></thead><tbody>"+
+  pairs.map(function(p){
+   var k=p.kutas||p.koota||{};
+   return "<tr><td>"+esc(p.a||p.A||"")+"</td><td>"+esc(p.b||p.B||"")+"</td><td>"+esc(p.total!=null?p.total:"")+"</td><td>"+
+     esc(Object.keys(k).map(function(n){return n+" "+k[n];}).join(", "))+"</td></tr>";}).join("")+
+  "</tbody></table><p class='pending'>"+esc(r.disclaimer||"")+"</p>";
+});
+
+/* ---------------- calendars ---------------- */
+$("#kGo").addEventListener("click",function(){
+ var d=dnOf("#kDate"), j=jdnOf("#kDate"), y=C.jdn2greg(j).Y, rows=[];
+ var cal=C.calendars?C.calendars(d,y):{};
+ Object.keys(cal||{}).forEach(function(k){
+  var v=cal[k]; rows.push([k, typeof v==="object"?JSON.stringify(v):String(v)]);});
+ try{var hm=P.hinduMonth(d);rows.unshift(["hindu month (amānta)",hm.masaFull+" "+hm.paksha],
+   ["pūrṇimānta",hm.purnimanta||"—"],["new moon before",hm.newMoon||"—"]);}catch(e){}
+ try{var m=C.mayan?C.mayan(j):null;if(m)rows.push(["maya long count",m.lc+" · "+m.tz+" · "+m.haab]);}catch(e){}
+ $("#kOut").innerHTML="<table><thead><tr><th>Reckoning</th><th>Reading</th></tr></thead><tbody>"+
+  rows.map(function(r){return "<tr><td>"+esc(r[0])+"</td><td>"+esc(r[1])+"</td></tr>";}).join("")+"</tbody></table>";
+});
+$("#kPrint").addEventListener("click",function(){window.print();});
+
+/* ---------------- store ---------------- */
+var SKEY="chakra.tools.sets";
+function sets(){try{return JSON.parse(window.localStorage.getItem(SKEY)||"{}");}catch(e){return {};}}
+function sShow(){var s=sets(),k=Object.keys(s);
+ $("#sOut").textContent=k.length?k.map(function(n){return n+"  ("+(s[n].savedAt||"")+")";}).join("\n"):"No saved sets yet.";}
+function snapshot(){
+ return {savedAt:new Date().toISOString(),
+  music:{date:$("#mzDate").value,span:$("#mzSpan").value,mode:$("#mzMode").value,scale:$("#mzScale").value,bodies:Object.keys(mzSel).filter(function(b){return mzSel[b];})},
+  batch:{from:$("#bFrom").value,to:$("#bTo").value,lat:$("#bLat").value,lon:$("#bLon").value},
+  muhurta:{from:$("#uFrom").value,days:$("#uDays").value,purpose:$("#uPurpose").value,tradition:$("#uTrad").value},
+  match:{a:$("#mA").value,b:$("#mB").value,seed:$("#mS").value}};
+}
+$("#sSave").addEventListener("click",function(){
+ var s=sets();s[$("#sName").value.trim()||"set"]=snapshot();
+ try{window.localStorage.setItem(SKEY,JSON.stringify(s));sShow();}catch(e){$("#sOut").textContent="Could not save: "+e.message;}});
+$("#sExport").addEventListener("click",function(){dl("chakra-tools.json",JSON.stringify({tool:"chakra-tools",sets:sets()},null,2),"application/json");});
+$("#sImport").addEventListener("click",function(){$("#sFile").click();});
+$("#sFile").addEventListener("change",function(){
+ var f=this.files[0];if(!f)return;var r=new FileReader();
+ r.onload=function(){try{var j=JSON.parse(r.result);
+  if(j&&j.sets){window.localStorage.setItem(SKEY,JSON.stringify(j.sets));sShow();}
+  else $("#sOut").textContent="Not a tools export.";}catch(e){$("#sOut").textContent="Bad JSON.";}};
+ r.readAsText(f);this.value="";});
+sShow();
+
+/* ---------------- place ---------------- */
+function placeFind(q){
+ q=String(q||"").trim().toLowerCase(); if(!q)return [];
+ return CITIES.filter(function(c){return c[0].toLowerCase().indexOf(q)>=0;});
+}
+$("#pGo").addEventListener("click",function(){
+ var r=placeFind($("#pQ").value);
+ $("#pOut").textContent=r.length?r.map(function(c){return c[0]+"   lat "+c[1]+"   lon "+c[2];}).join("\n")
+  :"Not in the built-in list. Online lookup is opt-in and not enabled here — enter the coordinates directly.";
+});
+window.__placeFind=placeFind;
+
+/* ---------------- BASIC ---------------- */
+$("#zRun").addEventListener("click",function(){
+ try{
+  var vm=P.BasicVM?P.BasicVM():null;
+  var r=vm?vm.run($("#zCode").value):{error:"BASIC unavailable"};
+  $("#zOut").textContent=(r.output&&r.output.length?r.output.join("\n"):"(no output)")+
+   (r.error?"\n\nerror: "+r.error:"")+(r.steps?"\n\nsteps: "+r.steps:"");
+ }catch(e){$("#zOut").textContent="error: "+e.message;}
+});
+$("#zEx").addEventListener("click",function(){
+ var d=$("#zDoc"); d.style.display=d.style.display==="none"?"block":"none";
+ d.textContent=
+  "STATEMENTS\n  REM  LET  PRINT  IF..THEN  FOR..NEXT  GOTO  END\n\n"+
+  "SKY FUNCTIONS (day offset from today)\n"+
+  "  TITHI(n)   lunar day index\n  NAK(n)     nakṣatra index\n  MASA(n)    month number\n"+
+  "  LAGNA(n)   ascendant degrees\n\nEXAMPLES\n"+
+  "  10 LET X = TITHI(0)\n  20 PRINT X\n\n"+
+  "  10 FOR I = 0 TO 6\n  20 PRINT NAK(I)\n  30 NEXT I\n\n"+
+  "  10 IF TITHI(0) = 11 THEN PRINT 1\n\n"+
+  "SANDBOX\n  No host access; unknown names are refused; a step limit stops runaway loops.";
+});
+
+/* ---------------- support / ads ---------------- */
+(function(){
+ var s=V.supportLinks(cfg), a=V.adState(cfg);
+ var h="<p class='hint'>"+esc(s.note)+"</p>";
+ if(s.ready.length) h+="<div class='row'>"+s.ready.map(function(c){
+   return '<a href="'+esc(c.url)+'" target="_blank" rel="noopener"><button>'+esc(c.label)+"</button></a>";}).join("")+"</div>";
+ if(s.pending.length) h+="<p class='pending'>Awaiting configuration: "+s.pending.map(function(c){return esc(c.label);}).join(" · ")+
+   "<br>"+esc(s.hint||"")+"</p>";
+ $("#supOut").innerHTML=h;
+ $("#adOut").textContent="ads enabled: "+a.enabled+"\nclient configured: "+a.clientConfigured+
+  "\nactive: "+a.active+"\nconsent required: "+a.consentRequired+"\nnetwork: "+a.network+
+  "\nslots: "+a.slots.map(function(x){return x.label+(x.active?" (active)":" (inert)");}).join(", ");
+})();
+
+/* ---------------- helpers ---------------- */
+function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function copy(t,msg){ if(window.navigator&&window.navigator.clipboard) window.navigator.clipboard.writeText(t);
+ var el=$("#cyStep"); if(el&&msg){var o=el.textContent;el.textContent=" "+msg;window.setTimeout(function(){el.textContent=o;},1400);} }
+function dl(name,text,type){var a=document.createElement("a");
+ a.href="data:"+type+";charset=utf-8,"+encodeURIComponent(text);a.download=name;
+ document.body.appendChild(a);a.click();a.remove();}
+window.__toolsReady=true;
+})();
+</script>
+</body>
+</html>
