@@ -123,7 +123,8 @@ sec("vendor neutrality \u00b7 a gate that must BITE");
 const BUILT = ["kundali.html", "mahabharata.html", "panjika.html", "tools.html",
                "js/chakra-plus.js", "js/chakra-mahabharata.js", "js/chakra-music.js",
                "js/chakra-civic.js", "js/chakra-cycler.js", "config/chakra.config.json"];
-const FORBIDDEN = /razorpay|adsbygoogle|anthropic|\bopenai\b|claude\.ai|chatgpt|perplexity\.ai|\bgemini\b/i;
+/* Vendor forms only — the zodiac sign Gemini is a legitimate term here. */
+const FORBIDDEN = /razorpay|adsbygoogle|anthropic|\bopenai\b|claude\.ai|chatgpt|perplexity\.ai|gemini\.google|bard\.google/i;
 let leaks = [];
 BUILT.forEach(f => {
   const p2 = path.join(ROOT, f);

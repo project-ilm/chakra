@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The sky on the day you were born — CHAKRA</title>
+<meta name="description" content="Type a date. See where the Sun, Moon and planets actually were, that same day in a dozen of the world's calendars, and how often the sky does that. Free, offline, no sign-up, no predictions.">
+<meta property="og:title" content="The sky on the day you were born">
+<meta property="og:description" content="Where everything actually was, that day in a dozen calendars, and how rare it was. Computed, never looked up.">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0a0e27">
+<style>
+:root{--bg:#0a0e27;--panel:#141a3a;--panel2:#0f1430;--line:#28305a;--ink:#e7ebf7;
+--soft:#aeb8d8;--faint:#7b86ab;--gold:#d4a843;--gold2:#e6bd5c;--grn:#5bb89a;--maxw:760px}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Georgia,serif;font-size:17px;line-height:1.55}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:1.4rem 18px 4rem}
+h1{font-size:1.9rem;line-height:1.15;margin:.3rem 0 .2rem;color:#f4f6fc}
+h1 .g{color:var(--gold)}
+.lede{color:var(--soft);font-size:.98rem;margin:.3rem 0 1rem}
+a{color:var(--gold);text-decoration:none;border-bottom:1px solid rgba(212,168,67,.3)}
+.ask{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:1rem;margin:.8rem 0}
+.ask .row{display:flex;flex-wrap:wrap;gap:.5rem;align-items:flex-end}
+.fld{display:flex;flex-direction:column;gap:.15rem}
+.fld label{font-size:.62rem;letter-spacing:.09em;text-transform:uppercase;color:var(--faint);font-family:ui-monospace,monospace}
+input{background:#070a1c;color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:.55rem .6rem;font:inherit;font-size:1rem}
+input[type=date]{min-width:170px}
+button{background:var(--gold);color:#0a0e27;border:1px solid var(--gold);border-radius:8px;
+padding:.55rem .95rem;font:inherit;font-size:.92rem;font-weight:700;cursor:pointer}
+button.ghost{background:transparent;color:var(--gold);font-weight:600}
+button.sm{padding:.3rem .6rem;font-size:.78rem}
+.more{font-size:.78rem;color:var(--faint);margin-top:.5rem;cursor:pointer;user-select:none}
+.opt{display:none;margin-top:.5rem}
+.opt.on{display:block}
+#head{font-size:1.25rem;color:var(--gold2);margin:1rem 0 .3rem;line-height:1.35}
+.share{display:flex;flex-wrap:wrap;gap:.45rem;margin:.7rem 0}
+canvas{width:100%;max-width:420px;height:auto;border:1px solid var(--line);border-radius:12px;display:block;margin:.6rem 0}
+.sect{border-top:1px solid var(--line);margin:1.6rem 0 0;padding-top:.9rem}
+.sect h2{font-size:1.02rem;margin:0 0 .1rem;color:#eef1fb}
+.sect p.k{font-size:.8rem;color:var(--faint);margin:.1rem 0 .5rem}
+table{width:100%;border-collapse:collapse;font-size:.86rem}
+td{padding:.32rem .1rem;border-bottom:1px solid rgba(40,48,90,.6);vertical-align:top}
+td.s{color:var(--faint);white-space:nowrap;width:44%}
+td.r{color:var(--ink)}
+.rar{border:1px solid var(--line);background:var(--panel2);border-radius:9px;padding:.55rem .7rem;margin:.35rem 0}
+.rar b{color:var(--gold2)}
+.rar .w{display:block;font-size:.76rem;color:var(--faint);margin-top:.2rem}
+.mile{font-size:1.5rem;color:var(--gold2);font-weight:700}
+.warn{border-left:3px solid var(--gold);background:var(--panel2);border-radius:8px;padding:.6rem .8rem;
+font-size:.82rem;color:var(--soft);margin:1rem 0}
+.warn b{color:var(--ink)}
+footer{border-top:1px solid var(--line);margin-top:2rem;padding-top:1rem;font-size:.78rem;color:var(--faint)}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%) translateY(20px);background:#060818;
+border:1px solid var(--line);color:#fff;font-family:ui-monospace,monospace;font-size:.75rem;
+padding:.5rem .9rem;border-radius:6px;opacity:0;transition:.22s;pointer-events:none;z-index:50}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#out{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>The sky on the day <span class="g">you</span> were born</h1>
+  <p class="lede">Where the Sun, Moon and planets actually were. That same day in a dozen of the world's calendars. And how often the sky does that. No sign-up, no account, nothing sent anywhere — and nothing about your future.</p>
+
+  <div class="ask">
+    <div class="row">
+      <div class="fld"><label>Your date</label><input id="date" type="date" value="1990-05-15"></div>
+      <button id="go">Show me</button>
+      <button id="today" class="ghost">Today's sky</button>
+    </div>
+    <div class="more" id="moreT">＋ add a time and place (sharper Moon, and your rising sign)</div>
+    <div class="opt" id="more">
+      <div class="row">
+        <div class="fld"><label>Time (local)</label><input id="time" type="time" value=""></div>
+        <div class="fld"><label>UTC offset</label><input id="tz" type="number" step="0.5" value="5.5" style="width:90px"></div>
+        <div class="fld"><label>Latitude</label><input id="lat" type="number" step="0.01" value="" placeholder="28.61" style="width:110px"></div>
+        <div class="fld"><label>Longitude</label><input id="lon" type="number" step="0.01" value="" placeholder="77.21" style="width:110px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="out">
+    <div id="head"></div>
+    <canvas id="card" width="1080" height="1080"></canvas>
+    <div class="share">
+      <button id="sh">Share this image</button>
+      <button id="dl" class="ghost">Download</button>
+      <button id="lnk" class="ghost sm">⧉ Copy link</button>
+      <button id="story" class="ghost sm">Story size</button>
+    </div>
+
+    <div class="sect">
+      <h2>The same day, elsewhere on Earth</h2>
+      <p class="k">One instant, in the reckonings people actually live by.</p>
+      <table id="cals"></table>
+    </div>
+
+    <div class="sect">
+      <h2>How often does the sky do this?</h2>
+      <p class="k">Frequencies of the sky — with the arithmetic shown. Not statements about you.</p>
+      <div id="rar"></div>
+    </div>
+
+    <div class="sect">
+      <h2>Days</h2>
+      <div id="mile"></div>
+    </div>
+
+    <div class="sect">
+      <h2>When it comes back</h2>
+      <p class="k">Your birthday is a solar return. These are the others nobody shows you.</p>
+      <table id="rets"></table>
+    </div>
+
+    <div class="warn" id="caveats"></div>
+
+    <div class="sect">
+      <h2>Go further</h2>
+      <p class="k">All of it computed in your browser, offline, from the same ephemeris.</p>
+      <div class="share">
+        <a href="kundali.html"><button class="ghost sm">Your full chart</button></a>
+        <a href="tools.html#music"><button class="ghost sm">Hear this sky as music</button></a>
+        <a href="panjika.html"><button class="ghost sm">পঞ্জিকা Panjika</button></a>
+        <a href="pro.html"><button class="ghost sm">Drag the sky</button></a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 1993–2026 Abhishek Choudhary · AyeAI · computed, never looked up · no tracking, no account, works offline.<br>
+    <span id="chakra-support"></span>
+  </footer>
+</div>
+<div id="toast"></div>
+
+<script src="src/chakra-core.js"></script>
+<script src="js/chakra-civic.js"></script>
+<script src="js/chakra-shell.js" defer></script>
+<script src="js/chakra-moment.js"></script>
+<script src="js/chakra-card.js"></script>
+<script>
+(function(){
+"use strict";
+var C=window.Chakra,M=window.ChakraMoment,K=window.ChakraCard;
+var $=function(s){return document.querySelector(s);};
+var ID=null,SIZE="square";
+function toast(m){var t=$("#toast");t.textContent=m;t.className="show";
+  window.setTimeout(function(){t.className="";},1900);}
+function esc(v){return String(v==null?"":v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+
+$("#moreT").addEventListener("click",function(){
+  var o=$("#more");o.classList.toggle("on");
+  $("#moreT").textContent=(o.classList.contains("on")?"− ":"＋ ")+"add a time and place (sharper Moon, and your rising sign)";
+});
+
+/* a shared link must reproduce exactly what was seen */
+function readURL(){
+  var q=new URLSearchParams(window.location.search);
+  if(q.get("d"))$("#date").value=q.get("d");
+  if(q.get("t")){$("#time").value=q.get("t");$("#more").classList.add("on");}
+  if(q.get("tz"))$("#tz").value=q.get("tz");
+  if(q.get("lat")){$("#lat").value=q.get("lat");$("#more").classList.add("on");}
+  if(q.get("lon"))$("#lon").value=q.get("lon");
+  return !!q.get("d");
+}
+function writeURL(){
+  var p=new URLSearchParams();
+  p.set("d",$("#date").value);
+  if($("#time").value){p.set("t",$("#time").value);p.set("tz",$("#tz").value);}
+  if($("#lat").value){p.set("lat",$("#lat").value);p.set("lon",$("#lon").value);}
+  var u=window.location.pathname+"?"+p.toString();
+  try{window.history.replaceState(null,"",u);}catch(e){}
+  return window.location.origin+u;
+}
+
+function build(){
+  var v=$("#date").value;
+  if(!v){toast("pick a date first");return;}
+  var p=v.split("-"),Y=+p[0],Mo=+p[1],D=+p[2];
+  var opts={year:Y,month:Mo,day:D,nowJdn:C.greg2jdn(
+    new Date().getUTCFullYear(),new Date().getUTCMonth()+1,new Date().getUTCDate())};
+  if($("#time").value){
+    var hm=$("#time").value.split(":");
+    opts.hourUT=(+hm[0])+(+hm[1])/60-(+$("#tz").value||0);
+  }
+  if($("#lat").value!==""&&$("#lon").value!==""){opts.lat=+$("#lat").value;opts.lonE=+$("#lon").value;}
+  try{ID=M.cosmicId(opts);}catch(e){toast(e.message);return;}
+
+  $("#out").style.display="block";
+  $("#head").textContent=ID.headline;
+
+  var cal=ID.calendars.filter(function(c){return c.system!=="Julian Day";});
+  $("#cals").innerHTML=cal.map(function(c){
+    return '<tr><td class="s">'+esc(c.system)+'</td><td class="r">'+esc(c.reading)+"</td></tr>";}).join("");
+
+  $("#rar").innerHTML=ID.rarity.items.map(function(r){
+    return '<div class="rar"><b>'+esc(r.what)+"</b> — "+esc(r.chance)+
+      '<span class="w">'+esc(r.working)+"</span></div>";}).join("")+
+    '<p class="k">'+esc(ID.rarity.note)+"</p>";
+
+  var m=ID.milestones;
+  $("#mile").innerHTML='<div class="mile">'+m.daysAlive.toLocaleString()+" days</div>"+
+    '<p class="k">Next milestone: <b style="color:var(--ink)">'+m.next.mark.toLocaleString()+
+    " days</b> — in "+m.next.inDays.toLocaleString()+" days.</p>"+
+    m.fun.map(function(f){return '<p class="k">'+esc(f)+"</p>";}).join("");
+
+  $("#rets").innerHTML=ID.returns.map(function(r){
+    return '<tr><td class="s">'+esc(r.what)+'</td><td class="r">'+r.count+
+      " so far · next in "+Math.round(r.nextInDays).toLocaleString()+" days</td></tr>";}).join("");
+
+  $("#caveats").innerHTML="<b>What this is and is not.</b> "+
+    ID.caveats.map(function(c){return esc(c);}).join(" ");
+
+  draw();
+  writeURL();
+}
+function draw(){
+  if(!ID)return;
+  var cv=$("#card");
+  K.render(ID,{canvas:cv,size:SIZE,site:"project-ilm.github.io/chakra"});
+}
+
+$("#go").addEventListener("click",build);
+$("#date").addEventListener("change",function(){if(ID)build();});
+$("#today").addEventListener("click",function(){
+  var n=new Date();
+  $("#date").value=n.getFullYear()+"-"+String(n.getMonth()+1).padStart(2,"0")+"-"+String(n.getDate()).padStart(2,"0");
+  build();
+});
+$("#story").addEventListener("click",function(){
+  SIZE=SIZE==="square"?"story":"square";
+  $("#story").textContent=SIZE==="square"?"Story size":"Square size";
+  draw();
+});
+$("#sh").addEventListener("click",function(){
+  if(!ID)return;
+  K.share(ID,{size:SIZE,url:writeURL(),site:"project-ilm.github.io/chakra"}).then(function(r){
+    if(r.ok&&r.how==="native-share-with-image")toast("shared");
+    else if(r.ok)toast(r.note||"image downloaded");
+    else if(r.how==="cancelled")toast("cancelled");
+    else toast(r.reason||"could not share");
+  });
+});
+$("#dl").addEventListener("click",function(){
+  if(!ID)return;
+  K.toBlob(K.render(ID,{size:SIZE,site:"project-ilm.github.io/chakra"}))
+   .then(function(b){return K.download(b,"sky-"+ID.date+".png");})
+   .then(function(r){toast(r.ok?"downloaded":"could not save");});
+});
+$("#lnk").addEventListener("click",function(){
+  var u=writeURL();
+  if(window.navigator.clipboard)window.navigator.clipboard.writeText(u).then(function(){toast("link copied");},function(){toast("copy failed");});
+  else toast("copy the address bar");
+});
+
+if(readURL())build();
+window.__skyReady=true;
+})();
+</script>
+</body>
+</html>

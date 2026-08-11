@@ -26,6 +26,7 @@
   /* What CHAKRA can do, in the order a newcomer should meet it. Pages that do
      not exist yet are simply not shown — the strip never advertises a 404. */
   var SHOWCASE = [
+    { href: "sky.html",         title: "The sky you were born under", blurb: "One date. Where everything was, that day in a dozen calendars, and how rare it was." },
     { href: "kundali.html",     title: "Kuṇḍalī",        blurb: "Your chart, sixteen vargas, the daśā — printable." },
     { href: "panjika.html",     title: "পঞ্জিকা Panjika", blurb: "A Bengali-style almanac, computed for your own meridian." },
     { href: "tools.html#music", title: "Music of the Stars", blurb: "The real ephemeris, heard. Raw or scaled, alone or in Σ." },
