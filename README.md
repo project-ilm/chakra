@@ -75,3 +75,11 @@ The same engine in C99 for firmware, kiosks and e-paper: `make && make test` bui
 Code **GPL-3.0-or-later** (`LICENSE`) · documentation **CC BY-SA 4.0** (`LICENSE-docs`) · © 1993–2026 **Abhishek Choudhary**, sole author. Not for navigation, muhūrta-critical, or safety-critical use — `DISCLAIMER.md`.
 
 Part of **Project ILM** · https://github.com/project-ilm · live: https://project-ilm.github.io/chakra/
+
+<!-- trademarks:begin -->
+---
+AyeAI®, AyeCNSe® and AyeAM® are registered trademarks of Abhishek Choudhary in India, used and claimed worldwide since
+2019. The names of his products and projects are his trademarks; see [legal/TRADEMARKS.md](legal/TRADEMARKS.md). Code
+licences in this repository grant copyright permissions only and no right in any mark.
+© 1993–2026 Abhishek Choudhary. All rights reserved. AyeAI.
+<!-- trademarks:end -->
